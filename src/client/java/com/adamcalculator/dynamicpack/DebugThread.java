@@ -28,7 +28,7 @@ public class DebugThread extends Thread {
 
     private void debug() throws IOException {
         for (Pack pack : DynamicPackMod.packs) {
-            Out.println("[Debug] pack " + pack.getLocation().getName() + ": updateAvailable: " + pack.isUpdateAvailable());
+            Out.println("[Debug] pack " + pack.getLocation().getName() + ": updateAvailable: " + pack.checkIsUpdateAvailable());
         }
     }
 }

@@ -54,7 +54,7 @@ public class Pack {
         return cachedJson.getJSONObject("current").optString("version", "");
     }
 
-    public boolean isUpdateAvailable() throws IOException {
+    public boolean checkIsUpdateAvailable() throws IOException {
         return remote.checkUpdateAvailable();
     }
 
@@ -74,7 +74,7 @@ public class Pack {
             progress.done(false);
             return;
         }
-        if (!isUpdateAvailable() && !manually) {
+        if (!checkIsUpdateAvailable() && !manually) {
             progress.textLog("update not available");
             progress.done(false);
             return;

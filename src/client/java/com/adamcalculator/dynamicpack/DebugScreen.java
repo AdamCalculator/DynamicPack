@@ -32,7 +32,7 @@ public class DebugScreen extends Screen {
         for (Pack pack : DynamicPackMod.packs) {
             Out.println("gui pack: " + pack);
             try {
-                addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.isUpdateAvailable()), button -> {
+                addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.checkIsUpdateAvailable()), button -> {
 
                 }).size(100, 20).position(10, height).build());
 
