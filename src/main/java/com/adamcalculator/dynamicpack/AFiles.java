@@ -2,9 +2,10 @@ package com.adamcalculator.dynamicpack;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.UnzipParameters;
+import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -59,5 +60,11 @@ public class AFiles {
         if (toDelParent != null && isEmpty(toDelParent)) {
             noEmptyDirDelete(toDelParent);
         }
+    }
+
+    public static void write(File file, String string) throws IOException {
+        FileOutputStream close;
+        IOUtils.write(string, (close = new FileOutputStream(file)), StandardCharsets.UTF_8);
+        close.close();
     }
 }

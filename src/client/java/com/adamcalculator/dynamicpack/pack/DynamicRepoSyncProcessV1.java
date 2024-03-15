@@ -42,7 +42,6 @@ public class DynamicRepoSyncProcessV1 {
 
     public void run() throws IOException, NoSuchAlgorithmException {
         PackUtil.walkScan(oldestFilesList, packRootPath);
-        Out.println("scanFiles... files: " + Arrays.toString(oldestFilesList.toArray()));
 
         List<JSONObject> jsonObjects = calcActiveContents();
 
@@ -54,7 +53,7 @@ public class DynamicRepoSyncProcessV1 {
         for (String s : oldestFilesList) {
             if (s.contains(DynamicPackMod.CLIENT_FILE)) continue;
 
-            System.out.println("File " + s + " deleted.");
+            progress.textLog("File deleted from resource-pack: " + s);
             AFiles.noEmptyDirDelete(packRootPath.resolve(s));
         }
     }
@@ -64,8 +63,12 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     private void processContent(JSONObject object) throws IOException, NoSuchAlgorithmException {
+        String id = object.getString("id");
+        if (!IDValidator.isValid(id)) {
+            throw new RuntimeException("Id of content is not valid.");
+        }
         String url = object.getString("url");
-        String urlCompressed = object.optString("urlCompressed", null);
+        String urlCompressed = object.optString("url_compressed", null);
         boolean compressSupported = urlCompressed != null;
 
         checkPathSafety(url);
@@ -76,6 +79,7 @@ public class DynamicRepoSyncProcessV1 {
             urlCompressed = remote.getUrl() + "/" + urlCompressed;
         }
 
+        progress.textLog("process content id:" + id);
         processContentParsed(new JSONObject(compressSupported ? Urls.parseGZipContent(urlCompressed) : Urls.parseContent(url)));
     }
 
@@ -87,6 +91,7 @@ public class DynamicRepoSyncProcessV1 {
         JSONObject c = j.getJSONObject("content");
         String par = c.optString("parent", "");
         JSONObject files = c.getJSONObject("files");
+        int processedFiles = 0;
         for (String localPath : files.keySet()) {
             String path = getPath(par, localPath);
             String realUrl = getUrlFromPath(path);
@@ -95,7 +100,6 @@ public class DynamicRepoSyncProcessV1 {
 
 
             Path filePath = packRootPath.resolve(path);
-            Out.println(filePath.toString());
             oldestFilesList.remove(filePath.toString());
 
             boolean isOverwrite = false;
@@ -109,10 +113,13 @@ public class DynamicRepoSyncProcessV1 {
             }
 
             if (isOverwrite) {
+                this.progress.textLog("(over)write file: " + filePath);
                 Urls.downloadDynamicFile(realUrl, filePath);
             }
 
+            processedFiles++;
         }
+        this.progress.textLog("Files processed in this content: " + processedFiles);
     }
 
     private String getUrlFromPath(String path) {

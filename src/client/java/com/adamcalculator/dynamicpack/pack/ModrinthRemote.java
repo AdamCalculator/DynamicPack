@@ -1,23 +1,23 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 
 public class ModrinthRemote extends Remote {
     private final Pack parent;
 
     private String projectId;
+    private String gameVersion;
 
 
 
     public ModrinthRemote(Pack parent, JSONObject json) {
         this.parent = parent;
         this.projectId = json.getString("modrinth_project_id");
+        this.gameVersion = json.getString("game_version");
     }
 
     public String getVersionsUrl() {
@@ -27,12 +27,29 @@ public class ModrinthRemote extends Remote {
     public JSONObject parseLatestVersionJson() throws IOException {
         String content = Urls.parseContent(getVersionsUrl());
         JSONArray j = new JSONArray(content);
-        return j.getJSONObject(0);
+        for (Object o : j) {
+            JSONObject jsonObject = (JSONObject) o;
+            JSONArray gameVersions = jsonObject.getJSONArray("game_versions");
+            boolean supportGameVersion = false;
+            for (Object version : gameVersions) {
+                if (gameVersion.equals(version)) {
+                    supportGameVersion = true;
+                    break;
+                }
+            }
+            if (supportGameVersion) {
+                return jsonObject;
+            }
+        }
+        return null;
     }
 
     @Override
     public boolean checkUpdateAvailable() throws IOException {
         JSONObject latest = parseLatestVersionJson();
+        if (latest.getString("version_number").equals(parent.getCurrentVersionNumber())) {
+            return false;
+        }
         return !parent.getCurrentUnique().equals(latest.getString("id"));
     }
 

@@ -12,7 +12,6 @@ public class Pack {
     private final File location;
     private JSONObject cachedJson;
     private long current_build;
-    private String current_version;
     private Remote remote;
     private boolean isSyncing = false;
 
@@ -30,7 +29,6 @@ public class Pack {
 
         } else if (Objects.equals(remoteType, "modrinth")) {
             this.remote = new ModrinthRemote(this, remote);
-            this.current_version = current.getString("version");
 
         } else {
             throw new RuntimeException("Unknown remote format: " + remoteType);
@@ -53,7 +51,7 @@ public class Pack {
     }
 
     public String getCurrentUnique() {
-        return current_version;
+        return cachedJson.getJSONObject("current").optString("version", "");
     }
 
     public boolean isUpdateAvailable() throws IOException {
@@ -73,31 +71,32 @@ public class Pack {
     private void sync0(SyncProgress progress, boolean manually) throws Exception {
         if (isSyncing) {
             progress.textLog("already syncing...");
-            progress.done();
+            progress.done(false);
             return;
         }
         if (!isUpdateAvailable() && !manually) {
             progress.textLog("update not available");
-            progress.done();
+            progress.done(false);
             return;
         }
 
         isSyncing = true;
         progress.textLog("start syncing...");
 
+        boolean reloadRequired = false;
         if (remote instanceof ModrinthRemote modrinthRemote) {
-            modrinthSync(modrinthRemote, progress);
+            reloadRequired = modrinthSync(modrinthRemote, progress);
 
         } else if (remote instanceof DynamicRepoRemote dynamicRepoRemote) {
-            dynamicRepoSync(dynamicRepoRemote, progress);
+            reloadRequired = dynamicRepoSync(dynamicRepoRemote, progress);
         } else {
             isSyncing = false;
         }
         isSyncing = false;
-        progress.done();
+        progress.done(reloadRequired);
     }
 
-    private void dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
+    private boolean dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
         JSONObject j = new JSONObject(Urls.parseContent(dynamicRepoRemote.packUrl));
         if (j.getLong("formatVersion") != 1) {
             throw new RuntimeException("Incompatible formatVersion!");
@@ -113,13 +112,23 @@ public class Pack {
             dynamicRepoSyncProcessV1.close();
             throw e;
         }
+
+        this.current_build = j.getLong("build");
+        cachedJson.getJSONObject("current").put("build", this.current_build);
+
+        if (isZip()) {
+            PackUtil.addFileToZip(location, DynamicPackMod.CLIENT_FILE, cachedJson.toString(2));
+        } else {
+            AFiles.write(new File(location, DynamicPackMod.CLIENT_FILE), cachedJson.toString(2));
+        }
+        return true;
     }
 
     public boolean isContentActive(String id) {
         return true; // todo
     }
 
-    private void modrinthSync(ModrinthRemote modrinthRemote, SyncProgress progress) throws IOException {
+    private boolean modrinthSync(ModrinthRemote modrinthRemote, SyncProgress progress) throws IOException {
         progress.textLog("getting latest version on modrinth...");
         ModrinthRemote.LatestModrinthVersion latest = modrinthRemote.getLatest();
 
@@ -129,7 +138,7 @@ public class Pack {
         boolean isDynamicPack = zipFile.getEntry(DynamicPackMod.CLIENT_FILE) != null;
 
         cachedJson.getJSONObject("current").put("version", latest.latestId);
-        this.current_version = latest.latestId;
+        cachedJson.getJSONObject("current").remove("version_number");
 
         if (!isDynamicPack) {
             PackUtil.addFileToZip(file, DynamicPackMod.CLIENT_FILE, cachedJson.toString(2));
@@ -144,7 +153,10 @@ public class Pack {
 
 
         progress.textLog("done!");
-        isSyncing = false;
+        return true;
     }
 
+    public String getCurrentVersionNumber() {
+        return cachedJson.getJSONObject("current").optString("version_number", "");
+    }
 }

@@ -23,9 +23,7 @@ public class DynamicPackMod implements ClientModInitializer {
 		resourcePacks = new File(gameDir, "resourcepacks");
 		resourcePacks.mkdirs();
 
-		rescanPacks();
-
-		DebugThread.startDebug();
+		new SyncingTask(false).run(); // run blocking at minecraft starting...
 	}
 
 	public static void rescanPacks() {

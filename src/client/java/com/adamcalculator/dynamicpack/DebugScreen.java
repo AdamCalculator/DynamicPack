@@ -32,9 +32,9 @@ public class DebugScreen extends Screen {
         for (Pack pack : DynamicPackMod.packs) {
             Out.println("gui pack: " + pack);
             try {
-                addDrawableChild(ButtonWidget.builder(Text.of(pack.isUpdateAvailable() + ""), button -> {
+                addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.isUpdateAvailable()), button -> {
 
-                }).size(50, 20).position(10, height).build());
+                }).size(100, 20).position(10, height).build());
 
                 addDrawableChild(ButtonWidget.builder(Text.of("Sync!"), button -> {
                     SystemToast toast = new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal("T"), Text.literal("d"));
@@ -48,12 +48,7 @@ public class DebugScreen extends Screen {
                             }
 
                             @Override
-                            public void downloading(String file, long writtenBytes, long total) {
-                                toast.setContent(Text.literal(file), Text.literal(writtenBytes + "/" + total + " bytes"));
-                            }
-
-                            @Override
-                            public void done() {
+                            public void done(boolean b) {
                             }
                         }, true);
                     } catch (Exception e) {
