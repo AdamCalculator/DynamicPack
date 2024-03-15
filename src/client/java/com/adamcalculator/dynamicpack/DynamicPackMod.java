@@ -28,16 +28,16 @@ public class DynamicPackMod implements ClientModInitializer {
 		DebugThread.startDebug();
 	}
 
-	private void rescanPacks() {
+	public static void rescanPacks() {
 		packs.clear();
 
-		for (File packFile : Files.lists(resourcePacks)) {
+		for (File packFile : AFiles.lists(resourcePacks)) {
 			Out.println("file: " + packFile.getName());
 			try {
 				if (packFile.isDirectory()) {
 					File dynamic = new File(packFile, CLIENT_FILE);
-					if (Files.exists(dynamic)) {
-						processPack(packFile, new JSONObject(Files.read(dynamic)));
+					if (AFiles.exists(dynamic)) {
+						processPack(packFile, new JSONObject(AFiles.read(dynamic)));
 					}
 
 				} else if (packFile.getName().endsWith(".zip")) {

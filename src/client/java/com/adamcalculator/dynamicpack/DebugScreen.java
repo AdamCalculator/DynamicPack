@@ -23,6 +23,11 @@ public class DebugScreen extends Screen {
 
     @Override
     protected void init() {
+        addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan"), button -> {
+            DynamicPackMod.rescanPacks();
+            MinecraftClient.getInstance().setScreen(new DebugScreen());
+        }).size(50, 20).position(500, 10).build());
+
         int height = 10;
         for (Pack pack : DynamicPackMod.packs) {
             Out.println("gui pack: " + pack);
@@ -51,8 +56,8 @@ public class DebugScreen extends Screen {
                             public void done() {
                             }
                         }, true);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    } catch (Exception e) {
+                        Out.e(e);
                     }
                 }).size(50, 20).position(100, height).build());
             } catch (IOException e) {

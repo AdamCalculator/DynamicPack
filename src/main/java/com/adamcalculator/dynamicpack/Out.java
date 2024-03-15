@@ -3,6 +3,8 @@ package com.adamcalculator.dynamicpack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class Out {
     public static final Logger LOGGER = LoggerFactory.getLogger("dynamicpack");
 
@@ -16,5 +18,9 @@ public class Out {
 
     public static void error(String s, Exception e) {
         LOGGER.error(s, e);
+    }
+
+    public static void downloading(String url, File file) {
+        LOGGER.warn("Downloading " + file.getName() + " from " + url);
     }
 }

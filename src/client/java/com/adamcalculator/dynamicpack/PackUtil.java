@@ -1,6 +1,5 @@
 package com.adamcalculator.dynamicpack;
 
-import com.adamcalculator.dynamicpack.pack.Pack;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -10,9 +9,9 @@ import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipFile;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class PackUtil {
 
@@ -34,5 +33,14 @@ public class PackUtil {
                 writer.write(text);
             }
         }
+    }
+
+    public static void walkScan(Set<String> buffer, Path path) throws IOException {
+        Stream<Path> entries = Files.walk(path, Integer.MAX_VALUE);
+        entries.forEach(path1 -> {
+            if (!Files.isDirectory(path1)) {
+                buffer.add(path1.toString());
+            }
+        });
     }
 }

@@ -1,17 +1,15 @@
 package com.adamcalculator.dynamicpack;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.UnzipParameters;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
-public class Files {
+public class AFiles {
     public static File[] lists(File file) {
         return file.listFiles();
     }
@@ -28,10 +26,12 @@ public class Files {
         com.google.common.io.Files.move(source, dest);
     }
 
-    public static void unzip(File zipFilePath, File dir) throws ZipException {
+    public static void unzip(File zipFilePath, File dir) throws IOException {
         UnzipParameters unzipParameters = new UnzipParameters();
         unzipParameters.setExtractSymbolicLinks(false);
-        new ZipFile(zipFilePath).extractAll(dir.getPath(), unzipParameters);
+        ZipFile zip = new ZipFile(zipFilePath);
+        zip.extractAll(dir.getPath(), unzipParameters);
+        zip.close();
     }
 
     public static boolean deleteDirectory(File directoryToBeDeleted) {
@@ -42,5 +42,22 @@ public class Files {
             }
         }
         return directoryToBeDeleted.delete();
+    }
+
+    public static boolean isEmpty(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            try (Stream<Path> entries = Files.list(path)) {
+                return !entries.findFirst().isPresent();
+            }
+        }
+
+        return false;
+    }
+    public static void noEmptyDirDelete(Path toDel) throws IOException {
+        Path toDelParent = toDel.getParent();
+        Files.deleteIfExists(toDel);
+        if (toDelParent != null && isEmpty(toDelParent)) {
+            noEmptyDirDelete(toDelParent);
+        }
     }
 }

@@ -15,8 +15,6 @@ public class DynamicRepoRemote extends Remote {
     protected String packUrl;
     protected boolean skipSign; // ! TODO: Add signing functional for safety users
 
-    protected List<DynamicPackContent> contentList = new ArrayList<>();
-
     public DynamicRepoRemote(Pack pack, JSONObject remote) {
         this.parent = pack;
         this.url = remote.getString("url");
@@ -29,5 +27,9 @@ public class DynamicRepoRemote extends Remote {
     public boolean checkUpdateAvailable() throws IOException {
         String content = Urls.parseContent(buildUrl);
         return parent.getCurrentBuild() != Long.parseLong(content);
+    }
+
+    public String getUrl() {
+        return url;
     }
 }

@@ -1,13 +1,11 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.*;
-import com.adamcalculator.dynamicpack.Files;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.OptionalLong;
 import java.util.zip.ZipFile;
 
 public class Pack {
@@ -54,11 +52,25 @@ public class Pack {
         return current_build;
     }
 
+    public String getCurrentUnique() {
+        return current_version;
+    }
+
     public boolean isUpdateAvailable() throws IOException {
         return remote.checkUpdateAvailable();
     }
 
-    public void sync(SyncProgress progress, boolean manually) throws IOException {
+    public void sync(SyncProgress progress, boolean manually) throws Exception {
+        try {
+            sync0(progress, manually);
+
+        } catch (Exception e) {
+            isSyncing = false;
+            throw e;
+        }
+    }
+
+    private void sync0(SyncProgress progress, boolean manually) throws Exception {
         if (isSyncing) {
             progress.textLog("already syncing...");
             progress.done();
@@ -81,11 +93,30 @@ public class Pack {
         } else {
             isSyncing = false;
         }
+        isSyncing = false;
         progress.done();
     }
 
-    private void dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) {
-        isSyncing = false; // todo
+    private void dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
+        JSONObject j = new JSONObject(Urls.parseContent(dynamicRepoRemote.packUrl));
+        if (j.getLong("formatVersion") != 1) {
+            throw new RuntimeException("Incompatible formatVersion!");
+        }
+
+
+        DynamicRepoSyncProcessV1 dynamicRepoSyncProcessV1 = new DynamicRepoSyncProcessV1(this, dynamicRepoRemote, progress, j);
+        try {
+            dynamicRepoSyncProcessV1.run();
+            dynamicRepoSyncProcessV1.close();
+
+        } catch (Exception e) {
+            dynamicRepoSyncProcessV1.close();
+            throw e;
+        }
+    }
+
+    public boolean isContentActive(String id) {
+        return true; // todo
     }
 
     private void modrinthSync(ModrinthRemote modrinthRemote, SyncProgress progress) throws IOException {
@@ -93,28 +124,7 @@ public class Pack {
         ModrinthRemote.LatestModrinthVersion latest = modrinthRemote.getLatest();
 
         progress.textLog("downloading...");
-        File file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", new DownloadListener() {
-            long total = -1;
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onContentLength(OptionalLong contentLength) {
-                if (contentLength.isPresent()) total = contentLength.getAsLong();
-            }
-
-            @Override
-            public void onProgress(long writtenBytes) {
-                progress.downloading(Pack.this.location.getName() + ".zip", writtenBytes, total);
-            }
-
-            @Override
-            public void onFinish(boolean success) {
-
-            }
-        });
+        File file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip");
         ZipFile zipFile = new ZipFile(file);
         boolean isDynamicPack = zipFile.getEntry(DynamicPackMod.CLIENT_FILE) != null;
 
@@ -125,11 +135,11 @@ public class Pack {
             PackUtil.addFileToZip(file, DynamicPackMod.CLIENT_FILE, cachedJson.toString(2));
         }
         if (this.isZip()) {
-            Files.moveFile(file, this.location);
+            AFiles.moveFile(file, this.location);
 
         } else {
-            Files.deleteDirectory(this.location);
-            Files.unzip(file, this.location);
+            AFiles.deleteDirectory(this.location);
+            AFiles.unzip(file, this.location);
         }
 
 
@@ -137,7 +147,4 @@ public class Pack {
         isSyncing = false;
     }
 
-    public String getCurrentUnique() {
-        return current_version;
-    }
 }
