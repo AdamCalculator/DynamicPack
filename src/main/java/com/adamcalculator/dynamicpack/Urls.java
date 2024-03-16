@@ -64,20 +64,31 @@ public class Urls {
 
 
     public static void downloadDynamicFile(String url, Path path, String hash, LongConsumer progress) throws IOException {
-        Path parent = path.getParent();
-        if (parent != null && !Files.exists(parent)) {
-            Files.createDirectories(path);
-        }
+        final int maxI = 3;
+        int i = maxI;
+        while (i > 0) {
+            try {
+                Path parent = path.getParent();
+                if (parent != null && !Files.exists(parent)) {
+                    Files.createDirectories(path);
+                }
 
-        if (Files.exists(path)) {
-            Files.delete(path);
-        }
-        Files.createFile(path);
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                }
+                Files.createFile(path);
 
-        try {
-            _transferStreamsWithHash(hash, _getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
-        } catch (Exception e) {
-            throw new RuntimeException("File " + path + " download error. From url: " + url + ". Expected hash: " + hash, e);
+                try {
+                    _transferStreamsWithHash(hash, _getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
+                } catch (Exception e) {
+                    throw new RuntimeException("File " + path + " download error. From url: " + url + ". Expected hash: " + hash, e);
+                }
+                break;
+            } catch (Exception e) {
+                Out.error("downloadDynamicFile. Attempt=" + (maxI - i + 1) + "/" + maxI, e);
+            }
+
+            i--;
         }
     }
 

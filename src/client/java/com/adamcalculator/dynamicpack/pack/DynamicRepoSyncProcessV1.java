@@ -129,7 +129,7 @@ public class DynamicRepoSyncProcessV1 {
                 Urls.downloadDynamicFile(realUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
                     public void onUpdate(FileDownloadConsumer it) {
-                        progress.downloading(path.toString(), it.getPercentage());
+                        progress.downloading(path, it.getPercentage());
                     }
                 });
             }

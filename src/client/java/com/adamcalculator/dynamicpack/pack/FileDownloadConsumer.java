@@ -20,7 +20,7 @@ public class FileDownloadConsumer implements LongConsumer {
             return -1;
         }
 
-        return (float) max * 100f / (float) latest;
+        return (float) latest * 100f / (float) max;
     }
 
     public void onUpdate(FileDownloadConsumer it) {
