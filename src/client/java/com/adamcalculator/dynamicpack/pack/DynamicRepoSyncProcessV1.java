@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -66,6 +67,7 @@ public class DynamicRepoSyncProcessV1 {
 
     private void processContent(JSONObject object) throws IOException, NoSuchAlgorithmException {
         String id = object.getString("id");
+        String contentRemoteHash = object.getString("hash");
         if (!IDValidator.isValid(id)) {
             throw new RuntimeException("Id of content is not valid.");
         }
@@ -82,7 +84,12 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         progress.textLog("process content id:" + id);
-        processContentParsed(new JSONObject(compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT)));
+        String content = compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT);
+        String receivedHash = Hashes.calcHashForBytes(content.getBytes(StandardCharsets.UTF_8));
+        if (!contentRemoteHash.equals(receivedHash)) {
+            throw new SecurityException("Hash of content at " + url + " not verified. remote: " + contentRemoteHash + "; received: " + receivedHash);
+        }
+        processContentParsed(new JSONObject(content));
     }
 
     private void processContentParsed(JSONObject j) throws IOException, NoSuchAlgorithmException {
@@ -119,7 +126,7 @@ public class DynamicRepoSyncProcessV1 {
             if (isOverwrite) {
                 if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) continue;
                 this.progress.textLog("(over)write file: " + filePath);
-                Urls.downloadDynamicFile(realUrl, filePath, new FileDownloadConsumer() {
+                Urls.downloadDynamicFile(realUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
                     public void onUpdate(FileDownloadConsumer it) {
                         progress.downloading(path.toString(), it.getPercentage());

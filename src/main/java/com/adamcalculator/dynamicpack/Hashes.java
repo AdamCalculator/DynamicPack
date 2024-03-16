@@ -15,4 +15,8 @@ public class Hashes {
     public static String calcHashForInputStream(InputStream inputStream) throws IOException {
         return DigestUtils.sha1Hex(inputStream);
     }
+
+    public static String calcHashForBytes(byte[] bytes) {
+        return DigestUtils.sha1Hex(bytes);
+    }
 }

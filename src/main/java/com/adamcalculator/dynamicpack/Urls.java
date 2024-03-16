@@ -63,7 +63,7 @@ public class Urls {
 
 
 
-    public static void downloadDynamicFile(String url, Path path, LongConsumer progress) throws IOException {
+    public static void downloadDynamicFile(String url, Path path, String hash, LongConsumer progress) throws IOException {
         Path parent = path.getParent();
         if (parent != null && !Files.exists(parent)) {
             Files.createDirectories(path);
@@ -74,7 +74,7 @@ public class Urls {
         }
         Files.createFile(path);
 
-        _transferStreams(_getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
+        _transferStreamsWithHash(hash, _getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
     }
 
 
@@ -132,7 +132,7 @@ public class Urls {
         return s;
     }
 
-    private static void _transferStreams(InputStream inputStream, OutputStream outputStream, LongConsumer progress) throws IOException {
+    private static void _transferStreams(InputStream inputStream, OutputStream outputStream, @Nullable LongConsumer progress) throws IOException {
         BufferedInputStream in = new BufferedInputStream(inputStream);
 
         byte[] dataBuffer = new byte[1024];
@@ -141,10 +141,35 @@ public class Urls {
         while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
             outputStream.write(dataBuffer, 0, bytesRead);
             total += bytesRead;
-            progress.accept(total);
+            if (progress != null) {
+                progress.accept(total);
+            }
         }
         outputStream.flush();
         outputStream.close();
         in.close();
+    }
+
+    private static void _transferStreamsWithHash(String hash, InputStream inputStream, OutputStream outputStream, LongConsumer progress) throws IOException {
+        BufferedInputStream in = new BufferedInputStream(inputStream);
+
+        ByteArrayOutputStream checkStream = new ByteArrayOutputStream();
+
+        byte[] dataBuffer = new byte[1024];
+        int bytesRead;
+        long total = 0;
+        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+            checkStream.write(dataBuffer, 0, bytesRead);
+            total += bytesRead;
+            progress.accept(total);
+        }
+        checkStream.flush();
+        in.close();
+
+        if (Hashes.calcHashForBytes(checkStream.toByteArray()).equals(hash)) {
+            _transferStreams(new ByteArrayInputStream(checkStream.toByteArray()), outputStream, null);
+        }
+
+        throw new SecurityException("Hash of pre-downloaded file not equal!");
     }
 }
