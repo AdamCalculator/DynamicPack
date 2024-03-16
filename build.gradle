@@ -37,6 +37,12 @@ dependencies {
 	include 'org.bouncycastle:bcpg-jdk18on:1.77'
 	implementation 'org.bouncycastle:bcpg-jdk18on:1.77'
 
+	include 'org.bouncycastle:bcprov-jdk18on:1.77'
+	implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
+
+	include 'org.bouncycastle:bcpkix-jdk18on:1.77'
+	implementation 'org.bouncycastle:bcpkix-jdk18on:1.77'
+
 	include 'org.json:json:20231013'
 	implementation 'org.json:json:20231013'
 

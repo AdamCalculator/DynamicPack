@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.Mod;
+import com.adamcalculator.dynamicpack.Out;
 import com.adamcalculator.dynamicpack.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,7 +49,11 @@ public class ModrinthRemote extends Remote {
     @Override
     public boolean checkUpdateAvailable() throws IOException {
         JSONObject latest = parseLatestVersionJson();
-        if (latest.getString("version_number").equals(parent.getCurrentVersionNumber())) {
+        if (latest == null) {
+            Out.LOGGER.warn("Latest version of " + parent.getLocation().getName() + " not available for this game_version");
+            return false;
+        }
+        if (latest.optString("version_number", "").equals(parent.getCurrentVersionNumber())) {
             return false;
         }
         return !parent.getCurrentUnique().equals(latest.getString("id"));
