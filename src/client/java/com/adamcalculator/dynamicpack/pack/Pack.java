@@ -92,6 +92,7 @@ public class Pack {
         }
 
         isSyncing = true;
+        progress.start();
         progress.textLog("start syncing...");
 
         boolean reloadRequired = false;
@@ -158,7 +159,13 @@ public class Pack {
         File file = null;
         int attempts = 3;
         while (attempts > 0) {
-            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT);
+            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT, new FileDownloadConsumer(){
+                @Override
+                public void onUpdate(FileDownloadConsumer it) {
+                    float percentage = it.getPercentage();
+                    progress.downloading("Modrinth pack (zip)", percentage);
+                }
+            });
 
             if (Hashes.calcHashForFile(file).equals(latest.fileHash)) {
                 progress.textLog("Download done! Hashes is equals.");

@@ -21,8 +21,9 @@ public class DebugScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan & Re-sync normally"), button -> {
             DynamicPackMod.rescanPacks();
+            SyncingTask.startSyncThread();
             MinecraftClient.getInstance().setScreen(new DebugScreen());
         }).size(50, 20).position(this.width-60, 10).build());
 
@@ -52,6 +53,16 @@ public class DebugScreen extends Screen {
                                 } else {
                                     toast.setContent(Text.literal("Done!"), Text.literal(""));
                                 }
+                            }
+
+                            @Override
+                            public void downloading(String name, float percentage) {
+
+                            }
+
+                            @Override
+                            public void start() {
+
                             }
                         }, true);
                     } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.enc.GPGDetachedSignatureVerifier;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.LongConsumer;
 import java.util.zip.GZIPInputStream;
 
 public class Urls {
@@ -49,19 +51,19 @@ public class Urls {
     /**
      * Create temp zipFile and download to it from url.
      */
-    public static File downloadFileToTemp(String url, String prefix, String suffix, long limit) throws IOException {
+    public static File downloadFileToTemp(String url, String prefix, String suffix, long limit, LongConsumer progress) throws IOException {
         File file = File.createTempFile(prefix, suffix);
 
-        InputStream inputStream = _getInputStreamOfUrl(url, limit);
+        InputStream inputStream = _getInputStreamOfUrl(url, limit, progress);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
-        _transferStreams(inputStream, fileOutputStream);
+        _transferStreams(inputStream, fileOutputStream, progress);
 
         return file;
     }
 
 
 
-    public static void downloadDynamicFile(String url, Path path) throws IOException {
+    public static void downloadDynamicFile(String url, Path path, LongConsumer progress) throws IOException {
         Path parent = path.getParent();
         if (parent != null && !Files.exists(parent)) {
             Files.createDirectories(path);
@@ -72,19 +74,27 @@ public class Urls {
         }
         Files.createFile(path);
 
-        _transferStreams(_getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT), Files.newOutputStream(path));
+        _transferStreams(_getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
     }
 
 
 
     private static InputStream _getInputStreamOfUrl(String url, long sizeLimit) throws IOException {
+        return _getInputStreamOfUrl(url, sizeLimit, null);
+    }
+
+    private static InputStream _getInputStreamOfUrl(String url, long sizeLimit, @Nullable LongConsumer progress) throws IOException {
         if (url.startsWith("file_debug_only://")) {
             if (!isFileDebugScheme()) {
                 throw new RuntimeException("Not allowed scheme.");
             }
 
             final File gameDir = FabricLoader.getInstance().getGameDir().toFile();
-            return new FileInputStream(new File(gameDir, url.replace("file_debug_only://", "")));
+            File file = new File(gameDir, url.replace("file_debug_only://", ""));
+            if (progress != null){
+                progress.accept(file.length());
+            }
+            return new FileInputStream(file);
 
 
         } else if (url.startsWith("http://")) {
@@ -94,8 +104,12 @@ public class Urls {
         } else if (url.startsWith("https://")) {
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
-            if (connection.getContentLengthLong() > sizeLimit) {
-                throw new RuntimeException("File at " + url+ " so bigger. " + connection.getContentLengthLong() + " > " + sizeLimit);
+            long length = connection.getContentLengthLong();
+            if (length > sizeLimit) {
+                throw new RuntimeException("File at " + url+ " so bigger. " + length + " > " + sizeLimit);
+            }
+            if (progress != null){
+                progress.accept(length);
             }
             return connection.getInputStream();
 
@@ -118,13 +132,16 @@ public class Urls {
         return s;
     }
 
-    private static void _transferStreams(InputStream inputStream, OutputStream outputStream) throws IOException {
+    private static void _transferStreams(InputStream inputStream, OutputStream outputStream, LongConsumer progress) throws IOException {
         BufferedInputStream in = new BufferedInputStream(inputStream);
 
         byte[] dataBuffer = new byte[1024];
         int bytesRead;
+        long total = 0;
         while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
             outputStream.write(dataBuffer, 0, bytesRead);
+            total += bytesRead;
+            progress.accept(total);
         }
         outputStream.flush();
         outputStream.close();

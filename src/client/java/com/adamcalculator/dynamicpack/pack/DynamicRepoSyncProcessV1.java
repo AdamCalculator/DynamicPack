@@ -107,15 +107,22 @@ public class DynamicRepoSyncProcessV1 {
                 String localHash = Hashes.calcHashForInputStream(Files.newInputStream(filePath));
                 if (!localHash.equals(hash)) {
                     isOverwrite = true;
+                    this.progress.textLog("hash not equal: local:" + localHash+ " remote:"+hash);
                 }
             } else {
+                this.progress.textLog("Not exists: " + filePath);
                 isOverwrite = true;
             }
 
             if (isOverwrite) {
                 if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) continue;
                 this.progress.textLog("(over)write file: " + filePath);
-                Urls.downloadDynamicFile(realUrl, filePath);
+                Urls.downloadDynamicFile(realUrl, filePath, new FileDownloadConsumer() {
+                    @Override
+                    public void onUpdate(FileDownloadConsumer it) {
+                        progress.downloading(path.toString(), it.getPercentage());
+                    }
+                });
             }
 
             processedFiles++;
