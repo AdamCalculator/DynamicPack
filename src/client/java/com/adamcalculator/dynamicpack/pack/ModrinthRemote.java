@@ -62,7 +62,8 @@ public class ModrinthRemote extends Remote {
             JSONObject j = files.getJSONObject(i);
             if (j.getBoolean("primary")) {
                 String url = j.getString("url");
-                return new LatestModrinthVersion(latestId, url);
+                JSONObject hashes = j.getJSONObject("hashes");
+                return new LatestModrinthVersion(latestId, url, hashes.getString("sha1"));
             }
             i++;
         }
@@ -73,11 +74,12 @@ public class ModrinthRemote extends Remote {
 
         public final String latestId;
         public final String url;
+        public final String fileHash;
 
-        public LatestModrinthVersion(String latestId, String url) {
+        public LatestModrinthVersion(String latestId, String url, String fileHash) {
             this.latestId = latestId;
-
             this.url = url;
+            this.fileHash = fileHash;
         }
     }
 }

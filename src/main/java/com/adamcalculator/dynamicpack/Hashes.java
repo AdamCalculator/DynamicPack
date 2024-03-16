@@ -11,7 +11,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Hashes {
-    public static String calcHashFor(File file) throws IOException, NoSuchAlgorithmException {
+    public static String calcHashForFile(File file) throws IOException, NoSuchAlgorithmException {
         byte[] data = Files.readAllBytes(file.toPath());
         byte[] hash = MessageDigest.getInstance("SHA-1").digest(data);
         return new BigInteger(1, hash).toString(16);

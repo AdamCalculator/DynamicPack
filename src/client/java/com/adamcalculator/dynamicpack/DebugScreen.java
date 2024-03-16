@@ -26,7 +26,7 @@ public class DebugScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan"), button -> {
             DynamicPackMod.rescanPacks();
             MinecraftClient.getInstance().setScreen(new DebugScreen());
-        }).size(50, 20).position(500, 10).build());
+        }).size(50, 20).position(this.width-60, 10).build());
 
         int height = 10;
         for (Pack pack : DynamicPackMod.packs) {
@@ -34,7 +34,7 @@ public class DebugScreen extends Screen {
             try {
                 addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.checkIsUpdateAvailable()), button -> {
 
-                }).size(100, 20).position(10, height).build());
+                }).size(160, 20).position(10, height).build());
 
                 addDrawableChild(ButtonWidget.builder(Text.of("Sync!"), button -> {
                     SystemToast toast = new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal("T"), Text.literal("d"));
@@ -49,12 +49,17 @@ public class DebugScreen extends Screen {
 
                             @Override
                             public void done(boolean b) {
+                                if (b) {
+                                    toast.setContent(Text.literal("Done. Reload!"), Text.literal("Reload required!!!"));
+                                } else {
+                                    toast.setContent(Text.literal("Done!"), Text.literal(""));
+                                }
                             }
                         }, true);
                     } catch (Exception e) {
                         Out.e(e);
                     }
-                }).size(50, 20).position(100, height).build());
+                }).size(50, 20).position(190, height).build());
             } catch (IOException e) {
                 addDrawableChild(ButtonWidget.builder(Text.of(e + ""), button -> {
                 }).size(500, 20).position(10, height).build());
