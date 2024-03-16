@@ -1,4 +1,4 @@
 {
-  "dynamicpack.toast.needReload": "Need reload",
-  "dynamicpack.toast.needReload.desc": "Need reload resources!"
+  "dynamicpack.toast.needReload": "Packs updated!",
+  "dynamicpack.toast.needReload.desc": "For update: F3 + T"
 }

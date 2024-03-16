@@ -74,7 +74,11 @@ public class Urls {
         }
         Files.createFile(path);
 
-        _transferStreamsWithHash(hash, _getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
+        try {
+            _transferStreamsWithHash(hash, _getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT, progress), Files.newOutputStream(path), progress);
+        } catch (Exception e) {
+            throw new RuntimeException("File " + path + " download error. From url: " + url + ". Expected hash: " + hash, e);
+        }
     }
 
 
@@ -166,10 +170,12 @@ public class Urls {
         checkStream.flush();
         in.close();
 
-        if (Hashes.calcHashForBytes(checkStream.toByteArray()).equals(hash)) {
+        String hashOfDownloaded = Hashes.calcHashForBytes(checkStream.toByteArray());
+        if (hashOfDownloaded.equals(hash)) {
             _transferStreams(new ByteArrayInputStream(checkStream.toByteArray()), outputStream, null);
+            return;
         }
 
-        throw new SecurityException("Hash of pre-downloaded file not equal!");
+        throw new SecurityException("Hash of pre-downloaded file not equal: remote: " + hash + "; real: " + hashOfDownloaded);
     }
 }

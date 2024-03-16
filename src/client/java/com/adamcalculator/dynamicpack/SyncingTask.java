@@ -1,9 +1,14 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.google.common.io.Files;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
+import net.minecraft.client.toast.ToastManager;
 import net.minecraft.text.Text;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 public class SyncingTask implements Runnable {
     public static void startSyncThread() {
@@ -11,12 +16,15 @@ public class SyncingTask implements Runnable {
             @Override
             public void syncDone(boolean reloadRequired) {
                 MinecraftClient client = MinecraftClient.getInstance();
-                if (client != null && client.isRunning() && reloadRequired) {
-                    client.getToastManager().add(SystemToast.create(client, SystemToast.Type.PACK_LOAD_FAILURE,
-                            Text.translatable("dynamicpack.toast.needReload"), Text.translatable("dynamicpack.toast.needReload.desc")));
-
+                if (client != null && reloadRequired) {
                     if (client.world == null) {
                         client.reloadResources();
+                    } else {
+                        ToastManager toastManager = client.getToastManager();
+                        if (toastManager != null) {
+                            toastManager.add(SystemToast.create(client, SystemToast.Type.PACK_LOAD_FAILURE,
+                                    Text.translatable("dynamicpack.toast.needReload"), Text.translatable("dynamicpack.toast.needReload.desc")));
+                        }
                     }
                 }
             }
@@ -64,12 +72,14 @@ public class SyncingTask implements Runnable {
 
             @Override
             public void done(boolean reloadRequired) {
-                if (reloadRequired) {
-                    MinecraftClient client = MinecraftClient.getInstance();
+                if (reloadRequired && !SyncingTask.this.reloadRequired) {
                     try {
-                        if (client != null) {
-                            if (client.options.resourcePacks.contains(pack.getLocation().getName())) {
-                                SyncingTask.this.reloadRequired = true;
+                        for (String readLine : Files.readLines(new File(DynamicPackMod.gameDir, "options.txt"), StandardCharsets.UTF_8)) {
+                            if (readLine.startsWith("resourcePacks:")) {
+                                String name = "file/" + pack.getLocation().getName();
+                                if (readLine.contains(name)) {
+                                    SyncingTask.this.reloadRequired = true;
+                                }
                             }
                         }
                     } catch (Exception ignored) {
