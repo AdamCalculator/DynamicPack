@@ -23,6 +23,11 @@ public class DynamicRepoRemote extends Remote {
         this.packSigUrl = url + "/dynamicmcpack.repo.json.sig";
         this.publicKey = remote.optString("public_key", "").replace("\n", "").trim();
         this.skipSign = remote.optBoolean("sign_no_required", false);
+
+
+        if (skipSign != this.publicKey.isBlank()) {
+            throw new RuntimeException("Incompatible parameters set. Select one of: sign_no_required or public_key");
+        }
     }
 
     @Override

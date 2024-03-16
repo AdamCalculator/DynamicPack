@@ -92,7 +92,7 @@ public class DynamicRepoSyncProcessV1 {
         processContentParsed(new JSONObject(content));
     }
 
-    private void processContentParsed(JSONObject j) throws IOException, NoSuchAlgorithmException {
+    private void processContentParsed(JSONObject j) throws IOException {
         if (j.getLong("formatVersion") != 1) {
             throw new RuntimeException("Incompatible formatVersion");
         }
