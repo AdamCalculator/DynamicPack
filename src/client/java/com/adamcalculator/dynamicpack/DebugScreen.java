@@ -25,7 +25,7 @@ public class DebugScreen extends Screen {
             DynamicPackMod.rescanPacks();
             SyncingTask.startSyncThread();
             MinecraftClient.getInstance().setScreen(new DebugScreen());
-        }).size(50, 20).position(this.width-60, 10).build());
+        }).size(120, 20).position(this.width-130, 10).build());
 
         int height = 10;
         for (Pack pack : DynamicPackMod.packs.toArray(new Pack[0])) {
