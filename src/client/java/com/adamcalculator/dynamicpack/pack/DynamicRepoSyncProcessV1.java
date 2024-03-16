@@ -59,7 +59,9 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     public void close() throws IOException {
-        zipFileSystem.close();
+        if (zipFileSystem != null && zipFileSystem.isOpen()) {
+            zipFileSystem.close();
+        }
     }
 
     private void processContent(JSONObject object) throws IOException, NoSuchAlgorithmException {

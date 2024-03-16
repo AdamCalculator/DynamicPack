@@ -28,7 +28,7 @@ public class DebugScreen extends Screen {
         }).size(50, 20).position(this.width-60, 10).build());
 
         int height = 10;
-        for (Pack pack : DynamicPackMod.packs) {
+        for (Pack pack : DynamicPackMod.packs.toArray(new Pack[0])) {
             Out.println("gui pack: " + pack);
             try {
                 addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.getCachedUpdateAvailableStatus()), button -> {

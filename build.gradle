@@ -34,11 +34,16 @@ loom {
 
 dependencies {
 	// https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on
+	include 'org.bouncycastle:bcpg-jdk18on:1.77'
 	implementation 'org.bouncycastle:bcpg-jdk18on:1.77'
 
+	include 'org.json:json:20231013'
 	implementation 'org.json:json:20231013'
-	modApi "com.terraformersmc:modmenu:7.2.2"
+
+	include "net.lingala.zip4j:zip4j:2.11.5"
 	implementation "net.lingala.zip4j:zip4j:2.11.5"
+
+	modApi "com.terraformersmc:modmenu:7.2.2"
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
