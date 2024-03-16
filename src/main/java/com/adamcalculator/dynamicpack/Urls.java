@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack;
 
-import com.adamcalculator.dynamicpack.enc.GPGDetachedSignatureVerifier;
+import  com.adamcalculator.dynamicpack.enc.GPGDetachedSignatureVerifier;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.Nullable;
 
@@ -106,6 +106,12 @@ public class Urls {
 
 
         } else if (url.startsWith("https://")) {
+            if (!Mod.isUrlHostTrusted(url)) {
+                if (Mod.isBlockAllNotTrustedNetworks()) {
+                    throw new SecurityException("Url host is not trusted!");
+                }
+            }
+
             if (url.contains(" ")) {
                 Out.LOGGER.warn("URL " + url + " contains not encoded spaced! Use %20 for space symbol in links!");
             }
