@@ -113,6 +113,7 @@ public class DynamicRepoSyncProcessV1 {
             }
 
             if (isOverwrite) {
+                if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) continue;
                 this.progress.textLog("(over)write file: " + filePath);
                 Urls.downloadDynamicFile(realUrl, filePath);
             }
@@ -137,7 +138,7 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     private void checkPathSafety(String s) {
-        if (s.contains("://") || s.contains("..")) {
+        if (s.contains("://") || s.contains("..") || s.contains("  ") || s.contains(".exe")) {
             throw new SecurityException("This url not supported redirects to other servers or jump-up!");
         }
     }

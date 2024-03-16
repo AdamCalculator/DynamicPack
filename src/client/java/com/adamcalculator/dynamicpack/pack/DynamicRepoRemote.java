@@ -4,8 +4,6 @@ import com.adamcalculator.dynamicpack.Urls;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DynamicRepoRemote extends Remote {
     private final Pack parent;
@@ -13,13 +11,17 @@ public class DynamicRepoRemote extends Remote {
     protected String url;
     protected String buildUrl;
     protected String packUrl;
-    protected boolean skipSign; // ! TODO: Add signing functional for safety users
+    protected String packSigUrl;
+    public String publicKey;
+    protected boolean skipSign;
 
     public DynamicRepoRemote(Pack pack, JSONObject remote) {
         this.parent = pack;
         this.url = remote.getString("url");
-        this.buildUrl = url + "/dynamicmcpack.repo.build"; // todo maybe other?
+        this.buildUrl = url + "/dynamicmcpack.repo.build";
         this.packUrl = url + "/dynamicmcpack.repo.json";
+        this.packSigUrl = url + "/dynamicmcpack.repo.json.sig";
+        this.publicKey = remote.optString("public_key", "").replace("\n", "").trim();
         this.skipSign = remote.optBoolean("sign_no_required", false);
     }
 

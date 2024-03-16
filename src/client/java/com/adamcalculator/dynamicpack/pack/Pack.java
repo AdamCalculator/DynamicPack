@@ -97,7 +97,18 @@ public class Pack {
     }
 
     private boolean dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
-        JSONObject j = new JSONObject(Urls.parseContent(dynamicRepoRemote.packUrl));
+        String packUrlContent;
+        if (dynamicRepoRemote.skipSign) {
+            packUrlContent = Urls.parseContent(dynamicRepoRemote.packUrl);
+            Out.LOGGER.warn("Dynamic pack " + location.getName() + " is skipping signing.");
+            progress.textLog("File parsed, verify skipped.");
+
+        } else {
+            packUrlContent = Urls.parseContentAndVerify(dynamicRepoRemote.packSigUrl, dynamicRepoRemote.packUrl, dynamicRepoRemote.publicKey);
+            progress.textLog("Success parse and verify file.");
+        }
+
+        JSONObject j = new JSONObject(packUrlContent);
         if (j.getLong("formatVersion") != 1) {
             throw new RuntimeException("Incompatible formatVersion!");
         }

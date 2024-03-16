@@ -1,24 +1,31 @@
 package com.adamcalculator.dynamicpack;
 
+import com.adamcalculator.dynamicpack.enc.GPGDetachedSignatureVerifier;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 public class Urls {
     public static boolean isFileDebugScheme() {
         return !Mod.isRelease();
+    }
+
+    public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64) throws IOException {
+        boolean isVerified = GPGDetachedSignatureVerifier
+                .verify(_getInputStreamOfUrl(url),
+                        _getInputStreamOfUrl(signatureUrl),
+                        publicKeyBase64);
+
+        if (!isVerified) {
+            throw new SecurityException("Failed to verify " + url + " using signature at " + signatureUrl + " and publicKey: " + publicKeyBase64);
+        }
+        return _parseContentFromStream(_getInputStreamOfUrl(url));
     }
 
     /**
@@ -68,24 +75,6 @@ public class Urls {
         _transferStreams(_getInputStreamOfUrl(url), Files.newOutputStream(path));
     }
 
-    public static void redownloadDynamicFileToZip(String url, File zipFile, String path) throws IOException {
-        Map<String, String> env = new HashMap<>();
-        env.put("create", "true");
-        URI uri = URI.create("jar:" + zipFile.toPath().toUri());
-        try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
-            Path nf = fs.getPath(path);
-            java.nio.file.Files.deleteIfExists(nf);
-            Path parent = nf.getParent();
-            if (parent != null) {
-                java.nio.file.Files.createDirectories(parent);
-            }
-            java.nio.file.Files.createFile(nf);
-
-            OutputStream outputStream = java.nio.file.Files.newOutputStream(nf, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-            _transferStreams(_getInputStreamOfUrl(url), outputStream);
-        }
-    }
-
 
 
     private static InputStream _getInputStreamOfUrl(String url) throws IOException {
@@ -105,6 +94,9 @@ public class Urls {
         } else if (url.startsWith("https://")) {
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
+            if (connection.getContentLengthLong() > Mod.HTTPS_FILE_SIZE_LIMIT) {
+                throw new RuntimeException("File at " + url+ " so bigger. l: " + connection.getContentLengthLong());
+            }
             return connection.getInputStream();
 
         } else {
