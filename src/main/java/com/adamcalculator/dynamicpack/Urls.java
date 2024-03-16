@@ -106,6 +106,9 @@ public class Urls {
 
 
         } else if (url.startsWith("https://")) {
+            if (url.contains(" ")) {
+                Out.LOGGER.warn("URL " + url + " contains not encoded spaced! Use %20 for space symbol in links!");
+            }
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
             long length = connection.getContentLengthLong();
