@@ -12,6 +12,7 @@ import java.util.zip.ZipFile;
 public class Pack {
     private final File location;
     private JSONObject cachedJson;
+    private boolean cachedUpdateAvailable;
     private long current_build;
     private Remote remote;
     private boolean isSyncing = false;
@@ -61,7 +62,11 @@ public class Pack {
     }
 
     public boolean checkIsUpdateAvailable() throws IOException {
-        return remote.checkUpdateAvailable();
+        return cachedUpdateAvailable = remote.checkUpdateAvailable();
+    }
+
+    public boolean getCachedUpdateAvailableStatus() {
+        return cachedUpdateAvailable;
     }
 
     public void sync(SyncProgress progress, boolean manually) throws Exception {
@@ -105,12 +110,12 @@ public class Pack {
     private boolean dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
         String packUrlContent;
         if (dynamicRepoRemote.skipSign) {
-            packUrlContent = Urls.parseContent(dynamicRepoRemote.packUrl);
+            packUrlContent = Urls.parseContent(dynamicRepoRemote.packUrl, Mod.MOD_FILES_LIMIT);
             Out.LOGGER.warn("Dynamic pack " + location.getName() + " is skipping signing.");
             progress.textLog("File parsed, verify skipped.");
 
         } else {
-            packUrlContent = Urls.parseContentAndVerify(dynamicRepoRemote.packSigUrl, dynamicRepoRemote.packUrl, dynamicRepoRemote.publicKey);
+            packUrlContent = Urls.parseContentAndVerify(dynamicRepoRemote.packSigUrl, dynamicRepoRemote.packUrl, dynamicRepoRemote.publicKey, Mod.MOD_FILES_LIMIT);
             progress.textLog("Success parse and verify file.");
         }
 
@@ -153,7 +158,7 @@ public class Pack {
         File file = null;
         int attempts = 3;
         while (attempts > 0) {
-            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip");
+            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT);
 
             if (Hashes.calcHashForFile(file).equals(latest.fileHash)) {
                 progress.textLog("Download done! Hashes is equals.");

@@ -80,7 +80,7 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         progress.textLog("process content id:" + id);
-        processContentParsed(new JSONObject(compressSupported ? Urls.parseGZipContent(urlCompressed) : Urls.parseContent(url)));
+        processContentParsed(new JSONObject(compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT)));
     }
 
     private void processContentParsed(JSONObject j) throws IOException, NoSuchAlgorithmException {

@@ -1,5 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
+import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,7 +26,7 @@ public class ModrinthRemote extends Remote {
     }
 
     public JSONObject parseLatestVersionJson() throws IOException {
-        String content = Urls.parseContent(getVersionsUrl());
+        String content = Urls.parseContent(getVersionsUrl(), Mod.MOD_MODTINTH_API_LIMIT);
         JSONArray j = new JSONArray(content);
         for (Object o : j) {
             JSONObject jsonObject = (JSONObject) o;

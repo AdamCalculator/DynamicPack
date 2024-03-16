@@ -8,8 +8,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 
-import java.io.IOException;
-
 public class DebugScreen extends Screen {
     protected DebugScreen() {
         super(Text.literal("DebugScreen"));
@@ -32,7 +30,7 @@ public class DebugScreen extends Screen {
         for (Pack pack : DynamicPackMod.packs) {
             Out.println("gui pack: " + pack);
             try {
-                addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.checkIsUpdateAvailable()), button -> {
+                addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.getCachedUpdateAvailableStatus()), button -> {
 
                 }).size(160, 20).position(10, height).build());
 
@@ -60,7 +58,7 @@ public class DebugScreen extends Screen {
                         Out.e(e);
                     }
                 }).size(50, 20).position(190, height).build());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 addDrawableChild(ButtonWidget.builder(Text.of(e + ""), button -> {
                 }).size(500, 20).position(10, height).build());
                 Out.e(e);

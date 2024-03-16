@@ -16,24 +16,24 @@ public class Urls {
         return !Mod.isRelease();
     }
 
-    public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64) throws IOException {
+    public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64, long maxLimit) throws IOException {
         boolean isVerified = GPGDetachedSignatureVerifier
-                .verify(_getInputStreamOfUrl(url),
-                        _getInputStreamOfUrl(signatureUrl),
+                .verify(_getInputStreamOfUrl(url, maxLimit),
+                        _getInputStreamOfUrl(signatureUrl, maxLimit),
                         publicKeyBase64);
 
         if (!isVerified) {
             throw new SecurityException("Failed to verify " + url + " using signature at " + signatureUrl + " and publicKey: " + publicKeyBase64);
         }
-        return _parseContentFromStream(_getInputStreamOfUrl(url));
+        return _parseContentFromStream(_getInputStreamOfUrl(url, maxLimit));
     }
 
     /**
      * Parse text content from url
      * @param url url
      */
-    public static String parseContent(String url) throws IOException {
-        return _parseContentFromStream(_getInputStreamOfUrl(url));
+    public static String parseContent(String url, long limit) throws IOException {
+        return _parseContentFromStream(_getInputStreamOfUrl(url, limit));
     }
 
 
@@ -41,18 +41,18 @@ public class Urls {
      * Parse GZip compressed content from url
      * @param url url
      */
-    public static String parseGZipContent(String url) throws IOException {
-        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url)));
+    public static String parseGZipContent(String url, long limit) throws IOException {
+        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url, limit)));
     }
 
 
     /**
      * Create temp zipFile and download to it from url.
      */
-    public static File downloadFileToTemp(String url, String prefix, String suffix) throws IOException {
+    public static File downloadFileToTemp(String url, String prefix, String suffix, long limit) throws IOException {
         File file = File.createTempFile(prefix, suffix);
 
-        InputStream inputStream = _getInputStreamOfUrl(url);
+        InputStream inputStream = _getInputStreamOfUrl(url, limit);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         _transferStreams(inputStream, fileOutputStream);
 
@@ -72,12 +72,12 @@ public class Urls {
         }
         Files.createFile(path);
 
-        _transferStreams(_getInputStreamOfUrl(url), Files.newOutputStream(path));
+        _transferStreams(_getInputStreamOfUrl(url, Mod.DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT), Files.newOutputStream(path));
     }
 
 
 
-    private static InputStream _getInputStreamOfUrl(String url) throws IOException {
+    private static InputStream _getInputStreamOfUrl(String url, long sizeLimit) throws IOException {
         if (url.startsWith("file_debug_only://")) {
             if (!isFileDebugScheme()) {
                 throw new RuntimeException("Not allowed scheme.");
@@ -94,8 +94,8 @@ public class Urls {
         } else if (url.startsWith("https://")) {
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
-            if (connection.getContentLengthLong() > Mod.HTTPS_FILE_SIZE_LIMIT) {
-                throw new RuntimeException("File at " + url+ " so bigger. l: " + connection.getContentLengthLong());
+            if (connection.getContentLengthLong() > sizeLimit) {
+                throw new RuntimeException("File at " + url+ " so bigger. " + connection.getContentLengthLong() + " > " + sizeLimit);
             }
             return connection.getInputStream();
 

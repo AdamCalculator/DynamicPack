@@ -27,7 +27,7 @@ public class DynamicRepoRemote extends Remote {
 
     @Override
     public boolean checkUpdateAvailable() throws IOException {
-        String content = Urls.parseContent(buildUrl);
+        String content = Urls.parseContent(buildUrl, 64).trim();
         return parent.getCurrentBuild() != Long.parseLong(content);
     }
 
