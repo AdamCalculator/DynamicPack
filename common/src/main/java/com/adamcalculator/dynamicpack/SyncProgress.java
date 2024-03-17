@@ -1,5 +1,8 @@
 package com.adamcalculator.dynamicpack;
 
+/**
+ * Sync pack info interface
+ */
 public interface SyncProgress {
     void textLog(String s);
     void done(boolean reloadRequired);

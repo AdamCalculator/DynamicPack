@@ -30,7 +30,7 @@
  * --- 2024.03.16 ---
  * This version of file Modified by adam.
  */
-package com.adamcalculator.dynamicpack.enc;
+package com.adamcalculator.dynamicpack.util.enc;
 
 
 import org.apache.commons.codec.binary.Base64InputStream;

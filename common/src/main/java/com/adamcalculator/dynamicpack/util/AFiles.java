@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack;
+package com.adamcalculator.dynamicpack.util;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.UnzipParameters;
@@ -26,7 +26,7 @@ public class AFiles {
     }
 
     public static void moveFile(File source, File dest) throws IOException {
-        com.google.common.io.Files.move(source, dest);
+        Files.move(source.toPath(), dest.toPath());
     }
 
     public static void unzip(File zipFilePath, File dir) throws IOException {

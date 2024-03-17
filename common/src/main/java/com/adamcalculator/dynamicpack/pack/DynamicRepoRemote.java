@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.Urls;
+import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONObject;
 
 import java.io.IOException;

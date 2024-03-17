@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.util.Out;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,13 +23,13 @@ public class DebugScreen extends Screen {
     @Override
     protected void init() {
         addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan & Re-sync normally"), button -> {
-            DynamicPackMod.rescanPacks();
-            SyncingTask.startSyncThread();
+            DynamicPackModBase.INSTANCE.rescanPacks();
+            DynamicPackModBase.INSTANCE.startSyncThread();
             MinecraftClient.getInstance().setScreen(new DebugScreen());
         }).size(120, 20).position(this.width-130, 10).build());
 
         int height = 10;
-        for (Pack pack : DynamicPackMod.packs.toArray(new Pack[0])) {
+        for (Pack pack : DynamicPackModBase.packs.toArray(new Pack[0])) {
             Out.println("gui pack: " + pack);
             try {
                 addDrawableChild(ButtonWidget.builder(Text.of(pack.getLocation().getName() + ":"+pack.getCachedUpdateAvailableStatus()), button -> {

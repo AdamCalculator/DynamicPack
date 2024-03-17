@@ -19,7 +19,7 @@
 			"com.adamcalculator.dynamicpack.ModMenu"
 		],
 		"client": [
-			"com.adamcalculator.dynamicpack.DynamicPackMod"
+			"com.adamcalculator.dynamicpack.FabricDynamicMod"
 		]
 	},
 	"mixins": [

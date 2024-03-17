@@ -1,6 +1,10 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.*;
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.IDValidator;
+import com.adamcalculator.dynamicpack.PackUtil;
+import com.adamcalculator.dynamicpack.SyncProgress;
+import com.adamcalculator.dynamicpack.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,7 +56,7 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         for (String s : oldestFilesList) {
-            if (s.contains(DynamicPackMod.CLIENT_FILE)) continue;
+            if (s.contains(DynamicPackModBase.CLIENT_FILE)) continue;
 
             progress.textLog("File deleted from resource-pack: " + s);
             AFiles.noEmptyDirDelete(packRootPath.resolve(s));
@@ -124,7 +128,7 @@ public class DynamicRepoSyncProcessV1 {
             }
 
             if (isOverwrite) {
-                if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) continue;
+                if (filePath.getFileName().toString().contains(DynamicPackModBase.CLIENT_FILE)) continue;
                 this.progress.textLog("(over)write file: " + filePath);
                 Urls.downloadDynamicFile(realUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override

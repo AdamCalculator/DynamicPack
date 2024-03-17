@@ -1,6 +1,9 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.*;
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.PackUtil;
+import com.adamcalculator.dynamicpack.SyncProgress;
+import com.adamcalculator.dynamicpack.util.*;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -112,7 +115,7 @@ public class Pack {
         String packUrlContent;
         if (dynamicRepoRemote.skipSign) {
             packUrlContent = Urls.parseContent(dynamicRepoRemote.packUrl, Mod.MOD_FILES_LIMIT);
-            Out.LOGGER.warn("Dynamic pack " + location.getName() + " is skipping signing.");
+            Out.warn("Dynamic pack " + location.getName() + " is skipping signing.");
             progress.textLog("File parsed, verify skipped.");
 
         } else {
@@ -140,9 +143,9 @@ public class Pack {
         cachedJson.getJSONObject("current").put("build", this.current_build);
 
         if (isZip()) {
-            PackUtil.addFileToZip(location, DynamicPackMod.CLIENT_FILE, cachedJson.toString(2));
+            PackUtil.addFileToZip(location, DynamicPackModBase.CLIENT_FILE, cachedJson.toString(2));
         } else {
-            AFiles.write(new File(location, DynamicPackMod.CLIENT_FILE), cachedJson.toString(2));
+            AFiles.write(new File(location, DynamicPackModBase.CLIENT_FILE), cachedJson.toString(2));
         }
         return true;
     }
@@ -178,14 +181,14 @@ public class Pack {
         }
 
         ZipFile zipFile = new ZipFile(file);
-        boolean isDynamicPack = zipFile.getEntry(DynamicPackMod.CLIENT_FILE) != null;
+        boolean isDynamicPack = zipFile.getEntry(DynamicPackModBase.CLIENT_FILE) != null;
 
         cachedJson.getJSONObject("current").put("version", latest.latestId);
         cachedJson.getJSONObject("current").remove("version_number");
 
 
         if (!isDynamicPack) {
-            PackUtil.addFileToZip(file, DynamicPackMod.CLIENT_FILE, cachedJson.toString(2));
+            PackUtil.addFileToZip(file, DynamicPackModBase.CLIENT_FILE, cachedJson.toString(2));
         }
         if (this.isZip()) {
             AFiles.moveFile(file, this.location);

@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack;
+package com.adamcalculator.dynamicpack.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,5 +22,9 @@ public class Out {
 
     public static void downloading(String url, File file) {
         LOGGER.warn("Downloading " + file.getName() + " from " + url);
+    }
+
+    public static void warn(String s) {
+        LOGGER.warn(s);
     }
 }

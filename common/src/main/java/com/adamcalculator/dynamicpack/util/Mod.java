@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack;
+package com.adamcalculator.dynamicpack.util;
 
 import java.io.IOException;
 import java.net.URI;

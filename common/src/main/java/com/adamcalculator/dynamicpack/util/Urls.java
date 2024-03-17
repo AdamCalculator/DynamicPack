@@ -1,8 +1,7 @@
-package com.adamcalculator.dynamicpack;
+package com.adamcalculator.dynamicpack.util;
 
-import  com.adamcalculator.dynamicpack.enc.GPGDetachedSignatureVerifier;
-import net.fabricmc.loader.api.FabricLoader;
-import org.jetbrains.annotations.Nullable;
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.util.enc.GPGDetachedSignatureVerifier;
 
 import java.io.*;
 import java.net.URL;
@@ -98,13 +97,13 @@ public class Urls {
         return _getInputStreamOfUrl(url, sizeLimit, null);
     }
 
-    private static InputStream _getInputStreamOfUrl(String url, long sizeLimit, @Nullable LongConsumer progress) throws IOException {
+    private static InputStream _getInputStreamOfUrl(String url, long sizeLimit, /*@Nullable*/ LongConsumer progress) throws IOException {
         if (url.startsWith("file_debug_only://")) {
             if (!isFileDebugScheme()) {
                 throw new RuntimeException("Not allowed scheme.");
             }
 
-            final File gameDir = FabricLoader.getInstance().getGameDir().toFile();
+            final File gameDir = DynamicPackModBase.INSTANCE.getGameDir();
             File file = new File(gameDir, url.replace("file_debug_only://", ""));
             if (progress != null){
                 progress.accept(file.length());
@@ -124,7 +123,7 @@ public class Urls {
             }
 
             if (url.contains(" ")) {
-                Out.LOGGER.warn("URL " + url + " contains not encoded spaced! Use %20 for space symbol in links!");
+                Out.warn("URL " + url + " contains not encoded spaced! Use %20 for space symbol in links!");
             }
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
@@ -156,7 +155,7 @@ public class Urls {
         return s;
     }
 
-    private static void _transferStreams(InputStream inputStream, OutputStream outputStream, @Nullable LongConsumer progress) throws IOException {
+    private static void _transferStreams(InputStream inputStream, OutputStream outputStream, /*@Nullable*/ LongConsumer progress) throws IOException {
         BufferedInputStream in = new BufferedInputStream(inputStream);
 
         byte[] dataBuffer = new byte[1024];

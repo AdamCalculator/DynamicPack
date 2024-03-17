@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack;
+package com.adamcalculator.dynamicpack.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
