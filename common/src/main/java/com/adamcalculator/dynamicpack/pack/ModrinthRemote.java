@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.util.Mod;
+import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONArray;

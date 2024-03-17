@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.util;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.util.enc.GPGDetachedSignatureVerifier;
 
 import java.io.*;
