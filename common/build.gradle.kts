@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.adamcalculator"
-version = "1.4"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
