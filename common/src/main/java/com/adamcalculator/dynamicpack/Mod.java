@@ -1,4 +1,6 @@
-package com.adamcalculator.dynamicpack.util;
+package com.adamcalculator.dynamicpack;
+
+import com.adamcalculator.dynamicpack.util.Out;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +21,9 @@ public class Mod {
         ALLOWED_HOSTS.add("github.com");
         ALLOWED_HOSTS.add("github.io");
         ALLOWED_HOSTS.add("githubusercontent.com");
+        if (!isRelease()) {
+            ALLOWED_HOSTS.add("localhost");
+        }
     }
 
     public static boolean isUrlHostTrusted(String url) throws IOException {
@@ -50,7 +55,9 @@ public class Mod {
         return 1024L * 1024L * mb;
     }
 
+    // TRUE FOR ALL PUBLIC VERSION!!!!!!
+    // false is equal not safe!1!!!
     public static boolean isRelease() {
-        return false;
+        return true;
     }
 }
