@@ -3,15 +3,15 @@
 	"id": "dynamicpack",
 	"version": "${version}",
 	"name": "DynamicPack",
-	"description": "Auto-sync resource packs",
+	"description": "Automatically sync resource packs with a remote server",
 	"authors": [
 		"AdamCalculator"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/dynamicpack",
+		"sources": "https://github.com/AdamCalculator/DynamicPack"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/dynamicpack/icon.png",
 	"environment": "client",
 	"entrypoints": {
@@ -30,9 +30,8 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.15.0",
+		"fabricloader": ">=0.14.0",
 		"minecraft": ">=1.20.1",
-		"java": ">=17",
-		"fabric-api": "*"
+		"java": ">=17"
 	}
 }

@@ -26,7 +26,7 @@ public class Urls {
         if (!isVerified) {
             throw new SecurityException("Failed to verify " + url + " using signature at " + signatureUrl + " and publicKey: " + publicKeyBase64);
         }
-        return _parseContentFromStream(_getInputStreamOfUrl(url, maxLimit));
+        return _parseContentFromStream(_getInputStreamOfUrl(url, maxLimit), maxLimit);
     }
 
     /**
@@ -34,7 +34,7 @@ public class Urls {
      * @param url url
      */
     public static String parseContent(String url, long limit) throws IOException {
-        return _parseContentFromStream(_getInputStreamOfUrl(url, limit));
+        return _parseContentFromStream(_getInputStreamOfUrl(url, limit), limit);
     }
 
 
@@ -43,7 +43,7 @@ public class Urls {
      * @param url url
      */
     public static String parseGZipContent(String url, long limit) throws IOException {
-        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url, limit)));
+        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url, limit)), limit);
     }
 
 
@@ -141,14 +141,19 @@ public class Urls {
         }
     }
 
-    private static String _parseContentFromStream(InputStream stream) throws IOException {
+    private static String _parseContentFromStream(InputStream stream, long maxLimit) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] dataBuffer = new byte[1024];
         int bytesRead;
+        long total = 0;
         while ((bytesRead = stream.read(dataBuffer, 0, 1024)) != -1) {
             byteArrayOutputStream.write(dataBuffer, 0, bytesRead);
+            total += bytesRead;
+
+            if (total > maxLimit) {
+                throw new SecurityException("Download limit! " + total + " > " + maxLimit);
+            }
         }
-        byteArrayOutputStream.flush();
         String s = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
         byteArrayOutputStream.close();
         stream.close();

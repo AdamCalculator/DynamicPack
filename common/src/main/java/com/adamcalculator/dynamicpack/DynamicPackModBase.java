@@ -20,8 +20,8 @@ public abstract class DynamicPackModBase {
 	public static DynamicPackModBase INSTANCE;
 
 	public static List<Pack> packs = new ArrayList<>();
-	private static File gameDir;
-	private static File resourcePacks;
+	private File gameDir;
+	private File resourcePacks;
 
 
 	public void init(File gameDir) {
@@ -29,7 +29,7 @@ public abstract class DynamicPackModBase {
 			throw new RuntimeException("Already initialized!");
 		}
 		INSTANCE = this;
-
+		this.gameDir = gameDir;
 		resourcePacks = new File(gameDir, "resourcepacks");
 		resourcePacks.mkdirs();
 

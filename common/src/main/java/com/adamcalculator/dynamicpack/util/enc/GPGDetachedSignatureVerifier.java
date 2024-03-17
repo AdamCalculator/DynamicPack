@@ -33,7 +33,9 @@
 package com.adamcalculator.dynamicpack.util.enc;
 
 
+import com.adamcalculator.dynamicpack.util.Out;
 import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.utils.IOUtils;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
@@ -91,9 +93,17 @@ public class GPGDetachedSignatureVerifier {
             PGPPublicKeyRing keyRing = (PGPPublicKeyRing) keyRingIter.next();
 
             Iterator keyIter = keyRing.getPublicKeys();
+            Object o = null;
+            boolean b = false;
             while (keyIter.hasNext()) {
-                return (PGPPublicKey) keyIter.next();
+                var key = (PGPPublicKey) keyIter.next();
+                Out.println("key:" + Hex.encodeHexString(key.getFingerprint()).toUpperCase());
+                if (!b) {
+                    o = key;
+                    b = true;
+                }
             }
+            return (PGPPublicKey) o;
         }
 
         throw new IllegalArgumentException("Can't find encryption key in key ring.");

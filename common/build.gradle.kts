@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.adamcalculator"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -11,13 +11,13 @@ repositories {
 
 dependencies {
     implementation("org.bouncycastle:bcpg-jdk18on:1.77")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.77")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+    //implementation("org.bouncycastle:bcprov-jdk18on:1.77")
+    //implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
     implementation("org.json:json:20231013")
 
     implementation("commons-codec:commons-codec:1.15")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
-    implementation("org.apache.commons:commons-compress:1.22")
+    implementation("org.apache.commons:commons-compress:1.24.0")
     implementation("commons-io:commons-io:2.11.0")
     implementation("org.slf4j:slf4j-api:2.0.1")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
