@@ -147,7 +147,7 @@ public class DynamicRepoSyncProcessV1 {
         return remote.getUrl() + "/" + path;
     }
 
-    private String getPath(String parent, String path) {
+    public static String getPath(String parent, String path) {
         checkPathSafety(path);
         checkPathSafety(parent);
 
@@ -157,7 +157,7 @@ public class DynamicRepoSyncProcessV1 {
         return parent + "/" + path;
     }
 
-    private void checkPathSafety(String s) {
+    public static void checkPathSafety(String s) {
         if (s.contains("://") || s.contains("..") || s.contains("  ") || s.contains(".exe")) {
             throw new SecurityException("This url not supported redirects to other servers or jump-up!");
         }
