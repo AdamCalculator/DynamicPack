@@ -39,7 +39,7 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on
 	include 'org.bouncycastle:bcpg-jdk18on:1.77'
-	//include 'org.bouncycastle:bcprov-jdk18on:1.77'
+	include "org.bouncycastle:bcutil-jdk18on:1.77"
 	//include 'org.bouncycastle:bcpkix-jdk18on:1.77'
 	include 'org.json:json:20231013'
 	include "net.lingala.zip4j:zip4j:2.11.5"
