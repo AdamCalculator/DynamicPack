@@ -45,7 +45,7 @@ dependencies {
 	include "net.lingala.zip4j:zip4j:2.11.5"
 
 
-	modApi "com.terraformersmc:modmenu:6.3.1"
+	modApi "com.terraformersmc:modmenu:7.2.2"
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
