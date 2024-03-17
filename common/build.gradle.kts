@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.adamcalculator"
-version = "1.0.6"
+version = "1.0.7"
 
 
 repositories {
@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation("org.bouncycastle:bcpg-jdk18on:1.77")
-    //implementation("org.bouncycastle:bcprov-jdk18on:1.77")
+    implementation("org.bouncycastle:bcutil-jdk18on:1.77")
     //implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
     implementation("org.json:json:20231013")
 
