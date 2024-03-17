@@ -22,6 +22,7 @@ public class SyncingTask implements Runnable {
             try {
                 pack.sync(createSyncProgressForPack(pack), manually);
             } catch (Exception e) {
+                onError(pack, e);
                 Out.error("error while process pack: " + pack.getLocation().getName(), e);
             }
         }
@@ -30,6 +31,10 @@ public class SyncingTask implements Runnable {
     }
 
     public void syncDone(boolean reloadRequired) {
+        // to override
+    }
+
+    public void onError(Pack pack, Exception e) {
         // to override
     }
 
