@@ -14,8 +14,12 @@ import java.util.function.LongConsumer;
 import java.util.zip.GZIPInputStream;
 
 public class Urls {
-    public static boolean isFileDebugScheme() {
-        return !Mod.isRelease();
+    public static boolean isFileDebugSchemeAllowed() {
+        return Mod.isFileDebugSchemeAllowed();
+    }
+
+    public static boolean isHTTPTrafficAllowed() {
+        return Mod.isHTTPTrafficAllowed();
     }
 
     public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64, long maxLimit) throws IOException {
@@ -99,8 +103,13 @@ public class Urls {
     }
 
     private static InputStream _getInputStreamOfUrl(String url, long sizeLimit, /*@Nullable*/ LongConsumer progress) throws IOException {
+        if (url.contains(" ")) {
+            throw new IOException("URL can't contains spaces!");
+        }
+
+
         if (url.startsWith("file_debug_only://")) {
-            if (!isFileDebugScheme()) {
+            if (!isFileDebugSchemeAllowed()) {
                 throw new RuntimeException("Not allowed scheme.");
             }
 
@@ -113,7 +122,26 @@ public class Urls {
 
 
         } else if (url.startsWith("http://")) {
-            throw new RuntimeException("HTTP (not secure) not allowed scheme.");
+            if (!isHTTPTrafficAllowed()) {
+                throw new RuntimeException("HTTP (not secure) not allowed scheme.");
+            }
+
+            if (!Mod.isUrlHostTrusted(url)) {
+                if (Mod.isBlockAllNotTrustedNetworks()) {
+                    throw new SecurityException("Url host is not trusted!");
+                }
+            }
+
+            URL urlObj = new URL(url);
+            URLConnection connection = urlObj.openConnection();
+            long length = connection.getContentLengthLong();
+            if (length > sizeLimit) {
+                throw new RuntimeException("[HTTP] File at " + url+ " so bigger. " + length + " > " + sizeLimit);
+            }
+            if (progress != null){
+                progress.accept(length);
+            }
+            return connection.getInputStream();
 
 
         } else if (url.startsWith("https://")) {
@@ -123,9 +151,6 @@ public class Urls {
                 }
             }
 
-            if (url.contains(" ")) {
-                Out.warn("URL " + url + " contains not encoded spaced! Use %20 for space symbol in links!");
-            }
             URL urlObj = new URL(url);
             URLConnection connection = urlObj.openConnection();
             long length = connection.getContentLengthLong();
