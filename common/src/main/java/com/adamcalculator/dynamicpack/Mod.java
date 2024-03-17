@@ -71,7 +71,7 @@ public class Mod {
         return false;
     }
 
-    // https:// allowed
+    // http:// allowed
     public static boolean isHTTPTrafficAllowed() {
         return false;
     }
