@@ -5,6 +5,7 @@ plugins {
 group = "com.adamcalculator"
 version = "1.0.5"
 
+
 repositories {
     mavenCentral()
 }
