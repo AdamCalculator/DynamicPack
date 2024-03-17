@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.adamcalculator"
-version = "1.0.7"
+version = "1.0.8"
 
 repositories {
     mavenCentral()
@@ -11,8 +11,7 @@ repositories {
 
 dependencies {
     implementation("org.bouncycastle:bcpg-jdk18on:1.77")
-    implementation("org.bouncycastle:bcutil-jdk18on:1.77")
-    //implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+    implementation("org.bouncycastle:bcprov-ext-jdk18on:1.77") // so larger for mod... 8 MB
     implementation("org.json:json:20231013")
 
     implementation("commons-codec:commons-codec:1.15")
