@@ -40,36 +40,49 @@ public class DebugScreen extends Screen {
                     SystemToast toast = new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal("T"), Text.literal("d"));
                     MinecraftClient.getInstance().getToastManager().add(toast);
 
-                    try {
-                        pack.sync(new SyncProgress() {
-                            @Override
-                            public void textLog(String s) {
-                                toast.setContent(Text.literal("Log"), Text.literal(s));
-                            }
+                    var task = new SyncingTask(true) {
+                        @Override
+                        public void syncDone(boolean reloadRequired) {
+                            toast.setContent(Text.literal("Error"), Text.literal("rel_req="+reloadRequired));
+                        }
 
-                            @Override
-                            public void done(boolean b) {
-                                if (b) {
-                                    toast.setContent(Text.literal("Done. Reload!"), Text.literal("Reload required!!!"));
-                                } else {
-                                    toast.setContent(Text.literal("Done!"), Text.literal(""));
+                        @Override
+                        public void onError(Pack pack, Exception e) {
+                            toast.setContent(Text.literal("Error"), Text.literal(e.getMessage()));
+                        }
+
+                        @Override
+                        public SyncProgress createSyncProgressForPack(Pack pack) {
+                            return new SyncProgress() {
+                                @Override
+                                public void textLog(String s) {
+                                    toast.setContent(Text.literal("Log"), Text.literal(s));
                                 }
-                            }
 
-                            @Override
-                            public void downloading(String name, float percentage) {
+                                @Override
+                                public void done(boolean b) {
+                                    if (b) {
+                                        toast.setContent(Text.literal("Done. Reload!"), Text.literal("Reload required!!!"));
+                                    } else {
+                                        toast.setContent(Text.literal("Done!"), Text.literal(""));
+                                    }
+                                }
 
-                            }
+                                @Override
+                                public void downloading(String name, float percentage) {
+                                    toast.setContent(Text.literal("Download " + Math.round(percentage) + "%"), Text.literal(name));
+                                }
 
-                            @Override
-                            public void start() {
-
-                            }
-                        }, true);
-                    } catch (Exception e) {
-                        Out.e(e);
-                    }
+                                @Override
+                                public void start() {
+                                    toast.setContent(Text.literal("Started!"), Text.literal(""));
+                                }
+                            };
+                        }
+                    };
+                    new Thread(task, "DynamicPack-ManuallyCheckThread").start();
                 }).size(50, 20).position(190, height).build());
+
             } catch (Exception e) {
                 addDrawableChild(ButtonWidget.builder(Text.of(e + ""), button -> {
                 }).size(500, 20).position(10, height).build());

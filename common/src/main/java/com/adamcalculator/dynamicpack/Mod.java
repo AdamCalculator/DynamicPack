@@ -21,7 +21,7 @@ public class Mod {
         ALLOWED_HOSTS.add("github.com");
         ALLOWED_HOSTS.add("github.io");
         ALLOWED_HOSTS.add("githubusercontent.com");
-        if (!isRelease()) {
+        if (isLocalHostAllowed()) {
             ALLOWED_HOSTS.add("localhost");
         }
     }
@@ -58,6 +58,26 @@ public class Mod {
     // TRUE FOR ALL PUBLIC VERSION!!!!!!
     // false is equal not safe!1!!!
     public static boolean isRelease() {
+        return true;
+    }
+
+    // localhost allowed
+    private static boolean isLocalHostAllowed() {
+        return false;
+    }
+
+    // file_debug_only:// allowed
+    public static boolean isFileDebugSchemeAllowed() {
+        return false;
+    }
+
+    // http:// allowed
+    public static boolean isHTTPTrafficAllowed() {
+        return false;
+    }
+
+    // DebugScreen allowed
+    public static boolean isDebugScreenAllowed() {
         return true;
     }
 }
