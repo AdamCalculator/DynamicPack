@@ -105,7 +105,7 @@ public class Pack {
         } else if (remote instanceof DynamicRepoRemote dynamicRepoRemote) {
             reloadRequired = dynamicRepoSync(dynamicRepoRemote, progress);
         } else {
-            isSyncing = false;
+            throw new RuntimeException("InternalError: unknown remote: " + remote);
         }
         isSyncing = false;
         progress.done(reloadRequired);

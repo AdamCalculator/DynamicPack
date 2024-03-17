@@ -20,22 +20,28 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
         SyncingTask syncingTask = new SyncingTask(false) {
             @Override
             public void syncDone(boolean reloadRequired) {
-                MinecraftClient client = MinecraftClient.getInstance();
-                if (client != null && reloadRequired) {
-                    if (client.world == null) {
-                        client.reloadResources();
-                    } else {
-                        ToastManager toastManager = client.getToastManager();
-                        if (toastManager != null) {
-                            toastManager.add(SystemToast.create(client, SystemToast.Type.PACK_LOAD_FAILURE,
-                                    Text.translatable("dynamicpack.toast.needReload"), Text.translatable("dynamicpack.toast.needReload.desc")));
-                        }
-                    }
+                if (reloadRequired) {
+                    tryToReloadResources();
                 }
             }
         };
         Thread thread = new Thread(syncingTask);
         thread.setName("DynamicPack-SyncTask");
         thread.start();
+    }
+
+    private void tryToReloadResources() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client != null) {
+            if (client.world == null) {
+                client.reloadResources();
+            } else {
+                ToastManager toastManager = client.getToastManager();
+                if (toastManager != null) {
+                    toastManager.add(SystemToast.create(client, SystemToast.Type.PACK_LOAD_FAILURE,
+                            Text.translatable("dynamicpack.toast.needReload"), Text.translatable("dynamicpack.toast.needReload.desc")));
+                }
+            }
+        }
     }
 }
