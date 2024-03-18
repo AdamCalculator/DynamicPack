@@ -1,21 +1,27 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.*;
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.IDValidator;
+import com.adamcalculator.dynamicpack.Mod;
+import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
-import com.adamcalculator.dynamicpack.util.*;
+import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.Hashes;
+import com.adamcalculator.dynamicpack.util.Out;
+import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DynamicRepoSyncProcessV1 {
     private final Pack parent;
@@ -24,24 +30,14 @@ public class DynamicRepoSyncProcessV1 {
     private final JSONObject j;
 
     private final Set<String> oldestFilesList = new HashSet<>();
-    private FileSystem zipFileSystem;
     private Path packRootPath;
 
-    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject j) throws IOException {
+    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject j, Path path) throws IOException {
         this.parent = pack;
         this.remote = dynamicRepoRemote;
         this.progress = progress;
         this.j = j;
-        if (parent.isZip()) {
-            Map<String, String> env = new HashMap<>();
-            env.put("create", "true");
-            URI uri = URI.create("jar:" + parent.getLocation().toPath().toUri());
-            zipFileSystem = FileSystems.newFileSystem(uri, env);
-            packRootPath = zipFileSystem.getPath("");
-
-        } else {
-            packRootPath = parent.getLocation().toPath();
-        }
+        this.packRootPath = path;
     }
 
     public void run() throws IOException, NoSuchAlgorithmException {
@@ -65,9 +61,6 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     public void close() throws IOException {
-        if (zipFileSystem != null && zipFileSystem.isOpen()) {
-            zipFileSystem.close();
-        }
     }
 
     private void processContent(JSONObject object) throws IOException, NoSuchAlgorithmException {

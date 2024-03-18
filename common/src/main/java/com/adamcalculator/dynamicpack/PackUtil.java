@@ -1,17 +1,16 @@
 package com.adamcalculator.dynamicpack;
 
+import com.adamcalculator.dynamicpack.util.AFiles;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class PackUtil {
@@ -25,18 +24,41 @@ public class PackUtil {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    public static JSONObject readJson(Path path) throws IOException {
+        return new JSONObject(readString(path));
+    }
+
+    public static String readString(Path path) throws IOException {
+        return Files.readString(path, StandardCharsets.UTF_8);
+    }
+
 
     public static void addFileToZip(File zipFile, String name, String text) throws IOException {
-        Map<String, String> env = new HashMap<>();
-        env.put("create", "true");
-        java.nio.file.Path path = zipFile.toPath();
-        URI uri = URI.create("jar:" + path.toUri());
-        try (FileSystem fs = FileSystems.newFileSystem(uri, env))
-        {
-            Path nf = fs.getPath(name);
-            try (Writer writer = java.nio.file.Files.newBufferedWriter(nf, StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
-                writer.write(text);
+        openPackFileSystem(zipFile, path -> {
+            AFiles.nioWriteText(path.resolve(name), text);
+        });
+    }
+
+    public static void openPackFileSystem(File pack, Consumer<Path> consumer) throws IOException {
+        if (!pack.exists()) {
+            throw new FileNotFoundException(pack.getCanonicalPath());
+        }
+
+        if (pack.isDirectory()) {
+            consumer.accept(pack.toPath());
+
+
+        } else if (pack.isFile() && pack.getName().toLowerCase().endsWith(".zip")) {
+            Map<String, String> env = new HashMap<>();
+            env.put("create", "true");
+
+            URI uri = URI.create("jar:" + pack.toPath().toUri());
+            try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
+                consumer.accept(fs.getPath(""));
             }
+
+        } else {
+            throw new RuntimeException("Failed to open pack file system");
         }
     }
 
@@ -49,7 +71,8 @@ public class PackUtil {
         });
     }
 
-    public static boolean isPathFileExists(Path path) throws IOException {
+    // if path exist and isFile
+    public static boolean isPathFileExists(Path path) {
         if (Files.exists(path)) {
             return !Files.isDirectory(path);
         }

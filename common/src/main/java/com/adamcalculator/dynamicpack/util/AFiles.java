@@ -7,9 +7,11 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
 
 public class AFiles {
@@ -68,5 +70,14 @@ public class AFiles {
         FileOutputStream close;
         IOUtils.write(string, (close = new FileOutputStream(file)), StandardCharsets.UTF_8);
         close.close();
+    }
+
+    public static void nioWriteText(Path path, String text) {
+        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
+            writer.write(text);
+
+        } catch (IOException e) {
+            throw new RuntimeException("nioWriteText exception!", e);
+        }
     }
 }

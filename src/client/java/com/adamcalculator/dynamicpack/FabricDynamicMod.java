@@ -7,6 +7,7 @@ import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
 import com.adamcalculator.dynamicpack.sync.state.SyncProgressState;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.toast.ToastManager;
@@ -72,6 +73,11 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
         Thread thread = new Thread(syncingTask);
         thread.setName("DynamicPack-SyncTask" + (SyncingTask.threadCounter++));
         thread.start();
+    }
+
+    @Override
+    public String getCurrentGameVersion() {
+        return SharedConstants.getGameVersion().getId();
     }
 
     private void tryToReloadResources() {

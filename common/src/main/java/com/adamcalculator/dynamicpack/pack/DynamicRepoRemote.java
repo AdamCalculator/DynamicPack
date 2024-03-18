@@ -9,12 +9,17 @@ import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 public class DynamicRepoRemote extends Remote {
-    private final Pack parent;
+    public static final String REPO_JSON = "dynamicmcpack.repo.json";
+    public static final String REPO_BUILD = "dynamicmcpack.repo.build";
+    public static final String REPO_SIGNATURE = "dynamicmcpack.repo.json.sig";
+
+
+    private Pack parent;
 
     protected String url;
     protected String buildUrl;
@@ -23,12 +28,15 @@ public class DynamicRepoRemote extends Remote {
     public String publicKey;
     protected boolean skipSign;
 
-    public DynamicRepoRemote(Pack pack, JSONObject remote) {
+    public DynamicRepoRemote() {
+    }
+
+    public void init(Pack pack, JSONObject remote) {
         this.parent = pack;
         this.url = remote.getString("url");
-        this.buildUrl = url + "/dynamicmcpack.repo.build";
-        this.packUrl = url + "/dynamicmcpack.repo.json";
-        this.packSigUrl = url + "/dynamicmcpack.repo.json.sig";
+        this.buildUrl = url + "/" + REPO_BUILD;
+        this.packUrl = url + "/" + REPO_JSON;
+        this.packSigUrl = url + "/" + REPO_SIGNATURE;
         this.publicKey = remote.optString("public_key", "").replace("\n", "").trim();
         this.skipSign = remote.optBoolean("sign_no_required", false);
 
@@ -44,28 +52,42 @@ public class DynamicRepoRemote extends Remote {
         return parent.getCurrentBuild() != Long.parseLong(content);
     }
 
+
     @Override
     public boolean sync(PackSyncProgress progress) throws IOException, NoSuchAlgorithmException {
+        PackUtil.openPackFileSystem(parent.getLocation(), path -> {
+            try {
+                sync0(progress, path);
+
+            } catch (IOException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return true;
+    }
+
+    public void sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
         String packUrlContent;
-        progress.downloading("dynamicmcpack.repo.json", 0);
+        progress.downloading(REPO_JSON, 0);
         if (skipSign) {
             packUrlContent = Urls.parseContent(packUrl, Mod.MOD_FILES_LIMIT);
-            Out.warn("Dynamic pack " + parent.getLocation().getName() + " is skipping signing.");
+            Out.warn("Dynamic pack " + parent.getName() + " is skipping signing.");
             progress.textLog("File parsed, verify skipped.");
 
         } else {
             packUrlContent = Urls.parseContentAndVerify(packSigUrl, packUrl, publicKey, Mod.MOD_FILES_LIMIT);
             progress.textLog("Success parse and verify file.");
         }
-        progress.downloading("dynamicmcpack.repo.json", 100);
+        progress.downloading(REPO_JSON, 100);
 
-        JSONObject j = new JSONObject(packUrlContent);
-        if (j.getLong("formatVersion") != 1) {
-            throw new RuntimeException("Incompatible formatVersion!");
+        JSONObject repoJson = new JSONObject(packUrlContent);
+        long formatVersion;
+        if ((formatVersion = repoJson.getLong("formatVersion")) != 1) {
+            throw new RuntimeException("Incompatible formatVersion: " + formatVersion);
         }
 
 
-        DynamicRepoSyncProcessV1 dynamicRepoSyncProcessV1 = new DynamicRepoSyncProcessV1(parent, this, progress, j);
+        DynamicRepoSyncProcessV1 dynamicRepoSyncProcessV1 = new DynamicRepoSyncProcessV1(parent, this, progress, repoJson, path);
         try {
             dynamicRepoSyncProcessV1.run();
             dynamicRepoSyncProcessV1.close();
@@ -74,16 +96,9 @@ public class DynamicRepoRemote extends Remote {
             dynamicRepoSyncProcessV1.close();
             throw e;
         }
+        parent.cachedJson.getJSONObject("current").put("build", repoJson.getLong("build"));
 
-        parent.current_build = j.getLong("build");
-        parent.cachedJson.getJSONObject("current").put("build", parent.current_build);
-
-        if (parent.isZip()) {
-            PackUtil.addFileToZip(parent.getLocation(), DynamicPackModBase.CLIENT_FILE, parent.cachedJson.toString(2));
-        } else {
-            AFiles.write(new File(parent.getLocation(), DynamicPackModBase.CLIENT_FILE), parent.cachedJson.toString(2));
-        }
-        return true;
+        AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.cachedJson.toString(2));
     }
 
     public String getUrl() {

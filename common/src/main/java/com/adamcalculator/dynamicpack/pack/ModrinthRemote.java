@@ -16,17 +16,24 @@ import java.io.IOException;
 import java.util.zip.ZipFile;
 
 public class ModrinthRemote extends Remote {
-    private final Pack parent;
+    private Pack parent;
 
     private String projectId;
     private String gameVersion;
 
 
+    public ModrinthRemote() {
+    }
 
-    public ModrinthRemote(Pack parent, JSONObject json) {
+    public void init(Pack parent, JSONObject json) {
         this.parent = parent;
         this.projectId = json.getString("modrinth_project_id");
-        this.gameVersion = json.getString("game_version");
+        var ver = json.getString("game_version");
+        this.gameVersion = ver.equalsIgnoreCase("current") ? getCurrentGameVersion() : ver;
+    }
+
+    private String getCurrentGameVersion() {
+        return DynamicPackModBase.INSTANCE.getCurrentGameVersion();
     }
 
     public String getVersionsUrl() {
@@ -103,6 +110,7 @@ public class ModrinthRemote extends Remote {
         if (!isDynamicPack) {
             PackUtil.addFileToZip(file, DynamicPackModBase.CLIENT_FILE, parent.cachedJson.toString(2));
         }
+
         if (parent.isZip()) {
             AFiles.moveFile(file, parent.getLocation());
 
