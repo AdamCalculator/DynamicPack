@@ -13,7 +13,7 @@ A mod that will monitor the current version of your resource pack and download a
 Resource pack developers need to create a `dynamicmcpack.json` file inside the resource pack, which will save some information, and the mod will update when the game starts if resource pack files are required.
 
 ## For users
-Install and it will automatically update trendy resource packs.
+Install and it will automatically update supported resource packs.
 
 ⚠️ Since the mod is being actively developed, it is not yet possible to check resource packs for updates, but this will be added in the future.
 
