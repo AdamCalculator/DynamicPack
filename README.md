@@ -8,6 +8,8 @@ A mod that will monitor the current version of your resource pack and download a
 ## Documentation
 [**Available here**](https://github.com/AdamCalculator/DynamicPack/wiki)
 
+## Plans
+The mod is planned to support **any bootloader** and any version, but I don't have enough time right now. **I'm always happy to see new contributors!**
 
 ## How it works
 Resource pack developers need to create a `dynamicmcpack.json` file inside the resource pack, which will save some information, and the mod will update when the game starts if resource pack files are required.
