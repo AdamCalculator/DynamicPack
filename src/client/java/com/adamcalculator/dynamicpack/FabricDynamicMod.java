@@ -13,6 +13,7 @@ import net.minecraft.client.toast.ToastManager;
 import net.minecraft.text.Text;
 
 public class FabricDynamicMod extends DynamicPackModBase implements ClientModInitializer {
+    private static final boolean SHOW_STATE = false;
     private SystemToast toast = null;
     private long toastUpdated = 0;
 
@@ -55,6 +56,8 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
 
             @Override
             public void onStateChanged(Pack pack, SyncProgressState state) {
+                if (!FabricDynamicMod.SHOW_STATE) return;
+
                 if (state instanceof StateDownloading downloading) {
                     setToastContent(Text.translatable("dynamicpack.toast.pack.state.downloading.title", pack.getName()), Text.translatable("dynamicpack.toast.pack.state.downloading.description", downloading.getPercentage(), downloading.getName()));
 
