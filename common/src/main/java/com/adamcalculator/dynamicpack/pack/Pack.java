@@ -153,4 +153,8 @@ public class Pack {
     public boolean isContentActive(String id) {
         return true; // todo
     }
+
+    public String getName() {
+        return location.getName();
+    }
 }

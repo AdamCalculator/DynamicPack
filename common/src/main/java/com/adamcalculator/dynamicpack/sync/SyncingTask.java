@@ -12,6 +12,8 @@ import com.adamcalculator.dynamicpack.util.Out;
  * Re-check all packs and update packs with update available
  */
 public class SyncingTask implements Runnable {
+    public static long threadCounter = 0;
+
     private final boolean manually; // skip checkUpdateAvailable().
     private boolean reloadRequired = false;
     private Pack currentPack;
@@ -48,7 +50,11 @@ public class SyncingTask implements Runnable {
 
 
     private void setState(SyncProgressState state) {
-        onStateChanged(currentPack, state);
+        try {
+            onStateChanged(currentPack, state);
+        } catch (Exception e) {
+            Out.error("onStateChanged exception!!!", e);
+        }
     }
 
     public PackSyncProgress createSyncProgressForPack(Pack pack) {
