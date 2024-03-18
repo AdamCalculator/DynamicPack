@@ -17,8 +17,12 @@ import java.util.stream.Stream;
 public class PackUtil {
 
     public static JSONObject readJson(InputStream inputStream) throws IOException {
+        return new JSONObject(readString(inputStream));
+    }
+
+    public static String readString(InputStream inputStream) throws IOException {
         byte[] bytes = inputStream.readAllBytes();
-        return new JSONObject(new String(bytes, StandardCharsets.UTF_8));
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
 
@@ -43,5 +47,12 @@ public class PackUtil {
                 buffer.add(path1.toString());
             }
         });
+    }
+
+    public static boolean isPathFileExists(Path path) throws IOException {
+        if (Files.exists(path)) {
+            return !Files.isDirectory(path);
+        }
+        return false;
     }
 }

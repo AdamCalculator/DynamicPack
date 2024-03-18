@@ -1,23 +1,22 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
-import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
-import com.adamcalculator.dynamicpack.SyncProgress;
-import com.adamcalculator.dynamicpack.util.*;
+import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
+import com.adamcalculator.dynamicpack.util.AFiles;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Pack {
     private final File location;
-    private JSONObject cachedJson;
+    JSONObject cachedJson;
     private boolean cachedUpdateAvailable;
-    private long current_build;
+    long current_build;
     private Remote remote;
     private boolean isSyncing = false;
 
@@ -73,17 +72,18 @@ public class Pack {
         return cachedUpdateAvailable;
     }
 
-    public void sync(SyncProgress progress, boolean manually) throws Exception {
+    public void sync(PackSyncProgress progress, boolean manually) throws Exception {
         try {
             sync0(progress, manually);
-
+            checkSafePackMinecraftMeta();
         } catch (Exception e) {
             isSyncing = false;
+            checkSafePackMinecraftMeta();
             throw e;
         }
     }
 
-    private void sync0(SyncProgress progress, boolean manually) throws Exception {
+    private void sync0(PackSyncProgress progress, boolean manually) throws Exception {
         if (isSyncing) {
             progress.textLog("already syncing...");
             progress.done(false);
@@ -99,108 +99,58 @@ public class Pack {
         progress.start();
         progress.textLog("start syncing...");
 
-        boolean reloadRequired = false;
-        if (remote instanceof ModrinthRemote modrinthRemote) {
-            reloadRequired = modrinthSync(modrinthRemote, progress);
+        boolean reloadRequired = remote.sync(progress);
 
-        } else if (remote instanceof DynamicRepoRemote dynamicRepoRemote) {
-            reloadRequired = dynamicRepoSync(dynamicRepoRemote, progress);
-        } else {
-            throw new RuntimeException("InternalError: unknown remote: " + remote);
-        }
         isSyncing = false;
         progress.done(reloadRequired);
     }
 
-    private boolean dynamicRepoSync(DynamicRepoRemote dynamicRepoRemote, SyncProgress progress) throws Exception {
-        String packUrlContent;
-        if (dynamicRepoRemote.skipSign) {
-            packUrlContent = Urls.parseContent(dynamicRepoRemote.packUrl, Mod.MOD_FILES_LIMIT);
-            Out.warn("Dynamic pack " + location.getName() + " is skipping signing.");
-            progress.textLog("File parsed, verify skipped.");
-
-        } else {
-            packUrlContent = Urls.parseContentAndVerify(dynamicRepoRemote.packSigUrl, dynamicRepoRemote.packUrl, dynamicRepoRemote.publicKey, Mod.MOD_FILES_LIMIT);
-            progress.textLog("Success parse and verify file.");
-        }
-
-        JSONObject j = new JSONObject(packUrlContent);
-        if (j.getLong("formatVersion") != 1) {
-            throw new RuntimeException("Incompatible formatVersion!");
-        }
-
-
-        DynamicRepoSyncProcessV1 dynamicRepoSyncProcessV1 = new DynamicRepoSyncProcessV1(this, dynamicRepoRemote, progress, j);
-        try {
-            dynamicRepoSyncProcessV1.run();
-            dynamicRepoSyncProcessV1.close();
-
-        } catch (Exception e) {
-            dynamicRepoSyncProcessV1.close();
-            throw e;
-        }
-
-        this.current_build = j.getLong("build");
-        cachedJson.getJSONObject("current").put("build", this.current_build);
-
+    private void checkSafePackMinecraftMeta() throws IOException {
+        final String meta = """
+                {
+                  "pack": {
+                    "pack_format": 17,
+                    "description": "Unknown DynamicPack resource-pack..."
+                  }
+                }
+                """;
         if (isZip()) {
-            PackUtil.addFileToZip(location, DynamicPackModBase.CLIENT_FILE, cachedJson.toString(2));
+            ZipFile zipFile = new ZipFile(location);
+            ZipEntry zipEntry = zipFile.getEntry(DynamicPackModBase.MINECRAFT_META);
+            boolean safe = zipEntry != null;
+            if (safe) {
+                safe = checkMinecraftMetaIsValid(PackUtil.readString(zipFile.getInputStream(zipEntry)));
+            }
+            if (!safe) {
+                PackUtil.addFileToZip(location, DynamicPackModBase.MINECRAFT_META, meta);
+            }
         } else {
-            AFiles.write(new File(location, DynamicPackModBase.CLIENT_FILE), cachedJson.toString(2));
+            File file = new File(location, DynamicPackModBase.MINECRAFT_META);
+            boolean safe = PackUtil.isPathFileExists(file.toPath());
+            if (safe) {
+                safe = checkMinecraftMetaIsValid(AFiles.read(file));
+            }
+            if (!safe) {
+                AFiles.write(file, meta);
+            }
+        }
+    }
+
+    private boolean checkMinecraftMetaIsValid(String s) {
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            JSONObject pack = jsonObject.getJSONObject("pack");
+            pack.getLong("pack_format");
+            if (pack.getString("description").length() > 60) {
+                throw new Exception("Description length");
+            }
+        } catch (Exception e) {
+            return false;
         }
         return true;
     }
 
     public boolean isContentActive(String id) {
         return true; // todo
-    }
-
-    private boolean modrinthSync(ModrinthRemote modrinthRemote, SyncProgress progress) throws IOException, NoSuchAlgorithmException {
-        progress.textLog("getting latest version on modrinth...");
-        ModrinthRemote.LatestModrinthVersion latest = modrinthRemote.getLatest();
-
-        progress.textLog("downloading...");
-        File file = null;
-        int attempts = 3;
-        while (attempts > 0) {
-            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT, new FileDownloadConsumer(){
-                @Override
-                public void onUpdate(FileDownloadConsumer it) {
-                    float percentage = it.getPercentage();
-                    progress.downloading("Modrinth pack (zip)", percentage);
-                }
-            });
-
-            if (Hashes.calcHashForFile(file).equals(latest.fileHash)) {
-                progress.textLog("Download done! Hashes is equals.");
-                break;
-            }
-            attempts--;
-        }
-        if (attempts == 0) {
-            throw new RuntimeException("Failed to download correct file from modrinth.");
-        }
-
-        ZipFile zipFile = new ZipFile(file);
-        boolean isDynamicPack = zipFile.getEntry(DynamicPackModBase.CLIENT_FILE) != null;
-
-        cachedJson.getJSONObject("current").put("version", latest.latestId);
-        cachedJson.getJSONObject("current").remove("version_number");
-
-
-        if (!isDynamicPack) {
-            PackUtil.addFileToZip(file, DynamicPackModBase.CLIENT_FILE, cachedJson.toString(2));
-        }
-        if (this.isZip()) {
-            AFiles.moveFile(file, this.location);
-
-        } else {
-            AFiles.deleteDirectory(this.location);
-            AFiles.unzip(file, this.location);
-        }
-        progress.textLog("dynamicmcpack.json is updated.");
-
-        progress.textLog("done!");
-        return true;
     }
 }
