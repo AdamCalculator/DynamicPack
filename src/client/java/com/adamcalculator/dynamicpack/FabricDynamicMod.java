@@ -41,6 +41,11 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
     public void startSyncThread() {
         SyncingTask syncingTask = new SyncingTask(false) {
             @Override
+            public void onSyncStart() {
+                setToastContent(Text.literal("DynamicPack"), Text.translatable("dynamicpack.toast.syncStarted"));
+            }
+
+            @Override
             public void onSyncDone(boolean reloadRequired) {
                 if (reloadRequired) {
                     setToastContent(Text.literal("DynamicPack"), Text.translatable("dynamicpack.toast.done"));
