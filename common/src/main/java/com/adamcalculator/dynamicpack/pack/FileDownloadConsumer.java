@@ -17,7 +17,7 @@ public class FileDownloadConsumer implements LongConsumer {
 
     public float getPercentage() {
         if (max <= latest) {
-            return -1;
+            return 99.99f;
         }
 
         return (float) latest * 100f / (float) max;
