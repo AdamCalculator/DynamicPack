@@ -179,6 +179,8 @@ public class Urls {
             if (total > maxLimit) {
                 throw new SecurityException("Download limit! " + total + " > " + maxLimit);
             }
+
+            Mod.debugNetwork();
         }
         String s = byteArrayOutputStream.toString(StandardCharsets.UTF_8);
         byteArrayOutputStream.close();
@@ -188,7 +190,7 @@ public class Urls {
 
     private static void _transferStreams(InputStream inputStream, OutputStream outputStream, /*@Nullable*/ LongConsumer progress) throws IOException {
         BufferedInputStream in = new BufferedInputStream(inputStream);
-
+        boolean isNetwork = !(inputStream instanceof ByteArrayInputStream);
         byte[] dataBuffer = new byte[1024];
         int bytesRead;
         long total = 0;
@@ -198,6 +200,9 @@ public class Urls {
             if (progress != null) {
                 progress.accept(total);
             }
+
+
+            if (isNetwork) Mod.debugNetwork();
         }
         outputStream.flush();
         outputStream.close();
@@ -216,6 +221,7 @@ public class Urls {
             checkStream.write(dataBuffer, 0, bytesRead);
             total += bytesRead;
             progress.accept(total);
+            Mod.debugNetwork();
         }
         checkStream.flush();
         in.close();

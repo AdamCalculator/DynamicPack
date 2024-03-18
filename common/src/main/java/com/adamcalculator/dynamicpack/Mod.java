@@ -80,4 +80,14 @@ public class Mod {
     public static boolean isDebugScreenAllowed() {
         return true;
     }
+
+    public static void debugNetwork() {
+        if (isRelease()) return;
+
+        try {
+            Thread.sleep(13);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -1,12 +1,19 @@
 package com.adamcalculator.dynamicpack.pack;
 
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.Mod;
+import com.adamcalculator.dynamicpack.PackUtil;
+import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
+import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.Hashes;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.zip.ZipFile;
 
 public class ModrinthRemote extends Remote {
     private final Pack parent;
@@ -57,6 +64,56 @@ public class ModrinthRemote extends Remote {
             return false;
         }
         return !parent.getCurrentUnique().equals(latest.getString("id"));
+    }
+
+    @Override
+    public boolean sync(PackSyncProgress progress) throws IOException {
+        progress.textLog("getting latest version on modrinth...");
+        ModrinthRemote.LatestModrinthVersion latest = getLatest();
+
+        progress.textLog("downloading...");
+        File file = null;
+        int attempts = 3;
+        while (attempts > 0) {
+            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT, new FileDownloadConsumer(){
+                @Override
+                public void onUpdate(FileDownloadConsumer it) {
+                    float percentage = it.getPercentage();
+                    progress.downloading("Modrinth pack (zip)", percentage);
+                }
+            });
+
+            if (Hashes.calcHashForFile(file).equals(latest.fileHash)) {
+                progress.textLog("Download done! Hashes is equals.");
+                break;
+            }
+            attempts--;
+        }
+        if (attempts == 0) {
+            throw new RuntimeException("Failed to download correct file from modrinth.");
+        }
+
+        ZipFile zipFile = new ZipFile(file);
+        boolean isDynamicPack = zipFile.getEntry(DynamicPackModBase.CLIENT_FILE) != null;
+
+        parent.cachedJson.getJSONObject("current").put("version", latest.latestId);
+        parent.cachedJson.getJSONObject("current").remove("version_number");
+
+
+        if (!isDynamicPack) {
+            PackUtil.addFileToZip(file, DynamicPackModBase.CLIENT_FILE, parent.cachedJson.toString(2));
+        }
+        if (parent.isZip()) {
+            AFiles.moveFile(file, parent.getLocation());
+
+        } else {
+            AFiles.deleteDirectory(parent.getLocation());
+            AFiles.unzip(file, parent.getLocation());
+        }
+        progress.textLog("dynamicmcpack.json is updated.");
+
+        progress.textLog("done!");
+        return true;
     }
 
     public LatestModrinthVersion getLatest() throws IOException {

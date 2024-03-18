@@ -1,6 +1,8 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.*;
+import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
+import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
 import com.adamcalculator.dynamicpack.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,14 +20,14 @@ import java.util.*;
 public class DynamicRepoSyncProcessV1 {
     private final Pack parent;
     private final DynamicRepoRemote remote;
-    private final SyncProgress progress;
+    private final PackSyncProgress progress;
     private final JSONObject j;
 
     private final Set<String> oldestFilesList = new HashSet<>();
     private FileSystem zipFileSystem;
     private Path packRootPath;
 
-    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, SyncProgress progress, JSONObject j) throws IOException {
+    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject j) throws IOException {
         this.parent = pack;
         this.remote = dynamicRepoRemote;
         this.progress = progress;
@@ -54,9 +56,11 @@ public class DynamicRepoSyncProcessV1 {
 
         for (String s : oldestFilesList) {
             if (s.contains(DynamicPackModBase.CLIENT_FILE)) continue;
+            Path path = packRootPath.resolve(s);
+            progress.stateChanged(new StateFileDeleted(path));
 
             progress.textLog("File deleted from resource-pack: " + s);
-            AFiles.noEmptyDirDelete(packRootPath.resolve(s));
+            AFiles.noEmptyDirDelete(path);
         }
     }
 
@@ -85,11 +89,13 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         progress.textLog("process content id:" + id);
+        progress.downloading("<content>.json", 0);
         String content = compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT);
         String receivedHash = Hashes.calcHashForBytes(content.getBytes(StandardCharsets.UTF_8));
         if (!contentRemoteHash.equals(receivedHash)) {
             throw new SecurityException("Hash of content at " + url + " not verified. remote: " + contentRemoteHash + "; received: " + receivedHash);
         }
+        progress.downloading("<content>.json", 100);
         processContentParsed(new JSONObject(content));
     }
 
@@ -130,7 +136,7 @@ public class DynamicRepoSyncProcessV1 {
                 Urls.downloadDynamicFile(realUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
                     public void onUpdate(FileDownloadConsumer it) {
-                        progress.downloading(path, it.getPercentage());
+                        progress.downloading(filePath.getFileName().toString(), it.getPercentage());
                     }
                 });
             }

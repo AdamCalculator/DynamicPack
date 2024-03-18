@@ -1,4 +1,16 @@
 {
   "dynamicpack.toast.needReload": "Packs updated!",
-  "dynamicpack.toast.needReload.desc": "For update: F3 + T"
+  "dynamicpack.toast.needReload.description": "For update: F3 + T",
+  "dynamicpack.toast.syncStarted": "Sync started",
+  "dynamicpack.toast.done": "Sync done",
+  "dynamicpack.toast.pack.done.success.title": "Pack %s",
+  "dynamicpack.toast.pack.done.success.description": "Done!",
+  "dynamicpack.toast.pack.error.title": "Pack %s",
+  "dynamicpack.toast.pack.error.description": "Error while sync...",
+  "dynamicpack.toast.pack.state.downloading.title": "Pack %s",
+  "dynamicpack.toast.pack.state.downloading.description": "[%s%%] %s",
+  "dynamicpack.toast.pack.state.deleting.title": "Pack %s",
+  "dynamicpack.toast.pack.state.deleting.description": "Delete %s",
+  "dynamicpack.toast.pack.state.unknown.title": "Pack %s",
+  "dynamicpack.toast.pack.state.unknown.description": "Processing..."
 }

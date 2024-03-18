@@ -16,12 +16,14 @@ import java.util.zip.ZipFile;
 
 public abstract class DynamicPackModBase {
 	public static final String CLIENT_FILE = "dynamicmcpack.json";
+	public static final String MINECRAFT_META = "pack.mcmeta";
 
 	public static DynamicPackModBase INSTANCE;
 
 	public static List<Pack> packs = new ArrayList<>();
 	private File gameDir;
 	private File resourcePacks;
+	private boolean minecraftInitialized = false;
 
 
 	public void init(File gameDir) {
@@ -30,8 +32,8 @@ public abstract class DynamicPackModBase {
 		}
 		INSTANCE = this;
 		this.gameDir = gameDir;
-		resourcePacks = new File(gameDir, "resourcepacks");
-		resourcePacks.mkdirs();
+		this.resourcePacks = new File(gameDir, "resourcepacks");
+		this.resourcePacks.mkdirs();
 
 		startSyncThread();
 	}
@@ -66,18 +68,14 @@ public abstract class DynamicPackModBase {
 
 
 	private void processPack(File location, JSONObject json) {
-		Out.println("pack " + location + ": " + json);
-
 		long formatVersion = json.getLong("formatVersion");
 		if (formatVersion == 1) {
-
 			Pack pack = new Pack(location, json);
 			packs.add(pack);
 
 		} else {
 			throw new RuntimeException("Unsupported formatVersion!");
 		}
-
 	}
 
 	public boolean isResourcePackActive(Pack pack) throws IOException {
@@ -94,5 +92,13 @@ public abstract class DynamicPackModBase {
 
 	public File getGameDir() {
 		return gameDir;
+	}
+
+	public void minecraftInitialized() {
+		this.minecraftInitialized = true;
+	}
+
+	public boolean isMinecraftInitialized() {
+		return minecraftInitialized;
 	}
 }
