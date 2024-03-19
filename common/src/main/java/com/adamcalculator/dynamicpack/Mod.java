@@ -15,7 +15,7 @@ public class Mod {
     public static final long GZIP_LIMIT = megabyte(50); // 50 MB of .gz file
     public static final long MOD_FILES_LIMIT = megabyte(8);
 
-    public static final Set<String> ALLOWED_HOSTS = new HashSet<>();
+    private static final Set<String> ALLOWED_HOSTS = new HashSet<>();
     static {
         ALLOWED_HOSTS.add("modrinth.com");
         ALLOWED_HOSTS.add("github.com");
@@ -24,6 +24,29 @@ public class Mod {
         if (isLocalHostAllowed()) {
             ALLOWED_HOSTS.add("localhost");
         }
+    }
+
+    /**
+     * API FOR MODPACKERS etc all-in-one packs
+     * @param host host to add.
+     * @param requester any object. It is recommended that .toString explicitly give out your name.
+     */
+    protected static void addAllowedHosts(String host, Object requester) throws Exception {
+        if (host == null || requester == null) {
+            Out.securityWarning("Try to add allowed hosts is failed: null host or requester");
+            throw new Exception("Try to add allowed hosts is failed: null host or requester");
+        }
+
+        Out.securityWarning("==== SECURITY WARNING ====");
+        Out.securityWarning("# The DynamicPack mod limits the hosts it can interact with.");
+        Out.securityWarning("# But a certain requester allowed the mod another host to interact with");
+        Out.securityWarning("# ");
+        Out.securityWarning("# Host: " + host);
+        Out.securityWarning("# Requester: " + requester);
+        Out.securityWarning("# ");
+        Out.securityWarning("===========================");
+
+        ALLOWED_HOSTS.add(host);
     }
 
     public static boolean isUrlHostTrusted(String url) throws IOException {

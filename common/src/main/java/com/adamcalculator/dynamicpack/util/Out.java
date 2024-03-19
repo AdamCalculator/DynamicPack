@@ -46,4 +46,20 @@ public class Out {
         }
         LOGGER.warn(s);
     }
+
+    /**
+     * Always enable! Ignore enable/disable
+     */
+    public static void securityWarning(String s) {
+        if (USE_SOUT) {
+            System.out.println("[dynamicpack] " + s);
+            return;
+        }
+
+        try {
+            LOGGER.warn(s);
+        } catch (Exception ignored) {
+            System.out.println("[dynamicpack] " + s);
+        }
+    }
 }

@@ -85,6 +85,15 @@ public abstract class DynamicPackModBase {
 		}
 	}
 
+	/**
+	 * API FOR MODPACKERS etc all-in-one packs
+	 * @param host host to add.
+	 * @param requester any object. It is recommended that .toString explicitly give out your name.
+	 */
+	public static void addAllowedHosts(String host, Object requester) throws Exception {
+		Mod.addAllowedHosts(host, requester);
+	}
+
 	public boolean isResourcePackActive(Pack pack) throws IOException {
 		for (String readLine : Files.readAllLines(new File(getGameDir(), "options.txt").toPath(), StandardCharsets.UTF_8)) {
 			if (readLine.startsWith("resourcePacks:")) {
