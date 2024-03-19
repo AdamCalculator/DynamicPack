@@ -56,12 +56,12 @@ public class Mod {
     }
 
     // TRUE FOR ALL PUBLIC VERSION!!!!!!
-    // false is equal not safe!1!!!
+    // false is equal not safe!1!!! RELEASE=true
     public static boolean isRelease() {
         return true;
     }
 
-    // localhost allowed
+    // localhost allowed RELEASE=false
     private static boolean isLocalHostAllowed() {
         return false;
     }
