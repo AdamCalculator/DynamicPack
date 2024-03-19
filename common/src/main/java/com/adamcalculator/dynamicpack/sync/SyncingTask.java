@@ -24,18 +24,21 @@ public class SyncingTask implements Runnable {
 
     @Override
     public void run() {
+        Out.println("SyncTask started!");
         onSyncStart();
         DynamicPackModBase.INSTANCE.rescanPacks();
-        for (Pack pack : DynamicPackModBase.packs) {
+        for (Pack pack : DynamicPackModBase.INSTANCE.getPacks()) {
             currentPack = pack;
             try {
                 pack.sync(createSyncProgressForPack(pack), manually);
                 onPackDoneSuccess(pack);
             } catch (Exception e) {
+                Out.error("Pack error: " + pack.getName(), e);
                 onPackError(pack, e);
             }
         }
         onSyncDone(reloadRequired);
+        Out.println("SyncTask ended!");
     }
 
     public void onPackDoneSuccess(Pack pack) {}
@@ -61,24 +64,27 @@ public class SyncingTask implements Runnable {
         return new PackSyncProgress() {
             private StateDownloading cachedDownloading = null;
 
+            private void _packLog(String s) {
+                Out.println(pack.getName() + ": " + s);
+            }
 
             @Override
             public void start() {
-                Out.println(pack.getLocation().getName() + ": Sync started.");
+                _packLog("Sync started.");
             }
 
             @Override
             public void done(boolean reloadRequired) {
-                Out.println(pack.getLocation().getName() + ": Sync done. pack reloadRequired=" + reloadRequired);
+                _packLog("Sync done. pack reloadRequired=" + reloadRequired);
 
                 if (reloadRequired && !SyncingTask.this.reloadRequired) {
                     try {
                         if (DynamicPackModBase.INSTANCE.isResourcePackActive(pack)) {
                             SyncingTask.this.reloadRequired = true;
-                            Out.println(pack.getLocation().getName() + ": SyncTask.reloadRequired now true!");
+                            _packLog("SyncTask.reloadRequired now true!");
                         }
                     } catch (Exception e) {
-                        Out.error(pack.getLocation().getName() + ": SyncTask.reloadRequired now true!", e);
+                        _packLog("SyncTask.reloadRequired now true, but check thrown exception: " + e);
                         SyncingTask.this.reloadRequired = true;
                     }
                 }
@@ -86,7 +92,7 @@ public class SyncingTask implements Runnable {
 
             @Override
             public void textLog(String s) {
-                Out.println(pack.getLocation().getName() + ": [textLog] " + s);
+                _packLog("[textLog] " + s);
             }
 
             @Override

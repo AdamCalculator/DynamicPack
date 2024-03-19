@@ -1,7 +1,7 @@
 package tests.enc;
 
 import com.adamcalculator.dynamicpack.util.Out;
-import com.adamcalculator.dynamicpack.util.enc.GPGDetachedSignatureVerifier;
+import com.adamcalculator.dynamicpack.util.enc.GPGSignatureVerifier;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ public class EncodingTest {
                 =08ZH
                 """.getBytes(StandardCharsets.UTF_8)));
 
-        var verified = GPGDetachedSignatureVerifier.verify(i1, i2, """
+        var verified = GPGSignatureVerifier.verify(i1, i2, """
                 mQINBGX1YNIBEAC3JgBxOPjy1BaQeHFU9fKaS6pCA647RUryfE7A/9mmhDZV6RyJ
                 miGAw6QKuVCzez8cbQXC6FgEp/2Iq07OzajHsSZW4ibC6GHp1pe7IqiM1Ad4huIX
                 1fLBXkz3SkIt2Ef/L85rKTCx3SJxGrOPY33+dKfv7cOjwD38DiGKiNVundY+CKox
