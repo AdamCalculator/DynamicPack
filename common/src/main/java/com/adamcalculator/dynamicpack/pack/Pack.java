@@ -26,6 +26,7 @@ public class Pack {
     private final Remote remote;
     private boolean isSyncing = false;
 
+
     public Pack(File location, JSONObject json) {
         this.location = location;
         this.cachedJson = json;
@@ -136,10 +137,6 @@ public class Pack {
             return false;
         }
         return true;
-    }
-
-    public boolean isContentActive(String id) {
-        return true; // todo
     }
 
     public String getName() {

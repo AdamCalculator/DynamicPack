@@ -181,7 +181,7 @@ public class DynamicRepoSyncProcessV1 {
         while (i < contents.length()) {
             JSONObject content = contents.getJSONObject(i);
             String id = content.getString("id");
-            if (parent.isContentActive(id)) {
+            if (remote.isContentActive(id) || content.optBoolean("required", false)) {
                 activeContents.add(content);
             }
             i++;

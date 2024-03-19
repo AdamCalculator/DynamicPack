@@ -11,7 +11,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.function.LongConsumer;
 
 public class DynamicRepoRemote extends Remote {
@@ -29,6 +31,8 @@ public class DynamicRepoRemote extends Remote {
     public String publicKey;
     protected boolean skipSign;
 
+    private final HashMap<String, Boolean> contentOverrides = new HashMap<>();
+
     public DynamicRepoRemote() {
     }
 
@@ -40,6 +44,13 @@ public class DynamicRepoRemote extends Remote {
         this.packSigUrl = url + "/" + REPO_SIGNATURE;
         this.publicKey = remote.optString("public_key", "").replace("\n", "").trim();
         this.skipSign = remote.optBoolean("sign_no_required", false);
+
+        if (remote.has("content_override")) {
+            JSONObject j = remote.getJSONObject("content_override");
+            for (String s : j.keySet()) {
+                this.contentOverrides.put(s, j.getBoolean(s));
+            }
+        }
 
 
         if (skipSign != this.publicKey.isBlank()) {
@@ -92,6 +103,14 @@ public class DynamicRepoRemote extends Remote {
             throw new RuntimeException("Incompatible formatVersion: " + formatVersion);
         }
 
+        String remoteName = repoJson.getString("name");
+        if (remoteName.isBlank()) {
+            throw new RemoteException("Name of remote pack can't be blank");
+        }
+        if (remoteName.trim().length() > 50) {
+            throw new RemoteException("Length of name pack can't > 50");
+        }
+
 
         DynamicRepoSyncProcessV1 dynamicRepoSyncProcessV1 = new DynamicRepoSyncProcessV1(parent, this, progress, repoJson, path);
         try {
@@ -109,5 +128,12 @@ public class DynamicRepoRemote extends Remote {
 
     public String getUrl() {
         return url;
+    }
+
+    public boolean isContentActive(String id) {
+        if (contentOverrides.containsKey(id)) {
+            return contentOverrides.get(id);
+        }
+        return true;
     }
 }
