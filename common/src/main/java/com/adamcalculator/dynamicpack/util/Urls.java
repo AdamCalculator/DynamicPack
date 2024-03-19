@@ -34,6 +34,10 @@ public class Urls {
      * @throws SecurityException is signature not valid
      */
     public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64, long maxLimit, LongConsumer progress) throws IOException {
+        if (!(url + ".sig").equalsIgnoreCase(signatureUrl)) {
+            throw new SecurityException("The signature and the file being checked are in different locations!");
+        }
+
         InputStream inputStream = _getInputStreamOfUrl(url, maxLimit, progress);
 
         ByteArrayOutputStream temp = new ByteArrayOutputStream();
@@ -47,6 +51,7 @@ public class Urls {
         if (!isVerified) {
             throw new SecurityException("Failed to verify " + url + " using signature at " + signatureUrl + " and publicKey: " + publicKeyBase64);
         }
+        Out.println("Urls.parseContentAndVerify success verified at " + url);
         return _parseContentFromStream(new ByteArrayInputStream(temp.toByteArray()), maxLimit, null);
     }
 
