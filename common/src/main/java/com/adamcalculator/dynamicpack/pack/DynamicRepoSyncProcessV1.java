@@ -140,6 +140,7 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     private String getUrlFromPath(String path) {
+        checkPathSafety(path);
         return remote.getUrl() + "/" + path;
     }
 
