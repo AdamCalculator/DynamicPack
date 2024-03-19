@@ -11,7 +11,9 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.toast.ToastManager;
+import net.minecraft.resource.metadata.PackResourceMetadataReader;
 import net.minecraft.text.Text;
+import net.minecraft.util.JsonHelper;
 
 public class FabricDynamicMod extends DynamicPackModBase implements ClientModInitializer {
     private static final boolean SHOW_STATE = false;
@@ -78,6 +80,16 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
     @Override
     public String getCurrentGameVersion() {
         return SharedConstants.getGameVersion().getId();
+    }
+
+    @Override
+    public boolean checkResourcePackMetaValid(String s) {
+        try {
+            new PackResourceMetadataReader().fromJson(JsonHelper.deserialize(s));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void tryToReloadResources() {
