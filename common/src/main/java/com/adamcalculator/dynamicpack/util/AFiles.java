@@ -6,8 +6,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -84,8 +82,12 @@ public class AFiles {
      * Write a text to path
      */
     public static void nioWriteText(Path path, String text) {
-        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
-            writer.write(text);
+        try {
+            if (!Files.isRegularFile(path)) {
+                throw new SecurityException("Try to write text to a not regular file.");
+            }
+            Files.deleteIfExists(path);
+            Files.writeString(path, text, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
         } catch (IOException e) {
             throw new RuntimeException("nioWriteText exception!", e);

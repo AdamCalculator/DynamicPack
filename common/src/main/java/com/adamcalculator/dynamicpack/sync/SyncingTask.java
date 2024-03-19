@@ -24,6 +24,7 @@ public class SyncingTask implements Runnable {
 
     @Override
     public void run() {
+        Out.println("SyncTask started!");
         onSyncStart();
         DynamicPackModBase.INSTANCE.rescanPacks();
         for (Pack pack : DynamicPackModBase.INSTANCE.getPacks()) {
@@ -32,10 +33,12 @@ public class SyncingTask implements Runnable {
                 pack.sync(createSyncProgressForPack(pack), manually);
                 onPackDoneSuccess(pack);
             } catch (Exception e) {
+                Out.error("Pack error: " + pack.getName(), e);
                 onPackError(pack, e);
             }
         }
         onSyncDone(reloadRequired);
+        Out.println("SyncTask ended!");
     }
 
     public void onPackDoneSuccess(Pack pack) {}
