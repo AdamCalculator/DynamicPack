@@ -21,25 +21,25 @@ public class SecurityTrustedUrlsTest {
 
 
         Assertions.assertDoesNotThrow(() -> {
-            DynamicRepoSyncProcessV1.getPath("assets", "minecraft/lang/en_us.json");
-            DynamicRepoSyncProcessV1.getPath("assets/", "minecraft/lang/en_us.json");
-            DynamicRepoSyncProcessV1.getPath("assets", "/minecraft/lang/en_us.json");
-            DynamicRepoSyncProcessV1.getPath("assets", "/minecraft/lang/en_us.json");
-            DynamicRepoSyncProcessV1.getPath("/assets/", "///minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets", "minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets/", "minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets", "/minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets", "/minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("/assets/", "///minecraft/lang/en_us.json");
         });
 
 
 
         Assertions.assertThrows(Exception.class, () -> {
-            DynamicRepoSyncProcessV1.getPath("assets/../../../../", "minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets/../../../../", "minecraft/lang/en_us.json");
         });
 
         Assertions.assertThrows(Exception.class, () -> {
-            DynamicRepoSyncProcessV1.getPath("assets/../../../../", "minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets/../../../../", "minecraft/lang/en_us.json");
         });
 
         Assertions.assertThrows(Exception.class, () -> {
-            DynamicRepoSyncProcessV1.getPath("assets/../../../../", "minecraft/lang/en_us.json");
+            DynamicRepoSyncProcessV1.getAndCheckPath("assets/../../../../", "minecraft/lang/en_us.json");
         });
 
     }

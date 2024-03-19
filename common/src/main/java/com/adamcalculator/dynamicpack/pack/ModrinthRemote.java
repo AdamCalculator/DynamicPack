@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.zip.ZipFile;
 
 public class ModrinthRemote extends Remote {
     private Pack parent;
@@ -28,7 +27,7 @@ public class ModrinthRemote extends Remote {
     public void init(Pack parent, JSONObject json) {
         this.parent = parent;
         this.projectId = json.getString("modrinth_project_id");
-        var ver = json.getString("game_version");
+        var ver = json.optString("game_version", "current");
         this.gameVersion = ver.equalsIgnoreCase("current") ? getCurrentGameVersion() : ver;
     }
 
@@ -79,10 +78,10 @@ public class ModrinthRemote extends Remote {
         ModrinthRemote.LatestModrinthVersion latest = getLatest();
 
         progress.textLog("downloading...");
-        File file = null;
+        File tempFile = null;
         int attempts = 3;
         while (attempts > 0) {
-            file = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT, new FileDownloadConsumer(){
+            tempFile = Urls.downloadFileToTemp(latest.url, "dynamicpack_download", ".zip", Mod.MODRINTH_HTTPS_FILE_SIZE_LIMIT, new FileDownloadConsumer(){
                 @Override
                 public void onUpdate(FileDownloadConsumer it) {
                     float percentage = it.getPercentage();
@@ -90,7 +89,7 @@ public class ModrinthRemote extends Remote {
                 }
             });
 
-            if (Hashes.calcHashForFile(file).equals(latest.fileHash)) {
+            if (Hashes.calcHashForFile(tempFile).equals(latest.fileHash)) {
                 progress.textLog("Download done! Hashes is equals.");
                 break;
             }
@@ -100,25 +99,20 @@ public class ModrinthRemote extends Remote {
             throw new RuntimeException("Failed to download correct file from modrinth.");
         }
 
-        ZipFile zipFile = new ZipFile(file);
-        boolean isDynamicPack = zipFile.getEntry(DynamicPackModBase.CLIENT_FILE) != null;
-
         parent.cachedJson.getJSONObject("current").put("version", latest.latestId);
         parent.cachedJson.getJSONObject("current").remove("version_number");
 
 
-        if (!isDynamicPack) {
-            PackUtil.addFileToZip(file, DynamicPackModBase.CLIENT_FILE, parent.cachedJson.toString(2));
-        }
+        PackUtil.openPackFileSystem(tempFile, path -> AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.cachedJson.toString(2)));
+        progress.textLog("dynamicmcpack.json is updated.");
 
         if (parent.isZip()) {
-            AFiles.moveFile(file, parent.getLocation());
+            AFiles.moveFile(tempFile, parent.getLocation());
 
         } else {
-            AFiles.deleteDirectory(parent.getLocation());
-            AFiles.unzip(file, parent.getLocation());
+            AFiles.recursiveDeleteDirectory(parent.getLocation());
+            AFiles.unzip(tempFile, parent.getLocation());
         }
-        progress.textLog("dynamicmcpack.json is updated.");
 
         progress.textLog("done!");
         return true;

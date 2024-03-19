@@ -7,9 +7,11 @@ import java.io.File;
 
 public class Out {
     public static final Logger LOGGER = LoggerFactory.getLogger("dynamicpack");
+    public static boolean ENABLE = true;
     public static boolean USE_SOUT = false;
 
     public static void println(Object o) {
+        if (!ENABLE) return;
         if (USE_SOUT) {
             System.out.println(o);
             return;
@@ -17,16 +19,8 @@ public class Out {
         LOGGER.warn(o + "");
     }
 
-    public static void e(Exception e) {
-        if (USE_SOUT) {
-            System.out.println(e);
-            e.printStackTrace();
-            return;
-        }
-        LOGGER.error("Out", e);
-    }
-
     public static void error(String s, Exception e) {
+        if (!ENABLE) return;
         if (USE_SOUT) {
             System.err.println(s);
             e.printStackTrace();
@@ -36,6 +30,7 @@ public class Out {
     }
 
     public static void downloading(String url, File file) {
+        if (!ENABLE) return;
         if (USE_SOUT) {
             System.out.println(file.getName() + " downloading from " + url);
             return;
@@ -44,6 +39,7 @@ public class Out {
     }
 
     public static void warn(String s) {
+        if (!ENABLE) return;
         if (USE_SOUT) {
             System.out.println("WARN: " + s);
             return;

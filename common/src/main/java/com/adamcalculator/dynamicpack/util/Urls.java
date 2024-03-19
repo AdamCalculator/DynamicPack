@@ -2,7 +2,7 @@ package com.adamcalculator.dynamicpack.util;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.Mod;
-import com.adamcalculator.dynamicpack.util.enc.GPGDetachedSignatureVerifier;
+import com.adamcalculator.dynamicpack.util.enc.GPGSignatureVerifier;
 
 import java.io.*;
 import java.net.URL;
@@ -22,24 +22,49 @@ public class Urls {
         return Mod.isHTTPTrafficAllowed();
     }
 
-    public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64, long maxLimit) throws IOException {
-        boolean isVerified = GPGDetachedSignatureVerifier
-                .verify(_getInputStreamOfUrl(url, maxLimit),
-                        _getInputStreamOfUrl(signatureUrl, maxLimit),
+    /**
+     * parse content and verify it
+     * @param signatureUrl signature binary url
+     * @param url url of source file
+     * @param publicKeyBase64 base64 public key
+     * @param maxLimit max limit of download
+     * @param progress progress
+     * @return parsed content or throw error
+     * @throws IOException IOException
+     * @throws SecurityException is signature not valid
+     */
+    public static String parseContentAndVerify(String signatureUrl, String url, String publicKeyBase64, long maxLimit, LongConsumer progress) throws IOException {
+        InputStream inputStream = _getInputStreamOfUrl(url, maxLimit, progress);
+
+        ByteArrayOutputStream temp = new ByteArrayOutputStream();
+        _transferStreams(inputStream, temp, progress);
+
+        boolean isVerified = GPGSignatureVerifier
+                .verify(new ByteArrayInputStream(temp.toByteArray()),
+                        _getInputStreamOfUrl(signatureUrl, maxLimit, null),
                         publicKeyBase64);
 
         if (!isVerified) {
             throw new SecurityException("Failed to verify " + url + " using signature at " + signatureUrl + " and publicKey: " + publicKeyBase64);
         }
-        return _parseContentFromStream(_getInputStreamOfUrl(url, maxLimit), maxLimit);
+        return _parseContentFromStream(new ByteArrayInputStream(temp.toByteArray()), maxLimit, null);
+    }
+
+    /**
+     * Parse text content from url with no progress
+     * @param url url
+     */
+    public static String parseContent(String url, long limit) throws IOException {
+        return parseContent(url, limit, null);
     }
 
     /**
      * Parse text content from url
      * @param url url
+     * @param progress progress
      */
-    public static String parseContent(String url, long limit) throws IOException {
-        return _parseContentFromStream(_getInputStreamOfUrl(url, limit), limit);
+    public static String parseContent(String url, long limit, LongConsumer progress) throws IOException {
+        return _parseContentFromStream(_getInputStreamOfUrl(url, limit, progress), limit, progress);
     }
 
 
@@ -47,8 +72,8 @@ public class Urls {
      * Parse GZip compressed content from url
      * @param url url
      */
-    public static String parseGZipContent(String url, long limit) throws IOException {
-        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url, limit)), limit);
+    public static String parseGZipContent(String url, long limit, LongConsumer progress) throws IOException {
+        return _parseContentFromStream(new GZIPInputStream(_getInputStreamOfUrl(url, limit, progress)), limit, progress);
     }
 
 
@@ -96,11 +121,6 @@ public class Urls {
         }
     }
 
-
-
-    private static InputStream _getInputStreamOfUrl(String url, long sizeLimit) throws IOException {
-        return _getInputStreamOfUrl(url, sizeLimit, null);
-    }
 
     private static InputStream _getInputStreamOfUrl(String url, long sizeLimit, /*@Nullable*/ LongConsumer progress) throws IOException {
         if (url.contains(" ")) {
@@ -167,7 +187,7 @@ public class Urls {
         }
     }
 
-    private static String _parseContentFromStream(InputStream stream, long maxLimit) throws IOException {
+    private static String _parseContentFromStream(InputStream stream, long maxLimit, /* Nullable */ LongConsumer progress) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] dataBuffer = new byte[1024];
         int bytesRead;
@@ -178,6 +198,10 @@ public class Urls {
 
             if (total > maxLimit) {
                 throw new SecurityException("Download limit! " + total + " > " + maxLimit);
+            }
+
+            if (progress != null) {
+                progress.accept(total);
             }
 
             Mod.debugNetwork();

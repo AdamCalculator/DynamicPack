@@ -66,12 +66,12 @@ public class Mod {
         return false;
     }
 
-    // file_debug_only:// allowed
+    // file_debug_only:// allowed RELEASE=false
     public static boolean isFileDebugSchemeAllowed() {
         return false;
     }
 
-    // http:// allowed
+    // http:// allowed RELEASE=false
     public static boolean isHTTPTrafficAllowed() {
         return false;
     }

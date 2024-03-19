@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.function.LongConsumer;
 
 public class DynamicRepoRemote extends Remote {
     public static final String REPO_JSON = "dynamicmcpack.repo.json";
@@ -68,17 +69,22 @@ public class DynamicRepoRemote extends Remote {
 
     public void sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
         String packUrlContent;
-        progress.downloading(REPO_JSON, 0);
+
+        LongConsumer parseProgress = new FileDownloadConsumer() {
+            @Override
+            public void onUpdate(FileDownloadConsumer it) {
+                progress.downloading(REPO_JSON, it.getPercentage());
+            }
+        };
         if (skipSign) {
-            packUrlContent = Urls.parseContent(packUrl, Mod.MOD_FILES_LIMIT);
+            packUrlContent = Urls.parseContent(packUrl, Mod.MOD_FILES_LIMIT, parseProgress);
             Out.warn("Dynamic pack " + parent.getName() + " is skipping signing.");
             progress.textLog("File parsed, verify skipped.");
 
         } else {
-            packUrlContent = Urls.parseContentAndVerify(packSigUrl, packUrl, publicKey, Mod.MOD_FILES_LIMIT);
+            packUrlContent = Urls.parseContentAndVerify(packSigUrl, packUrl, publicKey, Mod.MOD_FILES_LIMIT, parseProgress);
             progress.textLog("Success parse and verify file.");
         }
-        progress.downloading(REPO_JSON, 100);
 
         JSONObject repoJson = new JSONObject(packUrlContent);
         long formatVersion;

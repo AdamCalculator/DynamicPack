@@ -1,12 +1,17 @@
 package com.adamcalculator.dynamicpack;
 
-import com.adamcalculator.dynamicpack.util.AFiles;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,13 +35,6 @@ public class PackUtil {
 
     public static String readString(Path path) throws IOException {
         return Files.readString(path, StandardCharsets.UTF_8);
-    }
-
-
-    public static void addFileToZip(File zipFile, String name, String text) throws IOException {
-        openPackFileSystem(zipFile, path -> {
-            AFiles.nioWriteText(path.resolve(name), text);
-        });
     }
 
     public static void openPackFileSystem(File pack, Consumer<Path> consumer) throws IOException {

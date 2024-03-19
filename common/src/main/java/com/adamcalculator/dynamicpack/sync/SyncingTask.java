@@ -64,21 +64,21 @@ public class SyncingTask implements Runnable {
 
             @Override
             public void start() {
-                Out.println(pack.getLocation().getName() + ": Sync started.");
+                Out.println(pack.getName() + ": Sync started.");
             }
 
             @Override
             public void done(boolean reloadRequired) {
-                Out.println(pack.getLocation().getName() + ": Sync done. pack reloadRequired=" + reloadRequired);
+                Out.println(pack.getName() + ": Sync done. pack reloadRequired=" + reloadRequired);
 
                 if (reloadRequired && !SyncingTask.this.reloadRequired) {
                     try {
                         if (DynamicPackModBase.INSTANCE.isResourcePackActive(pack)) {
                             SyncingTask.this.reloadRequired = true;
-                            Out.println(pack.getLocation().getName() + ": SyncTask.reloadRequired now true!");
+                            Out.println(pack.getName() + ": SyncTask.reloadRequired now true!");
                         }
                     } catch (Exception e) {
-                        Out.error(pack.getLocation().getName() + ": SyncTask.reloadRequired now true!", e);
+                        Out.error(pack.getName() + ": SyncTask.reloadRequired now true!", e);
                         SyncingTask.this.reloadRequired = true;
                     }
                 }
@@ -86,7 +86,7 @@ public class SyncingTask implements Runnable {
 
             @Override
             public void textLog(String s) {
-                Out.println(pack.getLocation().getName() + ": [textLog] " + s);
+                Out.println(pack.getName() + ": [textLog] " + s);
             }
 
             @Override

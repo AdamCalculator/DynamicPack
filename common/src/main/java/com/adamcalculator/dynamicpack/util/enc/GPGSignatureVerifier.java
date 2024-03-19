@@ -47,9 +47,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
-public class GPGDetachedSignatureVerifier {
+public class GPGSignatureVerifier {
 
-    private GPGDetachedSignatureVerifier() {
+    private GPGSignatureVerifier() {
     }
 
     public static boolean verify(InputStream signedFileInputStream, InputStream signatureIs, String base64publicKey) throws IOException {
