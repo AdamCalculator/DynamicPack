@@ -106,10 +106,10 @@ public class DynamicRepoRemote extends Remote {
 
         String remoteName = repoJson.getString("name");
         if (remoteName.isBlank()) {
-            throw new RemoteException("Name of remote pack can't be blank");
+            throw new RuntimeException("Name of remote pack can't be blank");
         }
         if (remoteName.trim().length() > 50) {
-            throw new RemoteException("Length of name pack can't > 50");
+            throw new RuntimeException("Length of name pack can't > 50");
         }
 
 
