@@ -1,57 +1,49 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.*;
+import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.IDValidator;
+import com.adamcalculator.dynamicpack.Mod;
+import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
-import com.adamcalculator.dynamicpack.util.*;
+import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.FileDownloadConsumer;
+import com.adamcalculator.dynamicpack.util.Hashes;
+import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DynamicRepoSyncProcessV1 {
-    private final Pack parent;
     private final DynamicRepoRemote remote;
     private final PackSyncProgress progress;
-    private final JSONObject j;
+    private final JSONObject repoJson;
 
     private final Set<String> oldestFilesList = new HashSet<>();
-    private FileSystem zipFileSystem;
-    private Path packRootPath;
+    private final Path packRootPath;
 
-    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject j) throws IOException {
-        this.parent = pack;
+    public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject repoJson, Path path) {
         this.remote = dynamicRepoRemote;
         this.progress = progress;
-        this.j = j;
-        if (parent.isZip()) {
-            Map<String, String> env = new HashMap<>();
-            env.put("create", "true");
-            URI uri = URI.create("jar:" + parent.getLocation().toPath().toUri());
-            zipFileSystem = FileSystems.newFileSystem(uri, env);
-            packRootPath = zipFileSystem.getPath("");
-
-        } else {
-            packRootPath = parent.getLocation().toPath();
-        }
+        this.repoJson = repoJson;
+        this.packRootPath = path;
     }
 
-    public void run() throws IOException, NoSuchAlgorithmException {
+    public void run() throws IOException {
         PackUtil.walkScan(oldestFilesList, packRootPath);
 
-        List<JSONObject> jsonObjects = calcActiveContents();
+        List<JSONObject> activeContents = calcActiveContents();
 
-        for (JSONObject jsonObject : jsonObjects) {
-            Out.println("process activeContent: " + jsonObject);
-            processContent(jsonObject);
+        for (JSONObject jsonContent : activeContents) {
+            processContent(jsonContent);
         }
 
         for (String s : oldestFilesList) {
@@ -60,24 +52,22 @@ public class DynamicRepoSyncProcessV1 {
             progress.stateChanged(new StateFileDeleted(path));
 
             progress.textLog("File deleted from resource-pack: " + s);
-            AFiles.noEmptyDirDelete(path);
+            AFiles.nioSmartDelete(path);
         }
     }
 
     public void close() throws IOException {
-        if (zipFileSystem != null && zipFileSystem.isOpen()) {
-            zipFileSystem.close();
-        }
     }
 
-    private void processContent(JSONObject object) throws IOException, NoSuchAlgorithmException {
-        String id = object.getString("id");
-        String contentRemoteHash = object.getString("hash");
+    private void processContent(JSONObject jsonContent) throws IOException {
+        String id = jsonContent.getString("id");
         if (!IDValidator.isValid(id)) {
             throw new RuntimeException("Id of content is not valid.");
         }
-        String url = object.getString("url");
-        String urlCompressed = object.optString("url_compressed", null);
+
+        String contentRemoteHash = jsonContent.getString("hash");
+        String url = jsonContent.getString("url");
+        String urlCompressed = jsonContent.optString("url_compressed", null);
         boolean compressSupported = urlCompressed != null;
 
         checkPathSafety(url);
@@ -89,51 +79,62 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         progress.textLog("process content id:" + id);
-        progress.downloading("<content>.json", 0);
-        String content = compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT);
+        var contentDownloadProgress = new FileDownloadConsumer() {
+            @Override
+            public void onUpdate(FileDownloadConsumer it) {
+                progress.downloading("<content:"+ id +">.json", it.getPercentage());
+            }
+        };
+        String content = compressSupported ? Urls.parseGZipContent(urlCompressed, Mod.GZIP_LIMIT, contentDownloadProgress) : Urls.parseContent(url, Mod.MOD_FILES_LIMIT, contentDownloadProgress);
         String receivedHash = Hashes.calcHashForBytes(content.getBytes(StandardCharsets.UTF_8));
         if (!contentRemoteHash.equals(receivedHash)) {
             throw new SecurityException("Hash of content at " + url + " not verified. remote: " + contentRemoteHash + "; received: " + receivedHash);
         }
-        progress.downloading("<content>.json", 100);
         processContentParsed(new JSONObject(content));
     }
 
-    private void processContentParsed(JSONObject j) throws IOException {
-        if (j.getLong("formatVersion") != 1) {
-            throw new RuntimeException("Incompatible formatVersion");
+    private void processContentParsed(JSONObject jsonContent) throws IOException {
+        long formatVersion;
+        if ((formatVersion = jsonContent.getLong("formatVersion")) != 1) {
+            throw new RuntimeException("Incompatible formatVersion: " + formatVersion);
         }
 
-        JSONObject c = j.getJSONObject("content");
+        JSONObject c = jsonContent.getJSONObject("content");
         String par = c.optString("parent", "");
+        String rem = c.optString("remote_parent", "");
         JSONObject files = c.getJSONObject("files");
+
         int processedFiles = 0;
-        for (String localPath : files.keySet()) {
-            String path = getPath(par, localPath);
-            String realUrl = getUrlFromPath(path);
-            JSONObject fileExtra = files.getJSONObject(localPath);
+        for (final String _relativePath : files.keySet()) {
+            var path = getAndCheckPath(par, _relativePath); // parent / path.     assets/minecraft
+            var filePath = packRootPath.resolve(path);
+            var fileRemoteUrl = getUrlFromPath(rem, path);
+
+            JSONObject fileExtra = files.getJSONObject(_relativePath);
             String hash = fileExtra.getString("hash");
 
-
-            Path filePath = packRootPath.resolve(path);
+            // remove from unused list
             oldestFilesList.remove(filePath.toString());
 
             boolean isOverwrite = false;
-            if (!Files.notExists(filePath)) {
-                String localHash = Hashes.calcHashForInputStream(Files.newInputStream(filePath));
+            if (Files.exists(filePath)) {
+                String localHash = Hashes.nioCalcHashForPath(filePath);
                 if (!localHash.equals(hash)) {
                     isOverwrite = true;
-                    this.progress.textLog("hash not equal: local:" + localHash+ " remote:"+hash);
+                    this.progress.textLog(filePath + ": overwrite! hash not equal: local:" + localHash+ " remote:"+hash);
                 }
             } else {
-                this.progress.textLog("Not exists: " + filePath);
+                this.progress.textLog("Overwrite! Not exists: " + filePath);
                 isOverwrite = true;
             }
 
             if (isOverwrite) {
-                if (filePath.getFileName().toString().contains(DynamicPackModBase.CLIENT_FILE)) continue;
-                this.progress.textLog("(over)write file: " + filePath);
-                Urls.downloadDynamicFile(realUrl, filePath, hash, new FileDownloadConsumer() {
+                if (filePath.getFileName().toString().contains(DynamicPackModBase.CLIENT_FILE)) {
+                    continue;
+                }
+
+                this.progress.textLog("Overwriting: " + filePath);
+                Urls.downloadDynamicFile(fileRemoteUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
                     public void onUpdate(FileDownloadConsumer it) {
                         progress.downloading(filePath.getFileName().toString(), it.getPercentage());
@@ -146,11 +147,17 @@ public class DynamicRepoSyncProcessV1 {
         this.progress.textLog("Files processed in this content: " + processedFiles);
     }
 
-    private String getUrlFromPath(String path) {
-        return remote.getUrl() + "/" + path;
+    private String getUrlFromPath(String remoteParent, String path) {
+        checkPathSafety(remoteParent);
+
+        if (remoteParent.isEmpty()) {
+            return remote.getUrl() + "/" + path;
+        }
+
+        return remote.getUrl() + "/" + remoteParent + "/" + path;
     }
 
-    public static String getPath(String parent, String path) {
+    public static String getAndCheckPath(String parent, String path) {
         checkPathSafety(path);
         checkPathSafety(parent);
 
@@ -161,19 +168,19 @@ public class DynamicRepoSyncProcessV1 {
     }
 
     public static void checkPathSafety(String s) {
-        if (s.contains("://") || s.contains("..") || s.contains("  ") || s.contains(".exe")) {
-            throw new SecurityException("This url not supported redirects to other servers or jump-up!");
+        if (s.contains("://") || s.contains("..") || s.contains("  ") || s.contains(".exe") || s.contains(":") || s.contains(".jar")) {
+            throw new SecurityException("This url not safe: " + s);
         }
     }
 
     private List<JSONObject> calcActiveContents() {
         List<JSONObject> activeContents = new ArrayList<>();
-        JSONArray contents = j.getJSONArray("contents");
+        JSONArray contents = repoJson.getJSONArray("contents");
         int i = 0;
         while (i < contents.length()) {
             JSONObject content = contents.getJSONObject(i);
             String id = content.getString("id");
-            if (parent.isContentActive(id)) {
+            if (remote.isContentActive(id) || content.optBoolean("required", false)) {
                 activeContents.add(content);
             }
             i++;

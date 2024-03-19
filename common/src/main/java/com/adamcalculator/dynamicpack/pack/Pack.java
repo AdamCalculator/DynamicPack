@@ -8,35 +8,38 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.nio.file.Path;
 
 public class Pack {
+    public static final String UNKNOWN_PACK_MCMETA = """
+                {
+                  "pack": {
+                    "pack_format": 17,
+                    "description": "Unknown DynamicPack resource-pack..."
+                  }
+                }
+                """;
+
     private final File location;
-    JSONObject cachedJson;
+    private final JSONObject cachedJson;
+    private final Remote remote;
+
     private boolean cachedUpdateAvailable;
-    long current_build;
-    private Remote remote;
     private boolean isSyncing = false;
+
 
     public Pack(File location, JSONObject json) {
         this.location = location;
         this.cachedJson = json;
 
-        JSONObject current = json.getJSONObject("current");
+        try {
+            JSONObject remote = json.getJSONObject("remote");
+            String remoteType = remote.getString("type");
+            this.remote = Remote.REMOTES.get(remoteType).get();
+            this.remote.init(this, remote);
 
-        JSONObject remote = json.getJSONObject("remote");
-        String remoteType = remote.getString("type");
-        if (Objects.equals(remoteType, "dynamic_repo")) {
-            this.remote = new DynamicRepoRemote(this, remote);
-            this.current_build = current.getLong("build");
-
-        } else if (Objects.equals(remoteType, "modrinth")) {
-            this.remote = new ModrinthRemote(this, remote);
-
-        } else {
-            throw new RuntimeException("Unknown remote format: " + remoteType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse remote", e);
         }
     }
 
@@ -51,8 +54,16 @@ public class Pack {
         return location;
     }
 
+    public String getName() {
+        return location.getName();
+    }
+
+    public JSONObject getPackJson() {
+        return cachedJson;
+    }
+
     public long getCurrentBuild() {
-        return current_build;
+        return cachedJson.getJSONObject("current").optLong("build", -1);
     }
 
     public String getCurrentUnique() {
@@ -106,34 +117,20 @@ public class Pack {
     }
 
     private void checkSafePackMinecraftMeta() throws IOException {
-        final String meta = """
-                {
-                  "pack": {
-                    "pack_format": 17,
-                    "description": "Unknown DynamicPack resource-pack..."
-                  }
+        PackUtil.openPackFileSystem(location, path -> {
+            Path mcmeta = path.resolve(DynamicPackModBase.MINECRAFT_META);
+            boolean safe = PackUtil.isPathFileExists(mcmeta);
+            if (safe) {
+                try {
+                    safe = checkMinecraftMetaIsValid(PackUtil.readString(mcmeta));
+                } catch (IOException ignored) {
+                    safe = false;
                 }
-                """;
-        if (isZip()) {
-            ZipFile zipFile = new ZipFile(location);
-            ZipEntry zipEntry = zipFile.getEntry(DynamicPackModBase.MINECRAFT_META);
-            boolean safe = zipEntry != null;
-            if (safe) {
-                safe = checkMinecraftMetaIsValid(PackUtil.readString(zipFile.getInputStream(zipEntry)));
             }
             if (!safe) {
-                PackUtil.addFileToZip(location, DynamicPackModBase.MINECRAFT_META, meta);
+                AFiles.nioWriteText(mcmeta, UNKNOWN_PACK_MCMETA);
             }
-        } else {
-            File file = new File(location, DynamicPackModBase.MINECRAFT_META);
-            boolean safe = PackUtil.isPathFileExists(file.toPath());
-            if (safe) {
-                safe = checkMinecraftMetaIsValid(AFiles.read(file));
-            }
-            if (!safe) {
-                AFiles.write(file, meta);
-            }
-        }
+        });
     }
 
     private boolean checkMinecraftMetaIsValid(String s) {
@@ -148,13 +145,5 @@ public class Pack {
             return false;
         }
         return true;
-    }
-
-    public boolean isContentActive(String id) {
-        return true; // todo
-    }
-
-    public String getName() {
-        return location.getName();
     }
 }

@@ -6,10 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Hashes {
     public static String calcHashForFile(File file) throws IOException {
-        return DigestUtils.sha1Hex(Files.newInputStream(file.toPath()));
+        return nioCalcHashForPath(file.toPath());
+    }
+
+    public static String nioCalcHashForPath(Path path) throws IOException {
+        return DigestUtils.sha1Hex(Files.newInputStream(path));
     }
 
     public static String calcHashForInputStream(InputStream inputStream) throws IOException {

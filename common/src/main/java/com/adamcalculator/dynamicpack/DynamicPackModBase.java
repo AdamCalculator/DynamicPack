@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.pack.Remote;
 import com.adamcalculator.dynamicpack.util.AFiles;
 import com.adamcalculator.dynamicpack.util.Out;
 import org.json.JSONObject;
@@ -9,10 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public abstract class DynamicPackModBase {
 	public static final String CLIENT_FILE = "dynamicmcpack.json";
@@ -20,7 +20,8 @@ public abstract class DynamicPackModBase {
 
 	public static DynamicPackModBase INSTANCE;
 
-	public static List<Pack> packs = new ArrayList<>();
+	private boolean isPacksScanning = false;
+	private List<Pack> packs = new ArrayList<>();
 	private File gameDir;
 	private File resourcePacks;
 	private boolean minecraftInitialized = false;
@@ -34,6 +35,7 @@ public abstract class DynamicPackModBase {
 		this.gameDir = gameDir;
 		this.resourcePacks = new File(gameDir, "resourcepacks");
 		this.resourcePacks.mkdirs();
+		Remote.initRemoteTypes();
 
 		startSyncThread();
 	}
@@ -41,28 +43,33 @@ public abstract class DynamicPackModBase {
 	public abstract void startSyncThread();
 
 	public void rescanPacks() {
+		if (isPacksScanning) {
+			Out.warn("rescanPacks already in scanning!");
+			return;
+		}
+		isPacksScanning = true;
 		packs.clear();
 
 		for (File packFile : AFiles.lists(resourcePacks)) {
-			Out.println("file: " + packFile.getName());
 			try {
-				if (packFile.isDirectory()) {
-					File dynamic = new File(packFile, CLIENT_FILE);
-					if (AFiles.exists(dynamic)) {
-						processPack(packFile, new JSONObject(AFiles.read(dynamic)));
+				PackUtil.openPackFileSystem(packFile, path -> {
+					Path dynamicPackPath = path.resolve(CLIENT_FILE);
+					if (Files.exists(dynamicPackPath)) {
+						Out.println(" + Pack " + packFile.getName() + " supported by mod!");
+                        try {
+                            processPack(packFile, PackUtil.readJson(dynamicPackPath));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+						Out.println(" - Pack " + packFile.getName() + " not supported by mod.");
 					}
-
-				} else if (packFile.getName().endsWith(".zip")) {
-					ZipFile zipFile = new ZipFile(packFile);
-					ZipEntry entry = zipFile.getEntry(CLIENT_FILE);
-					if (entry != null) {
-						processPack(packFile, PackUtil.readJson(zipFile.getInputStream(entry)));
-					}
-				}
+                });
 			} catch (Exception e) {
 				Out.error("Error while processing pack: " + packFile, e);
 			}
 		}
+		isPacksScanning = false;
 	}
 
 
@@ -74,8 +81,17 @@ public abstract class DynamicPackModBase {
 			packs.add(pack);
 
 		} else {
-			throw new RuntimeException("Unsupported formatVersion!");
+			throw new RuntimeException("Unsupported formatVersion: " + formatVersion);
 		}
+	}
+
+	/**
+	 * API FOR MODPACKERS etc all-in-one packs
+	 * @param host host to add.
+	 * @param requester any object. It is recommended that .toString explicitly give out your name.
+	 */
+	public static void addAllowedHosts(String host, Object requester) throws Exception {
+		Mod.addAllowedHosts(host, requester);
 	}
 
 	public boolean isResourcePackActive(Pack pack) throws IOException {
@@ -94,6 +110,10 @@ public abstract class DynamicPackModBase {
 		return gameDir;
 	}
 
+	public Pack[] getPacks() {
+		return packs.toArray(new Pack[0]);
+	}
+
 	public void minecraftInitialized() {
 		this.minecraftInitialized = true;
 	}
@@ -101,4 +121,6 @@ public abstract class DynamicPackModBase {
 	public boolean isMinecraftInitialized() {
 		return minecraftInitialized;
 	}
+
+	public abstract String getCurrentGameVersion();
 }
