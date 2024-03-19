@@ -84,12 +84,8 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
 
     @Override
     public boolean checkResourcePackMetaValid(String s) {
-        try {
-            new PackResourceMetadataReader().fromJson(JsonHelper.deserialize(s));
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        new PackResourceMetadataReader().fromJson(JsonHelper.deserialize(s).getAsJsonObject("pack"));
+        return true;
     }
 
     private void tryToReloadResources() {
