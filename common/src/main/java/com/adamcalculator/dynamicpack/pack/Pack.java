@@ -21,16 +21,16 @@ public class Pack {
                 """;
 
     private final File location;
-    JSONObject cachedJson;
-    private boolean cachedUpdateAvailable;
+    private final JSONObject cachedJson;
     private final Remote remote;
+
+    private boolean cachedUpdateAvailable;
     private boolean isSyncing = false;
 
 
     public Pack(File location, JSONObject json) {
         this.location = location;
         this.cachedJson = json;
-
 
         try {
             JSONObject remote = json.getJSONObject("remote");
@@ -52,6 +52,14 @@ public class Pack {
 
     public File getLocation() {
         return location;
+    }
+
+    public String getName() {
+        return location.getName();
+    }
+
+    public JSONObject getPackJson() {
+        return cachedJson;
     }
 
     public long getCurrentBuild() {
@@ -137,9 +145,5 @@ public class Pack {
             return false;
         }
         return true;
-    }
-
-    public String getName() {
-        return location.getName();
     }
 }

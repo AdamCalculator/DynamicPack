@@ -96,11 +96,11 @@ public class ModrinthRemote extends Remote {
             throw new RuntimeException("Failed to download correct file from modrinth.");
         }
 
-        parent.cachedJson.getJSONObject("current").put("version", latest.latestId);
-        parent.cachedJson.getJSONObject("current").remove("version_number");
+        parent.getPackJson().getJSONObject("current").put("version", latest.latestId);
+        parent.getPackJson().getJSONObject("current").remove("version_number");
 
 
-        PackUtil.openPackFileSystem(tempFile, path -> AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.cachedJson.toString(2)));
+        PackUtil.openPackFileSystem(tempFile, path -> AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2)));
         progress.textLog("dynamicmcpack.json is updated.");
 
         if (parent.isZip()) {

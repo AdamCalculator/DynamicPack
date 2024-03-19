@@ -122,9 +122,9 @@ public class DynamicRepoRemote extends Remote {
             dynamicRepoSyncProcessV1.close();
             throw e;
         }
-        parent.cachedJson.getJSONObject("current").put("build", repoJson.getLong("build"));
+        parent.getPackJson().getJSONObject("current").put("build", repoJson.getLong("build"));
 
-        AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.cachedJson.toString(2));
+        AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2));
     }
 
     public String getUrl() {

@@ -8,6 +8,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
+/**
+ * Abstract remote of pack
+ */
 public abstract class Remote {
     private static boolean initialized = false;
     public static final HashMap<String, Supplier<Remote>> REMOTES = new HashMap<>();

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 public class DynamicRepoSyncProcessV1 {
-    private final Pack parent;
     private final DynamicRepoRemote remote;
     private final PackSyncProgress progress;
     private final JSONObject repoJson;
@@ -32,7 +31,6 @@ public class DynamicRepoSyncProcessV1 {
     private final Path packRootPath;
 
     public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject repoJson, Path path) {
-        this.parent = pack;
         this.remote = dynamicRepoRemote;
         this.progress = progress;
         this.repoJson = repoJson;
