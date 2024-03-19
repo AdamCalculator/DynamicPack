@@ -3,7 +3,8 @@
   "package": "com.adamcalculator.dynamicpack.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "ResourcePackEntryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

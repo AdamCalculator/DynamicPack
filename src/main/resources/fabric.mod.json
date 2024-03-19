@@ -14,6 +14,7 @@
 	"license": "MIT",
 	"icon": "assets/dynamicpack/icon.png",
 	"environment": "client",
+	"accessWidener": "dynamicpack.accesswidener",
 	"entrypoints": {
 		"modmenu": [
 			"com.adamcalculator.dynamicpack.ModMenu"

@@ -94,6 +94,19 @@ public abstract class DynamicPackModBase {
 		Mod.addAllowedHosts(host, requester);
 	}
 
+	public boolean isNameIsDynamic(String name) {
+		return getDynamicPackByMinecraftName(name) != null;
+	}
+
+	public Pack getDynamicPackByMinecraftName(String name) {
+		for (Pack pack : packs) {
+			if (("file/" + pack.getName()).equals(name)) {
+				return pack;
+			}
+		}
+		return null;
+	}
+
 	public boolean isResourcePackActive(Pack pack) throws IOException {
 		for (String readLine : Files.readAllLines(new File(getGameDir(), "options.txt").toPath(), StandardCharsets.UTF_8)) {
 			if (readLine.startsWith("resourcePacks:")) {
@@ -124,5 +137,5 @@ public abstract class DynamicPackModBase {
 
 	public abstract String getCurrentGameVersion();
 
-	public abstract boolean checkResourcePackMetaValid(String s);
+	public abstract boolean checkResourcePackMetaValid(String s) throws Exception;
 }
