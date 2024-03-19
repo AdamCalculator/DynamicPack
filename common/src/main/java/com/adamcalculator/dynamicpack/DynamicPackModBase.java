@@ -123,4 +123,6 @@ public abstract class DynamicPackModBase {
 	}
 
 	public abstract String getCurrentGameVersion();
+
+	public abstract boolean checkResourcePackMetaValid(String s);
 }

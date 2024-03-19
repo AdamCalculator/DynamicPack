@@ -4,6 +4,7 @@ import com.adamcalculator.dynamicpack.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.Out;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -135,15 +136,11 @@ public class Pack {
 
     private boolean checkMinecraftMetaIsValid(String s) {
         try {
-            JSONObject jsonObject = new JSONObject(s);
-            JSONObject pack = jsonObject.getJSONObject("pack");
-            pack.getLong("pack_format");
-            if (pack.getString("description").length() > 60) {
-                throw new Exception("Description length");
-            }
+            return DynamicPackModBase.INSTANCE.checkResourcePackMetaValid(s);
+
         } catch (Exception e) {
+            Out.error("Error while check meta valid.", e);
             return false;
         }
-        return true;
     }
 }
