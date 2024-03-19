@@ -83,7 +83,7 @@ public class AFiles {
      */
     public static void nioWriteText(Path path, String text) {
         try {
-            if (!Files.isRegularFile(path)) {
+            if (Files.exists(path) && !Files.isRegularFile(path)) {
                 throw new SecurityException("Try to write text to a not regular file.");
             }
             Files.deleteIfExists(path);
