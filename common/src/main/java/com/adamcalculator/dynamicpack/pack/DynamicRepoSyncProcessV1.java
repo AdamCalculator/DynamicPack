@@ -7,6 +7,7 @@ import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
 import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.FileDownloadConsumer;
 import com.adamcalculator.dynamicpack.util.Hashes;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONArray;

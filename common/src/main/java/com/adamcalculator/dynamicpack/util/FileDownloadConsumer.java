@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.pack;
+package com.adamcalculator.dynamicpack.util;
 
 import java.util.function.LongConsumer;
 

@@ -5,6 +5,7 @@ import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.FileDownloadConsumer;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONObject;
