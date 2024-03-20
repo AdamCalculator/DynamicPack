@@ -2,9 +2,10 @@ package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -24,7 +25,7 @@ public class DynamicPackScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
         context.drawTextWithShadow(this.textRenderer, this.title, 20, 8, 16777215);
         context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20, 16777215);
