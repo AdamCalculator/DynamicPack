@@ -15,5 +15,7 @@
   "dynamicpack.toast.pack.state.unknown.description": "Обработка...",
   "dynamicpack.screen.pack.description": "Этот ресурспак поддерживает возможности мода DynamicPack!",
   "dynamicpack.screen.pack.remote_type": "Тип: %s",
-  "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s"
+  "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s",
+  "dynamicpack.screen.pack.manually_sync": "Синхр. вручную"
+
 }

@@ -3,9 +3,8 @@ package com.adamcalculator.dynamicpack;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -25,20 +24,20 @@ public class DynamicPackScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
-        context.drawTextWithShadow(this.textRenderer, this.title, 20, 8, 16777215);
-        context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52, 16777215);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+        renderBackground(matrixStack);
+        drawTextWithShadow(matrixStack, this.textRenderer, this.title, 20, 8, 16777215);
+        drawTextWithShadow(matrixStack, this.textRenderer, screenDescText, 20, 20, 16777215);
+        drawTextWithShadow(matrixStack, this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36, 16777215);
+        drawTextWithShadow(matrixStack, this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52, 16777215);
 
-        super.render(context, mouseX, mouseY, delta);
+        super.render(matrixStack, mouseX, mouseY, delta);
     }
 
     @Override
     protected void init() {
         addDrawableChild(Compat.createButton(
-                Text.of("Manually sync"),
+                Text.translatable("dynamicpack.screen.pack.manually_sync"),
                         () -> {
                             DynamicPackModBase.INSTANCE.startManuallySync();
                             close();

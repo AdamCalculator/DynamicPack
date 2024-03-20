@@ -8,16 +8,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class PackMixinHelper {
-    private static final Identifier BUTTON_TEXTURE = Identifier.of("dynamicpack", "select_button.png");
-
-   
     public static void renderResourcePackEntry(Object resourcePackEntryMixin, MatrixStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
         if (DynamicPackModBase.INSTANCE.isNameIsDynamic(entry.getName())) {
             int i = mouseX - x;
             int j = mouseY - y;
 
-            // INDICATOR NOT WORKING IN 1.19.4 BACKPORT...
+            // TODO(adam) 2024.03.20: INDICATOR NOT WORKING IN 1.19.4 BACKPORT...
             //DrawableHelper.drawTexture(context, Identifier.of("dynamicpack", "select_button.png"), x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
         }
     }
