@@ -24,9 +24,9 @@ public abstract class Remote {
         REMOTES.put("dynamic_repo", DynamicRepoRemote::new);
     }
 
-    public abstract void init(Pack pack, JSONObject remote);
+    public abstract void init(Pack pack, JSONObject remote, JSONObject current);
 
     public abstract boolean checkUpdateAvailable() throws IOException;
 
-    public abstract boolean sync(PackSyncProgress progress) throws IOException, NoSuchAlgorithmException;
+    public abstract boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException;
 }

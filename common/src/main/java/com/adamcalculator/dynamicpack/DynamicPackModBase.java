@@ -3,6 +3,7 @@ package com.adamcalculator.dynamicpack;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.pack.Remote;
 import com.adamcalculator.dynamicpack.util.AFiles;
+import com.adamcalculator.dynamicpack.util.FailedOpenPackFileSystemException;
 import com.adamcalculator.dynamicpack.util.Out;
 import org.json.JSONObject;
 
@@ -19,6 +20,7 @@ public abstract class DynamicPackModBase {
 	public static final String MINECRAFT_META = "pack.mcmeta";
 
 	public static DynamicPackModBase INSTANCE;
+	protected static int manuallySyncThreadCounter = 0;
 
 	private boolean isPacksScanning = false;
 	private List<Pack> packs = new ArrayList<>();
@@ -40,7 +42,12 @@ public abstract class DynamicPackModBase {
 		startSyncThread();
 	}
 
+	/**
+	 * ONLY FOR FIRST INIT RUN! FOR MANUALLY USE startManuallySync!!!!!
+	 */
 	public abstract void startSyncThread();
+
+	public abstract void startManuallySync();
 
 	public void rescanPacks() {
 		if (isPacksScanning) {
@@ -55,18 +62,22 @@ public abstract class DynamicPackModBase {
 				PackUtil.openPackFileSystem(packFile, path -> {
 					Path dynamicPackPath = path.resolve(CLIENT_FILE);
 					if (Files.exists(dynamicPackPath)) {
-						Out.println(" + Pack " + packFile.getName() + " supported by mod!");
+						Out.println("+ Pack " + packFile.getName() + " supported by mod!");
                         try {
                             processPack(packFile, PackUtil.readJson(dynamicPackPath));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
-						Out.println(" - Pack " + packFile.getName() + " not supported by mod.");
+						Out.println("- Pack " + packFile.getName() + " not supported by mod.");
 					}
                 });
 			} catch (Exception e) {
-				Out.error("Error while processing pack: " + packFile, e);
+				if (e instanceof FailedOpenPackFileSystemException) {
+					Out.warn("Error while processing pack " + packFile.getName() + ": " + e.getMessage());
+				} else {
+					Out.error("Error while processing pack: " + packFile.getName(), e);
+				}
 			}
 		}
 		isPacksScanning = false;
@@ -99,7 +110,7 @@ public abstract class DynamicPackModBase {
 	}
 
 	public Pack getDynamicPackByMinecraftName(String name) {
-		for (Pack pack : packs) {
+		for (Pack pack : getPacks()) {
 			if (("file/" + pack.getName()).equals(name)) {
 				return pack;
 			}

@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.InputValidator;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
@@ -8,11 +9,11 @@ import com.adamcalculator.dynamicpack.util.AFiles;
 import com.adamcalculator.dynamicpack.util.FileDownloadConsumer;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.function.LongConsumer;
@@ -24,7 +25,7 @@ public class DynamicRepoRemote extends Remote {
 
 
     private Pack parent;
-
+    private JSONObject cachedCurrentJson;
     protected String url;
     protected String buildUrl;
     protected String packUrl;
@@ -37,8 +38,9 @@ public class DynamicRepoRemote extends Remote {
     public DynamicRepoRemote() {
     }
 
-    public void init(Pack pack, JSONObject remote) {
+    public void init(Pack pack, JSONObject remote, JSONObject current) {
         this.parent = pack;
+        this.cachedCurrentJson = current;
         this.url = remote.getString("url");
         this.buildUrl = url + "/" + REPO_BUILD;
         this.packUrl = url + "/" + REPO_JSON;
@@ -62,12 +64,50 @@ public class DynamicRepoRemote extends Remote {
     @Override
     public boolean checkUpdateAvailable() throws IOException {
         String content = Urls.parseContent(buildUrl, 64).trim();
-        return parent.getCurrentBuild() != Long.parseLong(content);
+        return getCurrentBuild() != Long.parseLong(content);
+    }
+
+    public long getCurrentBuild() {
+        return cachedCurrentJson.optLong("build", -1);
+    }
+
+
+    // currently not using. but in feature this may be used in settings screen to Enable/disable contents
+    public void updateCurrentKnownContents(JSONArray repoContents) {
+        if (cachedCurrentJson.has("known_contents")) {
+            cachedCurrentJson.remove("known_contents");
+        }
+        JSONObject newKnown = new JSONObject();
+        cachedCurrentJson.put("known_contents", newKnown);
+        for (Object _repoContent : repoContents) {
+            JSONObject repoContent = (JSONObject) _repoContent;
+            String id = repoContent.getString("id");
+            boolean required = repoContent.optBoolean("required", false);
+            JSONObject jsonObject = new JSONObject()
+                    .put("hash", repoContent.getString("hash"));
+            if (required) {
+                jsonObject.put("required", true);
+            }
+            newKnown.put(id, jsonObject);
+        }
+    }
+
+    public String getCurrentPackContentHash(String id) {
+        if (cachedCurrentJson.has("known_contents")) {
+            try {
+                return cachedCurrentJson.getJSONObject("known_contents").getJSONObject(id).getString("hash");
+
+            } catch (Exception e) {
+                // if hash not found
+                return null;
+            }
+        }
+        return null;
     }
 
 
     @Override
-    public boolean sync(PackSyncProgress progress) throws IOException, NoSuchAlgorithmException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException {
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {
                 sync0(progress, path);
@@ -105,11 +145,8 @@ public class DynamicRepoRemote extends Remote {
         }
 
         String remoteName = repoJson.getString("name");
-        if (remoteName.isBlank()) {
-            throw new RuntimeException("Name of remote pack can't be blank");
-        }
-        if (remoteName.trim().length() > 50) {
-            throw new RuntimeException("Length of name pack can't > 50");
+        if (!InputValidator.isPackNameValid(remoteName)) {
+            throw new RuntimeException("Remote name of pack not valid.");
         }
 
 
@@ -123,6 +160,7 @@ public class DynamicRepoRemote extends Remote {
             throw e;
         }
         parent.getPackJson().getJSONObject("current").put("build", repoJson.getLong("build"));
+        parent.updateJsonLatestUpdate();
 
         AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2));
     }
