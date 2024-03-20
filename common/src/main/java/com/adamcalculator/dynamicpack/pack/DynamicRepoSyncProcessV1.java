@@ -68,10 +68,9 @@ public class DynamicRepoSyncProcessV1 {
         String contentRemoteHash = jsonContent.getString("hash");
         String localCache = remote.getCurrentPackContentHash(id);
         if (Objects.equals(localCache, contentRemoteHash)) {
-            progress.textLog("Skipping content " + id + " because local hash is equal with remote...");
-            return;
+            progress.textLog("Content '" + id + "' local hash is equal with remote...");
         } else {
-            progress.textLog("Content " + id + " local hash different with remote or null. Updating...");
+            progress.textLog("Content '" + id + "' local hash different with remote or null.");
         }
 
         String url = jsonContent.getString("url");
