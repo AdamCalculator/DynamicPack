@@ -15,6 +15,7 @@ public class InputValidatorTest {
         Assertions.assertFalse(InputValidator.isContentIdValid("test\ntest"));
 
         Assertions.assertTrue(InputValidator.isContentIdValid("__"));
+        Assertions.assertTrue(InputValidator.isContentIdValid("_-"));
         Assertions.assertTrue(InputValidator.isContentIdValid("pack:megapack"));
         Assertions.assertTrue(InputValidator.isContentIdValid("1234567890"));
         Assertions.assertTrue(InputValidator.isContentIdValid("01"));

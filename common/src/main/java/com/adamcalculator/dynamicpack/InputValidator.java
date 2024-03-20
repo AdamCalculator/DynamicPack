@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InputValidator {
-    private static final Pattern CONTENT_ID_PATTERN = Pattern.compile("^[a-z0-9_:]{2,128}$");
+    private static final Pattern CONTENT_ID_PATTERN = Pattern.compile("^[a-z0-9_:-]{2,128}$");
 
     public static boolean isContentIdValid(String input) {
         if (input == null) {
