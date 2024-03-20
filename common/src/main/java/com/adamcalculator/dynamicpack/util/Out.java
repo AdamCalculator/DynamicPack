@@ -62,4 +62,8 @@ public class Out {
             System.out.println("[dynamicpack] " + s);
         }
     }
+
+    public static void debug(String s) {
+        println("DEBUG: " + s);
+    }
 }

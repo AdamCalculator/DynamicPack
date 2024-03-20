@@ -101,7 +101,7 @@ public class Mod {
 
     // DebugScreen allowed
     public static boolean isDebugScreenAllowed() {
-        return true;
+        return false;
     }
 
     public static void debugNetwork() {

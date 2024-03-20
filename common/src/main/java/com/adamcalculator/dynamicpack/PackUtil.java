@@ -1,5 +1,6 @@
 package com.adamcalculator.dynamicpack;
 
+import com.adamcalculator.dynamicpack.util.FailedOpenPackFileSystemException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -56,7 +57,7 @@ public class PackUtil {
             }
 
         } else {
-            throw new RuntimeException("Failed to open pack file system");
+            throw new FailedOpenPackFileSystemException("Failed to open pack file system");
         }
     }
 

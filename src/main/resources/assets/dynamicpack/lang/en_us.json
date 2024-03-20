@@ -12,5 +12,8 @@
   "dynamicpack.toast.pack.state.deleting.title": "Pack %s",
   "dynamicpack.toast.pack.state.deleting.description": "Delete %s",
   "dynamicpack.toast.pack.state.unknown.title": "Pack %s",
-  "dynamicpack.toast.pack.state.unknown.description": "Processing..."
+  "dynamicpack.toast.pack.state.unknown.description": "Processing...",
+  "dynamicpack.screen.pack.description": "This resource pack support DynamicPack features!",
+  "dynamicpack.screen.pack.remote_type": "Remote type: %s",
+  "dynamicpack.screen.pack.latestUpdated": "Latest updated at: %s"
 }

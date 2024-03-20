@@ -12,7 +12,7 @@ import com.adamcalculator.dynamicpack.util.Out;
  * Re-check all packs and update packs with update available
  */
 public class SyncingTask implements Runnable {
-    public static long threadCounter = 0;
+    public static boolean isSyncing = false;
 
     private final boolean manually; // skip checkUpdateAvailable().
     private boolean reloadRequired = false;
@@ -24,6 +24,11 @@ public class SyncingTask implements Runnable {
 
     @Override
     public void run() {
+        if (isSyncing) {
+            Out.warn("SyncTask already syncing....");
+            return;
+        }
+        isSyncing = true;
         Out.println("SyncTask started!");
         onSyncStart();
         DynamicPackModBase.INSTANCE.rescanPacks();
@@ -39,6 +44,7 @@ public class SyncingTask implements Runnable {
         }
         onSyncDone(reloadRequired);
         Out.println("SyncTask ended!");
+        isSyncing = false;
     }
 
     public void onPackDoneSuccess(Pack pack) {}

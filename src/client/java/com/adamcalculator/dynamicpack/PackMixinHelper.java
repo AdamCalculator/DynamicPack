@@ -8,6 +8,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class PackMixinHelper {
+    private static final Identifier BUTTON_TEXTURE = Identifier.of("dynamicpack", "select_button.png");
+
+   
     public static void renderResourcePackEntry(Object resourcePackEntryMixin, MatrixStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
         if (DynamicPackModBase.INSTANCE.isNameIsDynamic(entry.getName())) {

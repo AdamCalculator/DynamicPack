@@ -27,6 +27,7 @@ public class Pack {
 
     private boolean cachedUpdateAvailable;
     private boolean isSyncing = false;
+    private final String remoteTypeStr;
 
 
     public Pack(File location, JSONObject json) {
@@ -36,12 +37,17 @@ public class Pack {
         try {
             JSONObject remote = json.getJSONObject("remote");
             String remoteType = remote.getString("type");
+            this.remoteTypeStr = remoteType;
             this.remote = Remote.REMOTES.get(remoteType).get();
-            this.remote.init(this, remote);
+            this.remote.init(this, remote, cachedJson.getJSONObject("current"));
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse remote", e);
         }
+    }
+
+    public boolean isSyncing() {
+        return isSyncing;
     }
 
     public boolean isZip() {
@@ -63,17 +69,18 @@ public class Pack {
         return cachedJson;
     }
 
-    public long getCurrentBuild() {
-        return cachedJson.getJSONObject("current").optLong("build", -1);
+
+    public void updateJsonLatestUpdate() {
+        cachedJson.getJSONObject("current").put("latest_updated", System.currentTimeMillis() / 1000);
     }
 
-    public String getCurrentUnique() {
-        return cachedJson.getJSONObject("current").optString("version", "");
-    }
+    public long getLatestUpdated() {
+        try {
+            return cachedJson.getJSONObject("current").getLong("latest_updated");
 
-
-    public String getCurrentVersionNumber() {
-        return cachedJson.getJSONObject("current").optString("version_number", "");
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     public boolean checkIsUpdateAvailable() throws IOException {
@@ -111,7 +118,7 @@ public class Pack {
         progress.start();
         progress.textLog("start syncing...");
 
-        boolean reloadRequired = remote.sync(progress);
+        boolean reloadRequired = remote.sync(progress, manually);
 
         isSyncing = false;
         progress.done(reloadRequired);
@@ -142,5 +149,9 @@ public class Pack {
             Out.error("Error while check meta valid.", e);
             return false;
         }
+    }
+
+    public String getRemoteType() {
+        return remoteTypeStr;
     }
 }
