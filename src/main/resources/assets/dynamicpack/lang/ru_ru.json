@@ -12,5 +12,8 @@
   "dynamicpack.toast.pack.state.deleting.title": "Пак %s",
   "dynamicpack.toast.pack.state.deleting.description": "Удаление %s",
   "dynamicpack.toast.pack.state.unknown.title": "Пак %s",
-  "dynamicpack.toast.pack.state.unknown.description": "Обработка..."
+  "dynamicpack.toast.pack.state.unknown.description": "Обработка...",
+  "dynamicpack.screen.pack.description": "Этот ресурспак поддерживает возможности мода DynamicPack!",
+  "dynamicpack.screen.pack.remote_type": "Тип: %s",
+  "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s"
 }

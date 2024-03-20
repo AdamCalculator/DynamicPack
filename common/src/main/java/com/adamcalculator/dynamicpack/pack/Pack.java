@@ -27,6 +27,7 @@ public class Pack {
 
     private boolean cachedUpdateAvailable;
     private boolean isSyncing = false;
+    private final String remoteTypeStr;
 
 
     public Pack(File location, JSONObject json) {
@@ -36,12 +37,17 @@ public class Pack {
         try {
             JSONObject remote = json.getJSONObject("remote");
             String remoteType = remote.getString("type");
+            this.remoteTypeStr = remoteType;
             this.remote = Remote.REMOTES.get(remoteType).get();
             this.remote.init(this, remote, cachedJson.getJSONObject("current"));
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse remote", e);
         }
+    }
+
+    public boolean isSyncing() {
+        return isSyncing;
     }
 
     public boolean isZip() {
@@ -143,5 +149,9 @@ public class Pack {
             Out.error("Error while check meta valid.", e);
             return false;
         }
+    }
+
+    public String getRemoteType() {
+        return remoteTypeStr;
     }
 }
