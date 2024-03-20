@@ -85,15 +85,26 @@ public class ModrinthRemote extends Remote {
             return false;
         }
         if (latest.optString("version_number", "").equals(getCurrentVersionNumber())) {
+            Out.debug("version number equal");
             return false;
         }
+        Out.debug("version rem.id="+latest.getString("id") + "; curr=" + getCurrentUnique());
+
         return !getCurrentUnique().equals(latest.getString("id"));
     }
 
     @Override
-    public boolean sync(PackSyncProgress progress) throws IOException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
         progress.textLog("getting latest version on modrinth...");
         ModrinthRemote.LatestModrinthVersion latest = getLatest();
+
+        if (manually) {
+            if (latest.latestId.equals(getCurrentUnique())) {
+                progress.textLog("Manually & version ids equal. skipping.");
+
+                return false;
+            }
+        }
 
         progress.textLog("downloading...");
         File tempFile = null;
@@ -140,6 +151,7 @@ public class ModrinthRemote extends Remote {
     public LatestModrinthVersion getLatest() throws IOException {
         JSONObject latest = parseLatestVersionJson();
         String latestId = latest.getString("id");
+        String latestVersionNumber = latest.getString("version_number");
         JSONArray files = latest.getJSONArray("files");
         int i = 0;
         while (i < files.length()) {
@@ -147,7 +159,7 @@ public class ModrinthRemote extends Remote {
             if (j.getBoolean("primary")) {
                 String url = j.getString("url");
                 JSONObject hashes = j.getJSONObject("hashes");
-                return new LatestModrinthVersion(latestId, url, hashes.getString("sha1"));
+                return new LatestModrinthVersion(latestId, latestVersionNumber, url, hashes.getString("sha1"));
             }
             i++;
         }
@@ -157,11 +169,13 @@ public class ModrinthRemote extends Remote {
     public static class LatestModrinthVersion {
 
         public final String latestId;
+        public final String latestVersionNumber;
         public final String url;
         public final String fileHash;
 
-        public LatestModrinthVersion(String latestId, String url, String fileHash) {
+        public LatestModrinthVersion(String latestId, String latestVersionNumber, String url, String fileHash) {
             this.latestId = latestId;
+            this.latestVersionNumber = latestVersionNumber;
             this.url = url;
             this.fileHash = fileHash;
         }

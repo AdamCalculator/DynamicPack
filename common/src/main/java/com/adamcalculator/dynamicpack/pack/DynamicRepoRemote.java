@@ -107,7 +107,7 @@ public class DynamicRepoRemote extends Remote {
 
 
     @Override
-    public boolean sync(PackSyncProgress progress) throws IOException, NoSuchAlgorithmException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException {
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {
                 sync0(progress, path);

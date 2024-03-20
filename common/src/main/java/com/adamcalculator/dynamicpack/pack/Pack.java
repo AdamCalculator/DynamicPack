@@ -112,7 +112,7 @@ public class Pack {
         progress.start();
         progress.textLog("start syncing...");
 
-        boolean reloadRequired = remote.sync(progress);
+        boolean reloadRequired = remote.sync(progress, manually);
 
         isSyncing = false;
         progress.done(reloadRequired);

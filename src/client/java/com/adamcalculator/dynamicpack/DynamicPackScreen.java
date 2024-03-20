@@ -4,7 +4,6 @@ import com.adamcalculator.dynamicpack.pack.Pack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
 public class DynamicPackScreen extends Screen {
@@ -24,7 +23,11 @@ public class DynamicPackScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.of("Manually sync"), button -> DynamicPackModBase.INSTANCE.startSyncThread()).size(120, 20).position(this.width / 2, this.height / 2).build());
+        addDrawableChild(Compat.createButton(
+                Text.of("Manually sync"),
+                        () -> DynamicPackModBase.INSTANCE.startManuallySync(),
+                100, 20, width - 120, 10
+        ));
     }
 
     @Override

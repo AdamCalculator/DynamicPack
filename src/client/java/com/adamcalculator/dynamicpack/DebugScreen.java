@@ -18,6 +18,6 @@ public class DebugScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan & Re-sync normally"), button -> DynamicPackModBase.INSTANCE.startSyncThread()).size(120, 20).position(this.width / 2, this.height / 2).build());
+        addDrawableChild(ButtonWidget.builder(Text.of("Re-Scan & Re-sync normally"), button -> DynamicPackModBase.INSTANCE.startManuallySync()).size(120, 20).position(this.width / 2, this.height / 2).build());
     }
 }

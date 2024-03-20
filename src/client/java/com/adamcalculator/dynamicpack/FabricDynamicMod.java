@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.sync.SyncThread;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
 import com.adamcalculator.dynamicpack.sync.state.StateDownloading;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
@@ -43,23 +44,36 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
 
     @Override
     public void startSyncThread() {
-        SyncingTask syncingTask = new SyncingTask(false) {
+        new SyncThread(() -> createSyncTask(false)).start();
+    }
+
+    @Override
+    public void startManuallySync() {
+        Thread thread = new Thread(() -> createSyncTask(true).run());
+        thread.setName("DynamicPack-ManuallySyncThread" + (DynamicPackModBase.manuallySyncThreadCounter++));
+        thread.start();
+    }
+
+    private SyncingTask createSyncTask(boolean manually) {
+        return new SyncingTask(manually) {
             @Override
             public void onSyncStart() {
-                setToastContent(Text.literal("DynamicPack"), Text.translatable("dynamicpack.toast.syncStarted"));
+                if (manually) setToastContent(Text.literal("DynamicPack"), Text.translatable("dynamicpack.toast.syncStarted"));
             }
 
             @Override
             public void onSyncDone(boolean reloadRequired) {
-                if (reloadRequired) {
+                if (manually || reloadRequired) {
                     setToastContent(Text.literal("DynamicPack"), Text.translatable("dynamicpack.toast.done"));
+                }
+                if (reloadRequired) {
                     tryToReloadResources();
                 }
             }
 
             @Override
             public void onStateChanged(Pack pack, SyncProgressState state) {
-                if (!FabricDynamicMod.SHOW_STATE) return;
+                if (!manually) return;
 
                 if (state instanceof StateDownloading downloading) {
                     setToastContent(Text.translatable("dynamicpack.toast.pack.state.downloading.title", pack.getName()), Text.translatable("dynamicpack.toast.pack.state.downloading.description", downloading.getPercentage(), downloading.getName()));
@@ -72,9 +86,6 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
                 }
             }
         };
-        Thread thread = new Thread(syncingTask);
-        thread.setName("DynamicPack-SyncTask" + (SyncingTask.threadCounter++));
-        thread.start();
     }
 
     @Override

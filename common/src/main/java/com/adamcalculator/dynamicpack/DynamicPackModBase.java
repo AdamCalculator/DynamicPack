@@ -19,6 +19,7 @@ public abstract class DynamicPackModBase {
 	public static final String MINECRAFT_META = "pack.mcmeta";
 
 	public static DynamicPackModBase INSTANCE;
+	protected static int manuallySyncThreadCounter = 0;
 
 	private boolean isPacksScanning = false;
 	private List<Pack> packs = new ArrayList<>();
@@ -40,7 +41,12 @@ public abstract class DynamicPackModBase {
 		startSyncThread();
 	}
 
+	/**
+	 * ONLY FOR FIRST INIT RUN! FOR MANUALLY USE startManuallySync!!!!!
+	 */
 	public abstract void startSyncThread();
+
+	public abstract void startManuallySync();
 
 	public void rescanPacks() {
 		if (isPacksScanning) {
