@@ -8,6 +8,9 @@ A mod that will monitor the current version of your resource pack and download a
 ## Documentation
 [**Available here**](https://github.com/AdamCalculator/DynamicPack/wiki)
 
+## Packs using it mod
+* [CursedEveriday](https://github.com/AdamCalculator/CursedEveryday) by Adam - pack from the creator, on it you can learn how it works
+
 ## Plans
 The mod is planned to support **any bootloader** and any version, but I don't have enough time right now. **I'm always happy to see new contributors!**
 
