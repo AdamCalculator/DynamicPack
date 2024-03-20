@@ -24,7 +24,7 @@ public abstract class Remote {
         REMOTES.put("dynamic_repo", DynamicRepoRemote::new);
     }
 
-    public abstract void init(Pack pack, JSONObject remote);
+    public abstract void init(Pack pack, JSONObject remote, JSONObject current);
 
     public abstract boolean checkUpdateAvailable() throws IOException;
 

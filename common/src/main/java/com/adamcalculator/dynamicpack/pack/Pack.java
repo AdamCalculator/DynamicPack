@@ -37,7 +37,7 @@ public class Pack {
             JSONObject remote = json.getJSONObject("remote");
             String remoteType = remote.getString("type");
             this.remote = Remote.REMOTES.get(remoteType).get();
-            this.remote.init(this, remote);
+            this.remote.init(this, remote, cachedJson.getJSONObject("current"));
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse remote", e);
@@ -63,17 +63,18 @@ public class Pack {
         return cachedJson;
     }
 
-    public long getCurrentBuild() {
-        return cachedJson.getJSONObject("current").optLong("build", -1);
+
+    public void updateJsonLatestUpdate() {
+        cachedJson.getJSONObject("current").put("latest_updated", System.currentTimeMillis() / 1000);
     }
 
-    public String getCurrentUnique() {
-        return cachedJson.getJSONObject("current").optString("version", "");
-    }
+    public long getLatestUpdated() {
+        try {
+            return cachedJson.getJSONObject("current").getLong("latest_updated");
 
-
-    public String getCurrentVersionNumber() {
-        return cachedJson.getJSONObject("current").optString("version_number", "");
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     public boolean checkIsUpdateAvailable() throws IOException {

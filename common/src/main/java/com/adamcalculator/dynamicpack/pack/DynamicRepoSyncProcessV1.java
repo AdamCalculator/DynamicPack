@@ -6,10 +6,7 @@ import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
-import com.adamcalculator.dynamicpack.util.AFiles;
-import com.adamcalculator.dynamicpack.util.FileDownloadConsumer;
-import com.adamcalculator.dynamicpack.util.Hashes;
-import com.adamcalculator.dynamicpack.util.Urls;
+import com.adamcalculator.dynamicpack.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,10 +14,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DynamicRepoSyncProcessV1 {
     private final DynamicRepoRemote remote;
@@ -54,6 +48,12 @@ public class DynamicRepoSyncProcessV1 {
             progress.textLog("File deleted from resource-pack: " + s);
             AFiles.nioSmartDelete(path);
         }
+
+        try {
+            remote.updateCurrentKnownContents(repoJson.getJSONArray("contents"));
+        } catch (Exception e) {
+            Out.error("Error while update known_packs. Not fatal", e);
+        }
     }
 
     public void close() throws IOException {
@@ -66,6 +66,14 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         String contentRemoteHash = jsonContent.getString("hash");
+        String localCache = remote.getCurrentPackContentHash(id);
+        if (Objects.equals(localCache, contentRemoteHash)) {
+            progress.textLog("Skipping content " + id + " because local hash is equal with remote...");
+            return;
+        } else {
+            progress.textLog("Content " + id + " local hash different with remote or null. Updating...");
+        }
+
         String url = jsonContent.getString("url");
         String urlCompressed = jsonContent.optString("url_compressed", null);
         boolean compressSupported = urlCompressed != null;
@@ -180,12 +188,16 @@ public class DynamicRepoSyncProcessV1 {
         while (i < contents.length()) {
             JSONObject content = contents.getJSONObject(i);
             String id = content.getString("id");
+
+            if (!InputValidator.isContentIdValid(id)) {
+                throw new RuntimeException("Id of content is not valid.");
+            }
+
             if (remote.isContentActive(id) || content.optBoolean("required", false)) {
                 activeContents.add(content);
             }
             i++;
         }
-        
         return activeContents;
     }
 }
