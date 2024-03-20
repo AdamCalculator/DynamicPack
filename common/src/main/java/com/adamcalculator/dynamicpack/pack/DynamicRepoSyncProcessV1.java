@@ -1,7 +1,7 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
-import com.adamcalculator.dynamicpack.IDValidator;
+import com.adamcalculator.dynamicpack.InputValidator;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
@@ -61,7 +61,7 @@ public class DynamicRepoSyncProcessV1 {
 
     private void processContent(JSONObject jsonContent) throws IOException {
         String id = jsonContent.getString("id");
-        if (!IDValidator.isValid(id)) {
+        if (!InputValidator.isContentIdValid(id)) {
             throw new RuntimeException("Id of content is not valid.");
         }
 

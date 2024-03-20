@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.InputValidator;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
@@ -12,7 +13,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.function.LongConsumer;
@@ -105,11 +105,8 @@ public class DynamicRepoRemote extends Remote {
         }
 
         String remoteName = repoJson.getString("name");
-        if (remoteName.isBlank()) {
-            throw new RuntimeException("Name of remote pack can't be blank");
-        }
-        if (remoteName.trim().length() > 50) {
-            throw new RuntimeException("Length of name pack can't > 50");
+        if (!InputValidator.isPackNameValid(remoteName)) {
+            throw new RuntimeException("Remote name of pack not valid.");
         }
 
 
