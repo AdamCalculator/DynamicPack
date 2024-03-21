@@ -50,6 +50,8 @@ public class Mod {
         Out.securityWarning("# ");
         Out.securityWarning("# Host: " + host);
         Out.securityWarning("# Requester: " + requester);
+        Out.securityWarning("# StackTrace:");
+        Out.securityStackTrace();
         Out.securityWarning("# ");
         Out.securityWarning("===========================");
 

@@ -66,4 +66,16 @@ public class Out {
     public static void debug(String s) {
         println("DEBUG: " + s);
     }
+
+    /**
+     * Always enable! Ignore enable/disable
+     */
+    public static void securityStackTrace() {
+        if (USE_SOUT) {
+            System.out.println("[dynamicpack] Stacktrace");
+            new Throwable("StackTrace printer").printStackTrace();
+            return;
+        }
+        LOGGER.error("No error. This is stacktrace printer", new Throwable("StackTrace printer"));
+    }
 }
