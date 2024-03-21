@@ -2,6 +2,7 @@ package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.PackUtil;
+import com.adamcalculator.dynamicpack.status.StatusChecker;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.util.AFiles;
 import com.adamcalculator.dynamicpack.util.Out;
@@ -28,6 +29,7 @@ public class Pack {
     private boolean cachedUpdateAvailable;
     private boolean isSyncing = false;
     private final String remoteTypeStr;
+    private Exception latestException;
 
 
     public Pack(File location, JSONObject json) {
@@ -48,6 +50,12 @@ public class Pack {
 
     public boolean isSyncing() {
         return isSyncing;
+    }
+
+    // See StatusChecker for this.
+    // Developer can block network for specify version in dynamicpack.status.v1.json by security questions
+    public boolean isNetworkBlocked() {
+        return StatusChecker.isBlockUpdating(remoteTypeStr);
     }
 
     public boolean isZip() {
@@ -84,6 +92,7 @@ public class Pack {
     }
 
     public boolean checkIsUpdateAvailable() throws IOException {
+        checkNetwork();
         return cachedUpdateAvailable = remote.checkUpdateAvailable();
     }
 
@@ -95,9 +104,11 @@ public class Pack {
         try {
             sync0(progress, manually);
             checkSafePackMinecraftMeta();
+            setLatestException(null);
         } catch (Exception e) {
             isSyncing = false;
             checkSafePackMinecraftMeta();
+            setLatestException(e);
             throw e;
         }
     }
@@ -108,6 +119,9 @@ public class Pack {
             progress.done(false);
             return;
         }
+
+        checkNetwork();
+
         if (!checkIsUpdateAvailable() && !manually) {
             progress.textLog("update not available");
             progress.done(false);
@@ -122,6 +136,12 @@ public class Pack {
 
         isSyncing = false;
         progress.done(reloadRequired);
+    }
+
+    private void checkNetwork() {
+        if (isNetworkBlocked()) {
+            throw new SecurityException("Network is blocked for remote_type=" + remoteTypeStr + " current version of mod not safe. Update mod!");
+        }
     }
 
     private void checkSafePackMinecraftMeta() throws IOException {
@@ -153,5 +173,22 @@ public class Pack {
 
     public String getRemoteType() {
         return remoteTypeStr;
+    }
+
+    public void setLatestException(Exception e) {
+        Out.debug(this + ": latestExcep="+e);
+        this.latestException = e;
+    }
+
+    public Exception getLatestException() {
+        return latestException;
+    }
+
+    public void saveReScanData(Pack oldestPack) {
+        if (oldestPack == null) return;
+
+        if (this.latestException == null) {
+            this.latestException = oldestPack.latestException;
+        }
     }
 }

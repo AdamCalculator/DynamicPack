@@ -16,5 +16,12 @@
   "dynamicpack.screen.pack.description": "This resource pack support DynamicPack features!",
   "dynamicpack.screen.pack.remote_type": "Remote type: %s",
   "dynamicpack.screen.pack.latestUpdated": "Latest updated at: %s",
-  "dynamicpack.screen.pack.manually_sync": "Manually sync"
+  "dynamicpack.screen.pack.latestException": "Latest error on this pack: %s\nFor details see game logs",
+  "dynamicpack.screen.pack.manually_sync": "Manually sync",
+  "dynamicpack.status_checker.not_safe": "Security update available for DynamicPack mod! This message should not be ignored, since the update has fixed possible vulnerabilities: %s",
+  "dynamicpack.status_checker.not_safe.toast.title": "DynamicPack",
+  "dynamicpack.status_checker.not_safe.toast.description": "Security update available",
+  "dynamicpack.status_checker.format_not_actual": "Dynamic pack format update available! Perhaps resource pack developers will use it, and then without updating the mod they will stop working: %s",
+  "dynamicpack.status_checker.download": "Download!",
+  "dynamicpack.status_checker.download.hover": "Click for go to %s"
 }

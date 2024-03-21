@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class DynamicPackModBase {
@@ -21,9 +22,10 @@ public abstract class DynamicPackModBase {
 
 	public static DynamicPackModBase INSTANCE;
 	protected static int manuallySyncThreadCounter = 0;
+	public boolean rescanPacksBlocked = false;
 
 	private boolean isPacksScanning = false;
-	private List<Pack> packs = new ArrayList<>();
+	private HashMap<String, Pack> packs = new HashMap<>();
 	private File gameDir;
 	private File resourcePacks;
 	private boolean minecraftInitialized = false;
@@ -54,9 +56,12 @@ public abstract class DynamicPackModBase {
 			Out.warn("rescanPacks already in scanning!");
 			return;
 		}
+		if (rescanPacksBlocked) {
+			Out.warn("rescanPacks blocked");
+			return;
+		}
 		isPacksScanning = true;
-		packs.clear();
-
+		List<String> forDelete = new ArrayList<>(packs.keySet());
 		for (File packFile : AFiles.lists(resourcePacks)) {
 			try {
 				PackUtil.openPackFileSystem(packFile, path -> {
@@ -65,7 +70,8 @@ public abstract class DynamicPackModBase {
 						Out.println("+ Pack " + packFile.getName() + " supported by mod!");
                         try {
                             processPack(packFile, PackUtil.readJson(dynamicPackPath));
-                        } catch (IOException e) {
+							forDelete.remove(packFile.getName());
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -80,6 +86,10 @@ public abstract class DynamicPackModBase {
 				}
 			}
 		}
+		for (String s : forDelete) {
+			Out.println("Pack " + s + " no longer exists!");
+			packs.remove(s);
+		}
 		isPacksScanning = false;
 	}
 
@@ -87,9 +97,13 @@ public abstract class DynamicPackModBase {
 
 	private void processPack(File location, JSONObject json) {
 		long formatVersion = json.getLong("formatVersion");
+		Pack oldestPack = packs.getOrDefault(location.getName(), null);
 		if (formatVersion == 1) {
 			Pack pack = new Pack(location, json);
-			packs.add(pack);
+			if (oldestPack != null) {
+				pack.saveReScanData(oldestPack);
+			}
+			packs.put(location.getName(), pack);
 
 		} else {
 			throw new RuntimeException("Unsupported formatVersion: " + formatVersion);
@@ -135,7 +149,7 @@ public abstract class DynamicPackModBase {
 	}
 
 	public Pack[] getPacks() {
-		return packs.toArray(new Pack[0]);
+		return packs.values().toArray(new Pack[0]);
 	}
 
 	public void minecraftInitialized() {
