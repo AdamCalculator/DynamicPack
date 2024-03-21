@@ -29,6 +29,7 @@ public class Pack {
     private boolean cachedUpdateAvailable;
     private boolean isSyncing = false;
     private final String remoteTypeStr;
+    private Exception latestException;
 
 
     public Pack(File location, JSONObject json) {
@@ -103,9 +104,11 @@ public class Pack {
         try {
             sync0(progress, manually);
             checkSafePackMinecraftMeta();
+            setLatestException(null);
         } catch (Exception e) {
             isSyncing = false;
             checkSafePackMinecraftMeta();
+            setLatestException(e);
             throw e;
         }
     }
@@ -137,7 +140,7 @@ public class Pack {
 
     private void checkNetwork() {
         if (isNetworkBlocked()) {
-            throw new SecurityException("Network is blocked for remote_type: " + remoteTypeStr + " in dynamicpack.status.v1.json by security questions!");
+            throw new SecurityException("Network is blocked for remote_type=" + remoteTypeStr + " current version of mod not safe. Update mod!");
         }
     }
 
@@ -170,5 +173,22 @@ public class Pack {
 
     public String getRemoteType() {
         return remoteTypeStr;
+    }
+
+    public void setLatestException(Exception e) {
+        Out.debug(this + ": latestExcep="+e);
+        this.latestException = e;
+    }
+
+    public Exception getLatestException() {
+        return latestException;
+    }
+
+    public void saveReScanData(Pack oldestPack) {
+        if (oldestPack == null) return;
+
+        if (this.latestException == null) {
+            this.latestException = oldestPack.latestException;
+        }
     }
 }

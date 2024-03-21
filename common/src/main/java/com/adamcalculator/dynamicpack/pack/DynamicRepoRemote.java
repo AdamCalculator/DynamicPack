@@ -55,7 +55,6 @@ public class DynamicRepoRemote extends Remote {
             }
         }
 
-
         if (skipSign != this.publicKey.isBlank()) {
             throw new RuntimeException("Incompatible parameters set. Select one of: sign_no_required or public_key");
         }
@@ -107,12 +106,12 @@ public class DynamicRepoRemote extends Remote {
 
 
     @Override
-    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {
                 sync0(progress, path);
 
-            } catch (IOException | NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
@@ -142,6 +141,11 @@ public class DynamicRepoRemote extends Remote {
         long formatVersion;
         if ((formatVersion = repoJson.getLong("formatVersion")) != 1) {
             throw new RuntimeException("Incompatible formatVersion: " + formatVersion);
+        }
+
+        long minBuildForWork;
+        if ((minBuildForWork = repoJson.optLong("minimal_mod_build", Mod.VERSION_BUILD)) > Mod.VERSION_BUILD) {
+            throw new RuntimeException("Incompatible DynamicPack Mod version for this pack: required minimal_mod_build=" + minBuildForWork + ", but currently mod build is " + Mod.VERSION_BUILD);
         }
 
         String remoteName = repoJson.getString("name");

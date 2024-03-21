@@ -16,6 +16,7 @@
   "dynamicpack.screen.pack.description": "This resource pack support DynamicPack features!",
   "dynamicpack.screen.pack.remote_type": "Remote type: %s",
   "dynamicpack.screen.pack.latestUpdated": "Latest updated at: %s",
+  "dynamicpack.screen.pack.latestException": "Latest error on this pack: %s\nFor details see game logs",
   "dynamicpack.status_checker.not_safe": "Security update available for DynamicPack mod! This message should not be ignored, since the update has fixed possible vulnerabilities: %s",
   "dynamicpack.status_checker.not_safe.toast.title": "DynamicPack",
   "dynamicpack.status_checker.not_safe.toast.description": "Security update available",

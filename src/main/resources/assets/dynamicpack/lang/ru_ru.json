@@ -16,6 +16,7 @@
   "dynamicpack.screen.pack.description": "Этот ресурспак поддерживает возможности мода DynamicPack!",
   "dynamicpack.screen.pack.remote_type": "Тип: %s",
   "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s",
+  "dynamicpack.screen.pack.latestException": "Последняя ошибка в паке: %s\nДля дополнительного смотрите логи",
   "dynamicpack.status_checker.not_safe": "Доступно обновление безопасности для мода DynamicPack! Это сообщение не стоит игнорировать, поскольку в обновлении были исправлены возможные уязвимости: %s",
   "dynamicpack.status_checker.not_safe.toast.title": "DynamicPack",
   "dynamicpack.status_checker.not_safe.toast.description": "Доступно обновление безопасности",

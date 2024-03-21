@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.terraformersmc.modmenu.util.DrawingUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -30,6 +31,10 @@ public class DynamicPackScreen extends Screen {
         context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20, 16777215);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36, 16777215);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52, 16777215);
+
+        if (pack.getLatestException() != null) {
+            DrawingUtil.drawWrappedString(context, Text.translatable("dynamicpack.screen.pack.latestException", pack.getLatestException().getMessage()).asTruncatedString(9999), 20, 70, 500, 99, 0xff2222);
+        }
 
         super.render(context, mouseX, mouseY, delta);
     }
