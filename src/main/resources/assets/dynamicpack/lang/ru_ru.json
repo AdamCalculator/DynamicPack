@@ -15,5 +15,13 @@
   "dynamicpack.toast.pack.state.unknown.description": "Обработка...",
   "dynamicpack.screen.pack.description": "Этот ресурспак поддерживает возможности мода DynamicPack!",
   "dynamicpack.screen.pack.remote_type": "Тип: %s",
-  "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s"
+  "dynamicpack.screen.pack.latestUpdated": "Обновлён: %s",
+  "dynamicpack.screen.pack.latestException": "Последняя ошибка в паке: %s\nДля дополнительного смотрите логи",
+  "dynamicpack.screen.pack.manually_sync": "Синхр. вручную",
+  "dynamicpack.status_checker.not_safe": "Доступно обновление безопасности для мода DynamicPack! Это сообщение не стоит игнорировать, поскольку в обновлении были исправлены возможные уязвимости: %s",
+  "dynamicpack.status_checker.not_safe.toast.title": "DynamicPack",
+  "dynamicpack.status_checker.not_safe.toast.description": "Доступно обновление безопасности",
+  "dynamicpack.status_checker.format_not_actual": "Доступно обновление формата динамических паков! Возможно разработчики ресурспаков будут его использовать, и тогда без обновления мода они работать перестанут: %s",
+  "dynamicpack.status_checker.download": "Загрузить!",
+  "dynamicpack.status_checker.download.hover": "Нажмите чтобы перейти %s"
 }

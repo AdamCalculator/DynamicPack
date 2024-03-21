@@ -1,5 +1,8 @@
 package com.adamcalculator.dynamicpack.sync;
 
+import com.adamcalculator.dynamicpack.status.StatusChecker;
+import com.adamcalculator.dynamicpack.util.Out;
+
 import java.util.function.Supplier;
 
 public class SyncThread extends Thread {
@@ -10,6 +13,9 @@ public class SyncThread extends Thread {
 
     public SyncThread(Supplier<SyncingTask> taskSupplier) {
         super("SyncThread" + (counter++));
+        if (counter > 1) {
+            Out.warn("Multiple SyncThread's is bad behavior...");
+        }
         this.taskSupplier = taskSupplier;
     }
 
@@ -27,6 +33,11 @@ public class SyncThread extends Thread {
 
 
     private void startSync() {
+        try {
+            StatusChecker.check();
+        } catch (Exception e) {
+            Out.error("Error while check status!", e);
+        }
         taskSupplier.get().run();
     }
 }

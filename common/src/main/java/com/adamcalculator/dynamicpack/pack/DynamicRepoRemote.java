@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.LongConsumer;
 
 public class DynamicRepoRemote extends Remote {
@@ -54,7 +55,6 @@ public class DynamicRepoRemote extends Remote {
                 this.contentOverrides.put(s, j.getBoolean(s));
             }
         }
-
 
         if (skipSign != this.publicKey.isBlank()) {
             throw new RuntimeException("Incompatible parameters set. Select one of: sign_no_required or public_key");
@@ -107,19 +107,21 @@ public class DynamicRepoRemote extends Remote {
 
 
     @Override
-    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
+        AtomicBoolean returnValue = new AtomicBoolean(false);
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {
-                sync0(progress, path);
+                boolean t = sync0(progress, path);
+                returnValue.set(t);
 
-            } catch (IOException | NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-        return true;
+        return returnValue.get();
     }
 
-    public void sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
+    public boolean sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
         String packUrlContent;
 
         LongConsumer parseProgress = new FileDownloadConsumer() {
@@ -144,6 +146,11 @@ public class DynamicRepoRemote extends Remote {
             throw new RuntimeException("Incompatible formatVersion: " + formatVersion);
         }
 
+        long minBuildForWork;
+        if ((minBuildForWork = repoJson.optLong("minimal_mod_build", Mod.VERSION_BUILD)) > Mod.VERSION_BUILD) {
+            throw new RuntimeException("Incompatible DynamicPack Mod version for this pack: required minimal_mod_build=" + minBuildForWork + ", but currently mod build is " + Mod.VERSION_BUILD);
+        }
+
         String remoteName = repoJson.getString("name");
         if (!InputValidator.isPackNameValid(remoteName)) {
             throw new RuntimeException("Remote name of pack not valid.");
@@ -163,6 +170,8 @@ public class DynamicRepoRemote extends Remote {
         parent.updateJsonLatestUpdate();
 
         AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2));
+
+        return dynamicRepoSyncProcessV1.isReloadRequired();
     }
 
     public String getUrl() {

@@ -1,9 +1,12 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.sync.SyncingTask;
+import com.terraformersmc.modmenu.util.DrawingUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -14,6 +17,7 @@ public class DynamicPackScreen extends Screen {
     private final Screen parent;
     private final Pack pack;
     private final Text screenDescText;
+    private ButtonWidget syncButton;
 
     public DynamicPackScreen(Screen parent, Pack pack) {
         super(Text.literal(pack.getName()).formatted(Formatting.BOLD));
@@ -26,18 +30,24 @@ public class DynamicPackScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
+        syncButton.active = !SyncingTask.isSyncing;
+        int h = 20;
         context.drawTextWithShadow(this.textRenderer, this.title, 20, 8, 16777215);
-        context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52, 16777215);
+        context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20 + h, 16777215);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36 + h, 16777215);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
+
+        if (pack.getLatestException() != null) {
+            DrawingUtil.drawWrappedString(context, Text.translatable("dynamicpack.screen.pack.latestException", pack.getLatestException().getMessage()).asTruncatedString(9999), 20, 78 + h, 500, 99, 0xff2222);
+        }
 
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     protected void init() {
-        addDrawableChild(Compat.createButton(
-                Text.of("Manually sync"),
+        addDrawableChild(syncButton = Compat.createButton(
+                Text.translatable("dynamicpack.screen.pack.manually_sync"),
                         () -> {
                             DynamicPackModBase.INSTANCE.startManuallySync();
                             close();

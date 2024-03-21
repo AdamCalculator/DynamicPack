@@ -32,6 +32,7 @@ public class SyncingTask implements Runnable {
         Out.println("SyncTask started!");
         onSyncStart();
         DynamicPackModBase.INSTANCE.rescanPacks();
+        DynamicPackModBase.INSTANCE.rescanPacksBlocked = true;
         for (Pack pack : DynamicPackModBase.INSTANCE.getPacks()) {
             currentPack = pack;
             try {
@@ -42,6 +43,7 @@ public class SyncingTask implements Runnable {
                 onPackError(pack, e);
             }
         }
+        DynamicPackModBase.INSTANCE.rescanPacksBlocked = false;
         onSyncDone(reloadRequired);
         Out.println("SyncTask ended!");
         isSyncing = false;
