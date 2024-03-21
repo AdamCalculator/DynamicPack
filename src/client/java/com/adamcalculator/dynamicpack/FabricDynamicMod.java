@@ -1,23 +1,30 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.status.StatusChecker;
 import com.adamcalculator.dynamicpack.sync.SyncThread;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
 import com.adamcalculator.dynamicpack.sync.state.StateDownloading;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
 import com.adamcalculator.dynamicpack.sync.state.SyncProgressState;
+import com.adamcalculator.dynamicpack.util.Out;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.resource.metadata.PackResourceMetadataReader;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.JsonHelper;
 
 public class FabricDynamicMod extends DynamicPackModBase implements ClientModInitializer {
-    private static final boolean SHOW_STATE = false;
     private SystemToast toast = null;
     private long toastUpdated = 0;
 
@@ -40,6 +47,37 @@ public class FabricDynamicMod extends DynamicPackModBase implements ClientModIni
     public void onInitializeClient() {
         var gameDir = FabricLoader.getInstance().getGameDir().toFile();
         init(gameDir);
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            ClientPlayerEntity player = client.player;
+            Text download = Text.translatable("dynamicpack.status_checker.download")
+                    .fillStyle(Style.EMPTY
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("dynamicpack.status_checker.download.hover", Text.literal(Mod.MODRINTH_URL).formatted(Formatting.UNDERLINE, Formatting.AQUA))))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, Mod.MODRINTH_URL))
+                    )
+                    .formatted(Formatting.YELLOW, Formatting.UNDERLINE);
+
+
+            if (player == null) {
+                Out.warn("player == null on world join");
+
+            } else if (!StatusChecker.isSafe()) {
+                player.sendMessage(Text.translatable("dynamicpack.status_checker.not_safe", download));
+                setToastContent(Text.translatable("dynamicpack.status_checker.not_safe.toast.title"),
+                        Text.translatable("dynamicpack.status_checker.not_safe.toast.description"));
+
+            } else if (!StatusChecker.isFormatActual()) {
+                player.sendMessage(Text.translatable("dynamicpack.status_checker.format_not_actual", download));
+
+            } else if (StatusChecker.isModUpdateAvailable()) {
+                Out.println("DynamicPack mod update available: " + Mod.MODRINTH_URL);
+
+            } else if (!StatusChecker.isChecked()) {
+                Out.warn("StatusChecker isChecked = false :(");
+            } else {
+                Out.println("Mod in actual state in current date!");
+            }
+        });
     }
 
     @Override

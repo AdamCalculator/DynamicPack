@@ -2,6 +2,7 @@ package com.adamcalculator.dynamicpack.pack;
 
 import com.adamcalculator.dynamicpack.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.PackUtil;
+import com.adamcalculator.dynamicpack.status.StatusChecker;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import com.adamcalculator.dynamicpack.util.AFiles;
 import com.adamcalculator.dynamicpack.util.Out;
@@ -50,6 +51,12 @@ public class Pack {
         return isSyncing;
     }
 
+    // See StatusChecker for this.
+    // Developer can block network for specify version in dynamicpack.status.v1.json by security questions
+    public boolean isNetworkBlocked() {
+        return StatusChecker.isBlockUpdating(remoteTypeStr);
+    }
+
     public boolean isZip() {
         if (location.isDirectory()) {
             return false;
@@ -84,6 +91,7 @@ public class Pack {
     }
 
     public boolean checkIsUpdateAvailable() throws IOException {
+        checkNetwork();
         return cachedUpdateAvailable = remote.checkUpdateAvailable();
     }
 
@@ -108,6 +116,9 @@ public class Pack {
             progress.done(false);
             return;
         }
+
+        checkNetwork();
+
         if (!checkIsUpdateAvailable() && !manually) {
             progress.textLog("update not available");
             progress.done(false);
@@ -122,6 +133,12 @@ public class Pack {
 
         isSyncing = false;
         progress.done(reloadRequired);
+    }
+
+    private void checkNetwork() {
+        if (isNetworkBlocked()) {
+            throw new SecurityException("Network is blocked for remote_type: " + remoteTypeStr + " in dynamicpack.status.v1.json by security questions!");
+        }
     }
 
     private void checkSafePackMinecraftMeta() throws IOException {

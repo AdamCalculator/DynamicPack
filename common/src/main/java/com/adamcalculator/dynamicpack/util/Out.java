@@ -16,7 +16,7 @@ public class Out {
             System.out.println(o);
             return;
         }
-        LOGGER.warn(o + "");
+        LOGGER.info(o + "");
     }
 
     public static void error(String s, Exception e) {

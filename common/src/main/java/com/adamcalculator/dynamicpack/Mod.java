@@ -8,12 +8,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Mod {
+    public static final String VERSION_NAME_MOD = "1.0.13";
+    public static final String VERSION_NAME_BRANCH = "mc1.20.1";
+    public static final String VERSION_NAME =  VERSION_NAME_MOD + "-" + VERSION_NAME_BRANCH;
+    public static final long VERSION_BUILD = 14;
+
+
     // NOTE: for increase contact to mod developer.
     public static final long DYNAMIC_PACK_HTTPS_FILE_SIZE_LIMIT = megabyte(8); // kb -> mb -> 5MB (for files in resourcepack)
     public static final long MODRINTH_HTTPS_FILE_SIZE_LIMIT = megabyte(1024); // 1 GB (for .zip files from modrinth)
     public static final long MOD_MODTINTH_API_LIMIT = megabyte(8); // 8 MB of api
     public static final long GZIP_LIMIT = megabyte(50); // 50 MB of .gz file
     public static final long MOD_FILES_LIMIT = megabyte(8);
+    public static final String MODRINTH_URL = "https://modrinth.com/mod/dynamicpack";
 
     private static final Set<String> ALLOWED_HOSTS = new HashSet<>();
     static {
