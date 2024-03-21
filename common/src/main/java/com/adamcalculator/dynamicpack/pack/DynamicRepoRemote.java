@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.LongConsumer;
 
 public class DynamicRepoRemote extends Remote {
@@ -107,18 +108,20 @@ public class DynamicRepoRemote extends Remote {
 
     @Override
     public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
+        AtomicBoolean returnValue = new AtomicBoolean(false);
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {
-                sync0(progress, path);
+                boolean t = sync0(progress, path);
+                returnValue.set(t);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-        return true;
+        return returnValue.get();
     }
 
-    public void sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
+    public boolean sync0(PackSyncProgress progress, Path path) throws IOException, NoSuchAlgorithmException {
         String packUrlContent;
 
         LongConsumer parseProgress = new FileDownloadConsumer() {
@@ -167,6 +170,8 @@ public class DynamicRepoRemote extends Remote {
         parent.updateJsonLatestUpdate();
 
         AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2));
+
+        return dynamicRepoSyncProcessV1.isReloadRequired();
     }
 
     public String getUrl() {

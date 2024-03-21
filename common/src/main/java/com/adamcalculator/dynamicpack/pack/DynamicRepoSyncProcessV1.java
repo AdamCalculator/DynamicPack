@@ -23,6 +23,7 @@ public class DynamicRepoSyncProcessV1 {
 
     private final Set<String> oldestFilesList = new HashSet<>();
     private final Path packRootPath;
+    private boolean isReloadRequired = false;
 
     public DynamicRepoSyncProcessV1(Pack pack, DynamicRepoRemote dynamicRepoRemote, PackSyncProgress progress, JSONObject repoJson, Path path) {
         this.remote = dynamicRepoRemote;
@@ -47,6 +48,7 @@ public class DynamicRepoSyncProcessV1 {
 
             progress.textLog("File deleted from resource-pack: " + s);
             AFiles.nioSmartDelete(path);
+            markReloadRequired();
         }
 
         try {
@@ -140,6 +142,7 @@ public class DynamicRepoSyncProcessV1 {
                     continue;
                 }
 
+                markReloadRequired();
                 this.progress.textLog("Overwriting: " + filePath);
                 Urls.downloadDynamicFile(fileRemoteUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
@@ -198,5 +201,16 @@ public class DynamicRepoSyncProcessV1 {
             i++;
         }
         return activeContents;
+    }
+
+    public boolean isReloadRequired() {
+        return isReloadRequired;
+    }
+
+    private void markReloadRequired() {
+        if (!isReloadRequired) {
+            Out.debug("Now reload is required in " + this);
+        }
+        this.isReloadRequired = true;
     }
 }
