@@ -1,5 +1,6 @@
 package com.adamcalculator.dynamicpack;
 
+import com.adamcalculator.dynamicpack.include.modmenu.util.DrawingUtil;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -16,20 +17,20 @@ public class PackMixinHelper {
     private static void drawTexture(DrawContext context, Pack pack, int x, int y, int i, int j, boolean hovered) {
         Exception latestException = pack.getLatestException();
         if (pack.isSyncing()) {
-            context.drawTexture(BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+            DrawingUtil.drawTexture(context, BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
 
 
             double alpha = System.currentTimeMillis() / 200d;
             int xshift = (int) (Math.sin(alpha) * 6.9d);
             int yshift = (int) (Math.cos(alpha) * 6.9d);
 
-            context.drawTexture(BUTTON_SYNCING_TEXTURE, x + 174 + xshift+6, y+16 + yshift+6, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 4, 4, 16, 32);
+            DrawingUtil.drawTexture(context, BUTTON_SYNCING_TEXTURE, x + 174 + xshift+6, y+16 + yshift+6, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 4, 4, 16, 32);
 
         } else if (latestException != null) {
-            context.drawTexture(BUTTON_WARNING_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+            DrawingUtil.drawTexture(context, BUTTON_WARNING_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
 
         } else {
-            context.drawTexture(BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+            DrawingUtil.drawTexture(context, BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
         }
     }
 
