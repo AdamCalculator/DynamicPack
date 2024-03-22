@@ -117,9 +117,13 @@ public class Mod {
         if (isRelease()) return;
 
         try {
-            Thread.sleep(13);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean isDebugLogs() {
+        return false;
     }
 }

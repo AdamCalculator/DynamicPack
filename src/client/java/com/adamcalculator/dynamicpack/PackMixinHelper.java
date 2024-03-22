@@ -18,7 +18,7 @@ public class PackMixinHelper {
     public static void renderResourcePackEntry(Object resourcePackEntryMixin, MatrixStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
         Pack pack = DynamicPackModBase.INSTANCE.getDynamicPackByMinecraftName(entry.getName());
-        if (pack != null && !SyncingTask.isSyncing) {
+        if (pack != null) {
             int i = mouseX - x;
             int j = mouseY - y;
 
@@ -30,7 +30,7 @@ public class PackMixinHelper {
     public static void mouseClicked(Object resourcePackEntryMixin, PackListWidget widget, double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
         Pack pack = DynamicPackModBase.INSTANCE.getDynamicPackByMinecraftName(entry.getName());
-        if (pack != null && !SyncingTask.isSyncing) {
+        if (pack != null) {
             double d = mouseX - (double)widget.getRowLeft();
             double e = mouseY - (double)widget.getRowTop(widget.children().indexOf(entry));
 
