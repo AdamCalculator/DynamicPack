@@ -107,8 +107,12 @@ public class Pack {
             setLatestException(null);
         } catch (Exception e) {
             isSyncing = false;
-            checkSafePackMinecraftMeta();
             setLatestException(e);
+            try {
+                checkSafePackMinecraftMeta();
+            } catch (Exception e2) {
+                Out.error("Error while check safe pack meta", e);
+            }
             throw e;
         }
     }
@@ -144,7 +148,7 @@ public class Pack {
         }
     }
 
-    private void checkSafePackMinecraftMeta() throws IOException {
+    private void checkSafePackMinecraftMeta() throws Exception {
         PackUtil.openPackFileSystem(location, path -> {
             Path mcmeta = path.resolve(DynamicPackModBase.MINECRAFT_META);
             boolean safe = PackUtil.isPathFileExists(mcmeta);

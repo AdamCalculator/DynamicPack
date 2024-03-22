@@ -4,7 +4,6 @@ import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
@@ -28,5 +27,5 @@ public abstract class Remote {
 
     public abstract boolean checkUpdateAvailable() throws IOException;
 
-    public abstract boolean sync(PackSyncProgress progress, boolean manually) throws IOException, NoSuchAlgorithmException;
+    public abstract boolean sync(PackSyncProgress progress, boolean manually) throws Exception;
 }
