@@ -13,6 +13,9 @@ import com.adamcalculator.dynamicpack.util.Out;
  */
 public class SyncingTask implements Runnable {
     public static boolean isSyncing = false;
+    public static String syncingLog1 = "";
+    public static String syncingLog2 = "";
+    public static String syncingLog3 = "";
 
     private final boolean manually; // skip checkUpdateAvailable().
     private boolean reloadRequired = false;
@@ -30,6 +33,7 @@ public class SyncingTask implements Runnable {
         }
         isSyncing = true;
         Out.println("SyncTask started!");
+        log("Syncing started...");
         onSyncStart();
         DynamicPackModBase.INSTANCE.rescanPacks();
         DynamicPackModBase.INSTANCE.rescanPacksBlocked = true;
@@ -38,8 +42,10 @@ public class SyncingTask implements Runnable {
             try {
                 pack.sync(createSyncProgressForPack(pack), manually);
                 onPackDoneSuccess(pack);
+                log(pack.getName() + " success");
             } catch (Exception e) {
                 Out.error("Pack error: " + pack.getName(), e);
+                log(pack.getName() + " error: " + e);
                 onPackError(pack, e);
             }
         }
@@ -47,6 +53,7 @@ public class SyncingTask implements Runnable {
         onSyncDone(reloadRequired);
         Out.println("SyncTask ended!");
         isSyncing = false;
+        clearLog();
     }
 
     public void onPackDoneSuccess(Pack pack) {}
@@ -78,6 +85,7 @@ public class SyncingTask implements Runnable {
 
             @Override
             public void start() {
+                log("Sync started " + pack.getName());
                 _packLog("Sync started.");
             }
 
@@ -101,20 +109,25 @@ public class SyncingTask implements Runnable {
             @Override
             public void textLog(String s) {
                 _packLog("[textLog] " + s);
+                log(s);
             }
 
             @Override
             public void downloading(String name, float percentage) {
                 if (cachedDownloading == null) {
                     cachedDownloading = new StateDownloading(name);
+                    log("Downloading " + name);
                 } else {
-                    cachedDownloading.setName(name);
+                    if (!cachedDownloading.getName().equals(name)) {
+                        cachedDownloading.setName(name);
+                        log("Downloading " + name);
+                    }
                 }
                 if (percentage == 100f) {
                     setState(new StateDownloadDone());
                     return;
                 }
-
+                syncingLog3 = "Downloading " + name + " " + (Math.round(percentage * 100f) / 100f) + "%";
                 cachedDownloading.setPercentage(Math.round(percentage * 10f) / 10f);
                 setState(cachedDownloading);
             }
@@ -124,5 +137,18 @@ public class SyncingTask implements Runnable {
                 setState(state);
             }
         };
+    }
+
+    private void log(String s) {
+        Out.debug("log: " + s);
+        syncingLog1 = syncingLog2;
+        syncingLog2 = syncingLog3;
+        syncingLog3 = s;
+    }
+
+    private void clearLog() {
+        syncingLog3 = "";
+        syncingLog2 = "";
+        syncingLog1 = "";
     }
 }

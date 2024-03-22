@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pack {
     public static final String UNKNOWN_PACK_MCMETA = """
@@ -30,6 +32,8 @@ public class Pack {
     private boolean isSyncing = false;
     private final String remoteTypeStr;
     private Exception latestException;
+    private final List<Runnable> destroyListeners = new ArrayList<>();
+    private boolean destroyed = false;
 
 
     public Pack(File location, JSONObject json) {
@@ -190,9 +194,30 @@ public class Pack {
 
     public void saveReScanData(Pack oldestPack) {
         if (oldestPack == null) return;
+        oldestPack.markAsDestroyed();
 
         if (this.latestException == null) {
             this.latestException = oldestPack.latestException;
         }
+    }
+
+    public void addDestroyListener(Runnable runnable) {
+        destroyListeners.add(runnable);
+    }
+
+    public void removeDestroyListener(Runnable runnable) {
+        destroyListeners.remove(runnable);
+    }
+
+    private void markAsDestroyed() {
+        for (Runnable runnable : destroyListeners.toArray(new Runnable[0])) {
+            runnable.run();
+        }
+        destroyListeners.clear();
+        this.destroyed = true;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
     }
 }

@@ -1,8 +1,8 @@
 package com.adamcalculator.dynamicpack;
 
+import com.adamcalculator.dynamicpack.include.modmenu.util.DrawingUtil;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
-import com.terraformersmc.modmenu.util.DrawingUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -18,6 +18,7 @@ public class DynamicPackScreen extends Screen {
     private final Pack pack;
     private final Text screenDescText;
     private ButtonWidget syncButton;
+    private final Runnable destroyListener;
 
     public DynamicPackScreen(Screen parent, Pack pack) {
         super(Text.literal(pack.getName()).formatted(Formatting.BOLD));
@@ -25,6 +26,7 @@ public class DynamicPackScreen extends Screen {
         this.client = MinecraftClient.getInstance();
         this.parent = parent;
         this.screenDescText = Text.translatable("dynamicpack.screen.pack.description");
+        pack.addDestroyListener(destroyListener = () -> DrawingUtil.runAtUI(this::close));
     }
 
     @Override
@@ -41,6 +43,12 @@ public class DynamicPackScreen extends Screen {
             DrawingUtil.drawWrappedString(context, Text.translatable("dynamicpack.screen.pack.latestException", pack.getLatestException().getMessage()).asTruncatedString(9999), 20, 78 + h, 500, 99, 0xff2222);
         }
 
+        if (SyncingTask.isSyncing) {
+            DrawingUtil.drawWrappedString(context, SyncingTask.syncingLog1, 20, 78+30 + h, 500, 99, 0xCCCCCC);
+            DrawingUtil.drawWrappedString(context, SyncingTask.syncingLog2, 20, 78+30+20 + h, 500, 99, 0xCCCCCC);
+            DrawingUtil.drawWrappedString(context, SyncingTask.syncingLog3, 20, 78+30+40 + h, 500, 99, 0xCCCCCC);
+        }
+
         super.render(context, mouseX, mouseY, delta);
     }
 
@@ -50,7 +58,6 @@ public class DynamicPackScreen extends Screen {
                 Text.translatable("dynamicpack.screen.pack.manually_sync"),
                         () -> {
                             DynamicPackModBase.INSTANCE.startManuallySync();
-                            close();
                         },
                 100, 20, width - 120, 10
         ));
@@ -61,5 +68,6 @@ public class DynamicPackScreen extends Screen {
     @Override
     public void close() {
         this.client.setScreen(parent);
+        pack.removeDestroyListener(destroyListener);
     }
 }
