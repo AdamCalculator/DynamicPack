@@ -20,6 +20,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Language;
 import net.minecraft.util.math.MathHelper;
 
@@ -80,5 +81,10 @@ public class DrawingUtil {
 	 */
 	public static void runAtUI(Runnable o) {
 		MinecraftClient.getInstance().executeSync(o);
+	}
+
+	public static void drawTexture(DrawContext context, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+		// RenderSystem.setShaderTexture(0, pack.getLatestException() != null ? BUTTON_WARNING_TEXTURE : BUTTON_TEXTURE);
+		context.drawTexture(texture, x, y, u, v, width, height, textureWidth, textureHeight);
 	}
 }
