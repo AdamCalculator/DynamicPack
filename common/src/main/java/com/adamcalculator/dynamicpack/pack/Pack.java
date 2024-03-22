@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Pack {
     public static final String UNKNOWN_PACK_MCMETA = """
@@ -32,7 +33,7 @@ public class Pack {
     private boolean isSyncing = false;
     private final String remoteTypeStr;
     private Exception latestException;
-    private final List<Runnable> destroyListeners = new ArrayList<>();
+    private final List<Consumer<Pack>> destroyListeners = new ArrayList<>();
     private boolean destroyed = false;
 
 
@@ -194,24 +195,24 @@ public class Pack {
 
     public void saveReScanData(Pack oldestPack) {
         if (oldestPack == null) return;
-        oldestPack.markAsDestroyed();
+        oldestPack.markAsDestroyed(this);
 
         if (this.latestException == null) {
             this.latestException = oldestPack.latestException;
         }
     }
 
-    public void addDestroyListener(Runnable runnable) {
+    public void addDestroyListener(Consumer<Pack> runnable) {
         destroyListeners.add(runnable);
     }
 
-    public void removeDestroyListener(Runnable runnable) {
+    public void removeDestroyListener(Consumer<Pack> runnable) {
         destroyListeners.remove(runnable);
     }
 
-    private void markAsDestroyed() {
-        for (Runnable runnable : destroyListeners.toArray(new Runnable[0])) {
-            runnable.run();
+    private void markAsDestroyed(Pack heirPack) {
+        for (Consumer<Pack> runnable : destroyListeners.toArray(new Consumer[0])) {
+            runnable.accept(heirPack);
         }
         destroyListeners.clear();
         this.destroyed = true;
