@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/dynamicpack",
-		"sources": "https://github.com/AdamCalculator/DynamicPack"
+		"sources": "https://github.com/AdamCalculator/DynamicPack",
+		"issues": "https://github.com/AdamCalculator/DynamicPack/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/dynamicpack/icon.png",

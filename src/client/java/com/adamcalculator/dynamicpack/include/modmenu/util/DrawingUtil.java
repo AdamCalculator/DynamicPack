@@ -84,7 +84,7 @@ public class DrawingUtil {
 	}
 
 	public static void drawTexture(DrawContext context, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-		// RenderSystem.setShaderTexture(0, pack.getLatestException() != null ? BUTTON_WARNING_TEXTURE : BUTTON_TEXTURE);
+		// RenderSystem.setShaderTexture(0, texture);
 		context.drawTexture(texture, x, y, u, v, width, height, textureWidth, textureHeight);
 	}
 }
