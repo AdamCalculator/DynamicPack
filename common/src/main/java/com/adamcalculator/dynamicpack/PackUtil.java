@@ -38,7 +38,7 @@ public class PackUtil {
         return Files.readString(path, StandardCharsets.UTF_8);
     }
 
-    public static void openPackFileSystem(File pack, Consumer<Path> consumer) throws IOException {
+    public static void openPackFileSystem(File pack, Consumer<Path> consumer) throws Exception {
         if (!pack.exists()) {
             throw new FileNotFoundException(pack.getCanonicalPath());
         }
@@ -52,8 +52,16 @@ public class PackUtil {
             env.put("create", "true");
 
             URI uri = URI.create("jar:" + pack.toPath().toUri());
+            Exception ex = null;
             try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
-                consumer.accept(fs.getPath(""));
+                try {
+                    consumer.accept(fs.getPath(""));
+                } catch (Exception e) {
+                    ex = e;
+                }
+            }
+            if (ex != null) {
+                throw ex;
             }
 
         } else {
