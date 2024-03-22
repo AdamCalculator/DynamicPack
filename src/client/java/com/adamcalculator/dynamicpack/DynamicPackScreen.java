@@ -4,9 +4,10 @@ import com.adamcalculator.dynamicpack.include.modmenu.util.DrawingUtil;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -40,14 +41,14 @@ public class DynamicPackScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
         syncButton.active = !SyncingTask.isSyncing;
         int h = 20;
-        context.drawTextWithShadow(this.textRenderer, this.title, 20, 8, 16777215);
-        context.drawTextWithShadow(this.textRenderer, screenDescText, 20, 20 + h, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36 + h, 16777215);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
+        DrawableHelper.drawTextWithShadow(context, this.textRenderer, this.title, 20, 8, 16777215);
+        DrawableHelper.drawTextWithShadow(context, this.textRenderer, screenDescText, 20, 20 + h, 16777215);
+        DrawableHelper.drawTextWithShadow(context, this.textRenderer, Text.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36 + h, 16777215);
+        DrawableHelper.drawTextWithShadow(context, this.textRenderer, Text.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
 
         if (pack.getLatestException() != null) {
             DrawingUtil.drawWrappedString(context, Text.translatable("dynamicpack.screen.pack.latestException", pack.getLatestException().getMessage()).asTruncatedString(9999), 20, 78 + h, 500, 99, 0xff2222);
