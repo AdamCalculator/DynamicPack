@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.util;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.util.enc.GPGSignatureVerifier;
 
@@ -138,7 +138,7 @@ public class Urls {
                 throw new RuntimeException("Not allowed scheme.");
             }
 
-            final File gameDir = DynamicPackModBase.INSTANCE.getGameDir();
+            final File gameDir = DynamicPackMod.INSTANCE.getGameDir();
             File file = new File(gameDir, url.replace("file_debug_only://", ""));
             if (progress != null){
                 progress.accept(file.length());

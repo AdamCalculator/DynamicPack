@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
@@ -33,7 +33,7 @@ public class ModrinthRemote extends Remote {
     }
 
     private String getCurrentGameVersion() {
-        return DynamicPackModBase.INSTANCE.getCurrentGameVersion();
+        return DynamicPackMod.INSTANCE.getCurrentGameVersion();
     }
 
     public String getCurrentUnique() {
@@ -133,7 +133,7 @@ public class ModrinthRemote extends Remote {
         parent.updateJsonLatestUpdate();
 
 
-        PackUtil.openPackFileSystem(tempFile, path -> AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2)));
+        PackUtil.openPackFileSystem(tempFile, path -> AFiles.nioWriteText(path.resolve(DynamicPackMod.CLIENT_FILE), parent.getPackJson().toString(2)));
         progress.textLog("dynamicmcpack.json is updated.");
 
         if (parent.isZip()) {

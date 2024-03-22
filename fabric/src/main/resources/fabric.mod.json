@@ -1,0 +1,34 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://fabricmc.net/",
+        "sources": "https://github.com/FabricMC/fabric-example-mod"
+    },
+    "license": "${license}",
+    "icon": "icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "preLaunch": [
+            "com.adamcalculator.dynamicpack.fabric.FabricDynamicPreLaunch"
+        ]
+    },
+    "accessWidener": "dynamicpack.accesswidener",
+
+    "mixins": [
+        "dynamicpack.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": ">=${minecraft_version}",
+        "java": ">=17"
+    }
+}
+  

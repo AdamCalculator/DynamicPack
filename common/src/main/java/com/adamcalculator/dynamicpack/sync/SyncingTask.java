@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.sync;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.state.StateDownloadDone;
 import com.adamcalculator.dynamicpack.sync.state.StateDownloading;
@@ -35,9 +35,9 @@ public class SyncingTask implements Runnable {
         Out.println("SyncTask started!");
         log("Syncing started...");
         onSyncStart();
-        DynamicPackModBase.INSTANCE.rescanPacks();
-        DynamicPackModBase.INSTANCE.rescanPacksBlocked = true;
-        for (Pack pack : DynamicPackModBase.INSTANCE.getPacks()) {
+        DynamicPackMod.INSTANCE.rescanPacks();
+        DynamicPackMod.INSTANCE.rescanPacksBlocked = true;
+        for (Pack pack : DynamicPackMod.INSTANCE.getPacks()) {
             currentPack = pack;
             try {
                 pack.sync(createSyncProgressForPack(pack), manually);
@@ -49,7 +49,7 @@ public class SyncingTask implements Runnable {
                 onPackError(pack, e);
             }
         }
-        DynamicPackModBase.INSTANCE.rescanPacksBlocked = false;
+        DynamicPackMod.INSTANCE.rescanPacksBlocked = false;
         onSyncDone(reloadRequired);
         Out.println("SyncTask ended!");
         isSyncing = false;
@@ -95,7 +95,7 @@ public class SyncingTask implements Runnable {
 
                 if (reloadRequired && !SyncingTask.this.reloadRequired) {
                     try {
-                        if (DynamicPackModBase.INSTANCE.isResourcePackActive(pack)) {
+                        if (DynamicPackMod.INSTANCE.isResourcePackActive(pack)) {
                             SyncingTask.this.reloadRequired = true;
                             _packLog("SyncTask.reloadRequired now true!");
                         }

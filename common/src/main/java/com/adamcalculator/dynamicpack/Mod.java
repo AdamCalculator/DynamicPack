@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.util.Out;
+import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,10 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Mod {
-    public static final String VERSION_NAME_MOD = "1.0.15";
-    public static final String VERSION_NAME_BRANCH = "mc1.20.1";
+    public static final String VERSION_NAME_MOD = "1.0.15.1";
+    public static final String VERSION_NAME_BRANCH = "mc1.20";
     public static final String VERSION_NAME =  VERSION_NAME_MOD + "-" + VERSION_NAME_BRANCH;
     public static final long VERSION_BUILD = 15;
+    public static final String MOD_ID = "dynamicpack";
 
 
     // NOTE: for increase contact to mod developer.
@@ -125,5 +127,9 @@ public class Mod {
 
     public static boolean isDebugLogs() {
         return false;
+    }
+
+    public static boolean isDebugMessageOnWorldJoin() {
+        return true;
     }
 }

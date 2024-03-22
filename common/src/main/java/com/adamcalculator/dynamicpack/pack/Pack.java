@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.PackUtil;
 import com.adamcalculator.dynamicpack.status.StatusChecker;
 import com.adamcalculator.dynamicpack.sync.PackSyncProgress;
@@ -155,7 +155,7 @@ public class Pack {
 
     private void checkSafePackMinecraftMeta() throws Exception {
         PackUtil.openPackFileSystem(location, path -> {
-            Path mcmeta = path.resolve(DynamicPackModBase.MINECRAFT_META);
+            Path mcmeta = path.resolve(DynamicPackMod.MINECRAFT_META);
             boolean safe = PackUtil.isPathFileExists(mcmeta);
             if (safe) {
                 try {
@@ -172,7 +172,7 @@ public class Pack {
 
     private boolean checkMinecraftMetaIsValid(String s) {
         try {
-            return DynamicPackModBase.INSTANCE.checkResourcePackMetaValid(s);
+            return DynamicPackMod.INSTANCE.checkResourcePackMetaValid(s);
 
         } catch (Exception e) {
             Out.error("Error while check meta valid.", e);

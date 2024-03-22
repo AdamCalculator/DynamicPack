@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.InputValidator;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
@@ -42,7 +42,7 @@ public class DynamicRepoSyncProcessV1 {
         }
 
         for (String s : oldestFilesList) {
-            if (s.contains(DynamicPackModBase.CLIENT_FILE)) continue;
+            if (s.contains(DynamicPackMod.CLIENT_FILE)) continue;
             Path path = packRootPath.resolve(s);
             progress.stateChanged(new StateFileDeleted(path));
 
@@ -138,7 +138,7 @@ public class DynamicRepoSyncProcessV1 {
             }
 
             if (isOverwrite) {
-                if (filePath.getFileName().toString().contains(DynamicPackModBase.CLIENT_FILE)) {
+                if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) {
                     continue;
                 }
 

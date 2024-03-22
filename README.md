@@ -38,5 +38,5 @@ If you want your package to update itself from **Modrinth**, you need to add the
     "formatVersion": 1
 }
 ```
- 
+
 For other features (dynamic repos) visit [github wiki!](https://github.com/AdamCalculator/DynamicPack/wiki)

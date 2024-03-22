@@ -1,6 +1,6 @@
 package com.adamcalculator.dynamicpack.pack;
 
-import com.adamcalculator.dynamicpack.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.InputValidator;
 import com.adamcalculator.dynamicpack.Mod;
 import com.adamcalculator.dynamicpack.PackUtil;
@@ -169,7 +169,7 @@ public class DynamicRepoRemote extends Remote {
         parent.getPackJson().getJSONObject("current").put("build", repoJson.getLong("build"));
         parent.updateJsonLatestUpdate();
 
-        AFiles.nioWriteText(path.resolve(DynamicPackModBase.CLIENT_FILE), parent.getPackJson().toString(2));
+        AFiles.nioWriteText(path.resolve(DynamicPackMod.CLIENT_FILE), parent.getPackJson().toString(2));
 
         return dynamicRepoSyncProcessV1.isReloadRequired();
     }
