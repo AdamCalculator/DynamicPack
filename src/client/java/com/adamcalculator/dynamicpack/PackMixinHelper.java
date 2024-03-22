@@ -11,6 +11,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PackMixinHelper {
     private static final Identifier BUTTON_TEXTURE = Identifier.of("dynamicpack", "select_button.png");
     private static final Identifier BUTTON_WARNING_TEXTURE = Identifier.of("dynamicpack", "select_button_warning.png");
+    private static final Identifier BUTTON_SYNCING_TEXTURE = Identifier.of("dynamicpack", "select_button_syncing.png");
+
+    private static void drawTexture(DrawContext context, Pack pack, int x, int y, int i, int j, boolean hovered) {
+        Exception latestException = pack.getLatestException();
+        if (pack.isSyncing()) {
+            context.drawTexture(BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+
+
+            double alpha = System.currentTimeMillis() / 200d;
+            int xshift = (int) (Math.sin(alpha) * 6.9d);
+            int yshift = (int) (Math.cos(alpha) * 6.9d);
+
+            context.drawTexture(BUTTON_SYNCING_TEXTURE, x + 174 + xshift+6, y+16 + yshift+6, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 4, 4, 16, 32);
+
+        } else if (latestException != null) {
+            context.drawTexture(BUTTON_WARNING_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+
+        } else {
+            context.drawTexture(BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+        }
+    }
 
     public static void renderResourcePackEntry(Object resourcePackEntryMixin, DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
@@ -18,7 +39,7 @@ public class PackMixinHelper {
         if (pack != null) {
             int i = mouseX - x;
             int j = mouseY - y;
-            context.drawTexture(pack.getLatestException() != null ? BUTTON_WARNING_TEXTURE : BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
+            drawTexture(context, pack, x, y, i, j, hovered);
         }
     }
 
