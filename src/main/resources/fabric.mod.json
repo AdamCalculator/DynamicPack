@@ -3,7 +3,7 @@
 	"id": "dynamicpack",
 	"version": "${version}",
 	"name": "DynamicPack",
-	"description": "Automatically sync resource packs with a remote server",
+	"description": "Adds auto-update support for resource packs!",
 	"authors": [
 		"AdamCalculator"
 	],
