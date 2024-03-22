@@ -2,9 +2,12 @@ package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.include.modmenu.util.DrawingUtil;
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.sync.SyncingTask;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.pack.PackListWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -14,7 +17,7 @@ public class PackMixinHelper {
     private static final Identifier BUTTON_WARNING_TEXTURE = Identifier.of("dynamicpack", "select_button_warning.png");
     private static final Identifier BUTTON_SYNCING_TEXTURE = Identifier.of("dynamicpack", "select_button_syncing.png");
 
-    private static void drawTexture(DrawContext context, Pack pack, int x, int y, int i, int j, boolean hovered) {
+    private static void drawTexture(MatrixStack context, Pack pack, int x, int y, int i, int j, boolean hovered) {
         Exception latestException = pack.getLatestException();
         if (pack.isSyncing()) {
             DrawingUtil.drawTexture(context, BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
@@ -34,7 +37,7 @@ public class PackMixinHelper {
         }
     }
 
-    public static void renderResourcePackEntry(Object resourcePackEntryMixin, DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
+    public static void renderResourcePackEntry(Object resourcePackEntryMixin, MatrixStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackListWidget.ResourcePackEntry entry = (PackListWidget.ResourcePackEntry) resourcePackEntryMixin;
         Pack pack = DynamicPackModBase.INSTANCE.getDynamicPackByMinecraftName(entry.getName());
         if (pack != null) {
