@@ -94,7 +94,7 @@ public class ModrinthRemote extends Remote {
     }
 
     @Override
-    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws Exception {
         progress.textLog("getting latest version on modrinth...");
         ModrinthRemote.LatestModrinthVersion latest = getLatest();
 

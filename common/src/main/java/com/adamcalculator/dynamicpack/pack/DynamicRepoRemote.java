@@ -107,7 +107,7 @@ public class DynamicRepoRemote extends Remote {
 
 
     @Override
-    public boolean sync(PackSyncProgress progress, boolean manually) throws IOException {
+    public boolean sync(PackSyncProgress progress, boolean manually) throws Exception {
         AtomicBoolean returnValue = new AtomicBoolean(false);
         PackUtil.openPackFileSystem(parent.getLocation(), path -> {
             try {

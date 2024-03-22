@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public class PackUtilTest {
     @Test
-    public void test() throws IOException {
+    public void test() throws Exception {
         PackUtil.openPackFileSystem(new File("tests_files/filedir"), new Consumer<Path>() {
             @Override
             public void accept(Path path) {
