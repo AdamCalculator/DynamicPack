@@ -129,6 +129,6 @@ public class Mod {
     }
 
     public static boolean isDebugMessageOnWorldJoin() {
-        return false; // TODO: Disable
+        return false;
     }
 }
