@@ -10,6 +10,9 @@ import com.adamcalculator.dynamicpack.sync.state.StateDownloading;
 import com.adamcalculator.dynamicpack.sync.state.StateFileDeleted;
 import com.adamcalculator.dynamicpack.sync.state.SyncProgressState;
 import com.adamcalculator.dynamicpack.util.Out;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.internal.LazilyParsedNumber;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -20,8 +23,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.server.packs.metadata.MetadataSectionType;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
 
 public abstract class DynamicPackModBase extends DynamicPackMod {
@@ -35,7 +36,7 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
 
         if (toast == null || (System.currentTimeMillis() - toastUpdated > 1000*5)) {
             ToastComponent toastManager = Minecraft.getInstance().getToasts();
-            toastManager.addToast(toast = new SystemToast(SystemToast.SystemToastIds.NARRATOR_TOGGLE, title, text));
+            toastManager.addToast(toast = new SystemToast(/*1.20.4 port*/new SystemToast.SystemToastId(5000), title, text));
         } else {
             toast.reset(title, text);
         }
@@ -129,7 +130,16 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
 
     @Override
     public boolean checkResourcePackMetaValid(String s) {
-        MetadataSectionType.fromCodec("not used in this case string", PackMetadataSection.CODEC).fromJson(GsonHelper.parse(s).getAsJsonObject("pack"));
+        // 1.20.4 port
+        JsonObject pack = GsonHelper.parse(s).getAsJsonObject("pack");
+        if (pack.get("pack_format").getAsNumber() instanceof LazilyParsedNumber lazilyParsedNumber) {
+            lazilyParsedNumber.intValue();
+        }
+        JsonElement description = pack.get("description");
+        if (description.isJsonNull()) {
+            throw new NullPointerException("description is null in pack.mcmeta");
+        }
+        //MetadataSectionType.fromCodec("not used in this case string", PackMetadataSection.CODEC).fromJson(GsonHelper.parse(s).getAsJsonObject("pack"));
         return true;
     }
 
