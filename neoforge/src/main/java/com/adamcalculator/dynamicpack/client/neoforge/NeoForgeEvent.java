@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.neoforge;
+package com.adamcalculator.dynamicpack.client.neoforge;
 
 
 import net.minecraft.client.player.LocalPlayer;

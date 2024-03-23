@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.forge;
+package com.adamcalculator.dynamicpack.client.forge;
 
 
 import net.minecraft.client.player.LocalPlayer;

@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.forge;
+package com.adamcalculator.dynamicpack.client.forge;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.util.Loader;

@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.neoforge;
+package com.adamcalculator.dynamicpack.client.neoforge;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.util.Loader;

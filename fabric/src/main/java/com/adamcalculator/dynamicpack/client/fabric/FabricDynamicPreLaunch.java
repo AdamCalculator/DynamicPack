@@ -1,4 +1,4 @@
-package com.adamcalculator.dynamicpack.fabric;
+package com.adamcalculator.dynamicpack.client.fabric;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
 import com.adamcalculator.dynamicpack.util.Loader;
