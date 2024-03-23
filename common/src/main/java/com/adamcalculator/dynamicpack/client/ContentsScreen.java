@@ -2,9 +2,9 @@ package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,10 +46,10 @@ public class ContentsScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull PoseStack context, int mouseX, int mouseY, float delta) {
         Compat.renderBackground(this, context, mouseX, mouseY, delta);
         contentsList.render(context, mouseX, mouseY, delta);
-        Compat.drawCenteredString(context, this.font, this.title, this.width / 2, 8, 16777215);
+        /*1.19.4*/drawCenteredString(context, this.font, this.title, this.width / 2, 8, 16777215);
 
         super.render(context, mouseX, mouseY, delta);
     }

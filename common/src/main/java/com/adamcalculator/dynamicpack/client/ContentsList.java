@@ -6,8 +6,8 @@ import com.adamcalculator.dynamicpack.pack.OverrideType;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
@@ -124,14 +124,14 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
             return Component.translatable(s);
         }
 
-        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(PoseStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             String txt = content.getId();
             String name = content.getName();
             if (name != null) {
                 txt = name;
             }
             Component text = Component.literal(txt);
-            context.drawString(ContentsList.this.minecraft.font, text, (x - 70), y+10, 16777215, false);
+            Compat.drawString(context, ContentsList.this.minecraft.font, text, (x - 70), y+10, 16777215);
             this.stateButton.setX(x+entryWidth-140);
             this.stateButton.setY(y);
             this.stateButton.render(context, mouseX, mouseY, tickDelta);

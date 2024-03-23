@@ -2,8 +2,8 @@ package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.packs.TransferableSelectionList;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -14,7 +14,7 @@ public class PackMixinHelper {
     private static final ResourceLocation BUTTON_WARNING_TEXTURE = ResourceLocation.tryBuild("dynamicpack", "select_button_warning.png");
     private static final ResourceLocation BUTTON_SYNCING_TEXTURE = ResourceLocation.tryBuild("dynamicpack", "select_button_syncing.png");
 
-    private static void drawTexture(GuiGraphics context, Pack pack, int x, int y, int i, int j, boolean hovered) {
+    private static void drawTexture(PoseStack context, Pack pack, int x, int y, int i, int j, boolean hovered) {
         Exception latestException = pack.getLatestException();
         if (pack.isSyncing()) {
             Compat.drawTexture(context, BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
@@ -34,7 +34,7 @@ public class PackMixinHelper {
         }
     }
 
-    public static void renderResourcePackEntry(Object resourcePackEntryMixin, GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
+    public static void renderResourcePackEntry(Object resourcePackEntryMixin, PoseStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         TransferableSelectionList.PackEntry entry = (TransferableSelectionList.PackEntry) resourcePackEntryMixin;
         Pack pack = DynamicPackMod.INSTANCE.getDynamicPackByMinecraftName(entry.getPackId());
         if (pack != null) {

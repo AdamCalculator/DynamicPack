@@ -5,9 +5,9 @@ import com.adamcalculator.dynamicpack.pack.DynamicRepoRemote;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
 import com.adamcalculator.dynamicpack.util.TranslatableException;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -44,7 +44,7 @@ public class DynamicPackScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull PoseStack context, int mouseX, int mouseY, float delta) {
         Compat.renderBackground(this, context, mouseX, mouseY, delta);
         syncButton.active = !SyncingTask.isSyncing;
         contentsButton.active = !SyncingTask.isSyncing;
