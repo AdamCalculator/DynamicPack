@@ -117,6 +117,12 @@ public class DynamicRepoSyncProcessV1 {
         for (final String _relativePath : files.keySet()) {
             var path = getAndCheckPath(par, _relativePath); // parent / path.     assets/minecraft
             var filePath = packRootPath.resolve(path);
+            Path filePathForLogs;
+            if (remote.parent.isZip()) {
+                filePathForLogs = filePath;
+            } else {
+                filePathForLogs = filePath.relativize(DynamicPackMod.INSTANCE.getResourcePackDir());
+            }
             var fileRemoteUrl = getUrlFromPath(rem, path);
 
             JSONObject fileExtra = files.getJSONObject(_relativePath);
@@ -130,10 +136,10 @@ public class DynamicRepoSyncProcessV1 {
                 String localHash = Hashes.nioCalcHashForPath(filePath);
                 if (!localHash.equals(hash)) {
                     isOverwrite = true;
-                    this.progress.textLog(filePath + ": overwrite! hash not equal: local:" + localHash+ " remote:"+hash);
+                    this.progress.textLog(filePathForLogs + ": overwrite! hash not equal: local:" + localHash+ " remote:"+hash);
                 }
             } else {
-                this.progress.textLog("Overwrite! Not exists: " + filePath);
+                this.progress.textLog("Overwrite! Not exists: " + filePathForLogs);
                 isOverwrite = true;
             }
 
@@ -143,7 +149,7 @@ public class DynamicRepoSyncProcessV1 {
                 }
 
                 markReloadRequired();
-                this.progress.textLog("Overwriting: " + filePath);
+                this.progress.textLog("Overwriting: " + filePathForLogs);
                 Urls.downloadDynamicFile(fileRemoteUrl, filePath, hash, new FileDownloadConsumer() {
                     @Override
                     public void onUpdate(FileDownloadConsumer it) {
@@ -190,12 +196,13 @@ public class DynamicRepoSyncProcessV1 {
         while (i < contents.length()) {
             JSONObject content = contents.getJSONObject(i);
             String id = content.getString("id");
+            boolean defaultActive = content.optBoolean("default_active", true);
 
             if (!InputValidator.isContentIdValid(id)) {
                 throw new RuntimeException("Id of content is not valid.");
             }
 
-            if (remote.isContentActive(id) || content.optBoolean("required", false)) {
+            if (remote.isContentActive(id, defaultActive) || content.optBoolean("required", false)) {
                 activeContents.add(content);
             }
             i++;

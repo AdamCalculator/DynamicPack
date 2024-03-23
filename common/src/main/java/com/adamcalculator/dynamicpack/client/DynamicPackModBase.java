@@ -20,7 +20,8 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSectionSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.GsonHelper;
 
 public abstract class DynamicPackModBase extends DynamicPackMod {
@@ -128,7 +129,7 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
 
     @Override
     public boolean checkResourcePackMetaValid(String s) {
-        new PackMetadataSectionSerializer().fromJson(GsonHelper.parse(s).getAsJsonObject("pack"));
+        MetadataSectionType.fromCodec("not used in this case string", PackMetadataSection.CODEC).fromJson(GsonHelper.parse(s).getAsJsonObject("pack"));
         return true;
     }
 
