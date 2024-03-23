@@ -12,11 +12,11 @@
         "sources": "https://github.com/FabricMC/fabric-example-mod"
     },
     "license": "${license}",
-    "icon": "icon.png",
+    "icon": "assets/dynamicpack/icon.png",
     "environment": "client",
     "entrypoints": {
         "preLaunch": [
-            "com.adamcalculator.dynamicpack.fabric.FabricDynamicPreLaunch"
+          "com.adamcalculator.dynamicpack.client.fabric.FabricDynamicPreLaunch"
         ]
     },
     "accessWidener": "dynamicpack.accesswidener",

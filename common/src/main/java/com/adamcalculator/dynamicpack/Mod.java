@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Mod {
-    public static final String VERSION_NAME_MOD = "1.0.15.1";
+    public static final String VERSION_NAME_MOD = "1.0.15.2";
     public static final String VERSION_NAME_BRANCH = "mc1.20";
     public static final String VERSION_NAME =  VERSION_NAME_MOD + "-" + VERSION_NAME_BRANCH;
     public static final long VERSION_BUILD = 15;

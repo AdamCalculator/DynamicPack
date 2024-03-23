@@ -8,6 +8,7 @@ base {
     archivesName = "${mod_name}-neoforge-${minecraft_version}"
 }
 
+jarJar.enable()
 // Automatically enable neoforge AccessTransformers if the file exists
 // This location is hardcoded in FML and can not be changed.
 // https://github.com/neoforged/FancyModLoader/blob/a952595eaaddd571fbc53f43847680b00894e0c1/loader/src/main/java/net/neoforged/fml/loading/moddiscovery/ModFile.java#L118
@@ -38,12 +39,6 @@ runs {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on
-//    minecraftLibrary 'org.bouncycastle:bcpg-jdk18on:1.77'
-//    minecraftLibrary "org.bouncycastle:bcprov-ext-jdk18on:1.77"
-//    minecraftLibrary 'org.json:json:20231013'
-//    minecraftLibrary "net.lingala.zip4j:zip4j:2.11.5"
-
     implementation("org.bouncycastle:bcpg-jdk18on:1.77")
     implementation("org.bouncycastle:bcprov-ext-jdk18on:1.77") // so larger for mod... 8 MB
     implementation("org.json:json:20231013")
@@ -60,6 +55,17 @@ dependencies {
 
     implementation "net.neoforged:neoforge:${neoforge_version}"
     compileOnly project(":common")
+
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on
+//    include 'org.bouncycastle:bcpg-jdk18on:[1.77]'
+//    minecraftEmbed "org.bouncycastle:bcprov-jdk18on:[1.77]"
+//    minecraftEmbed 'org.json:json:[20231013]'
+//    minecraftEmbed "net.lingala.zip4j:zip4j:[2.11.5]"
+//
+//    minecraftLibrary 'org.bouncycastle:bcpg-jdk18on:[1.77]'
+//    minecraftLibrary "org.bouncycastle:bcprov-jdk18on:[1.77]"
+//    minecraftLibrary 'org.json:json:[20231013]'
+//    minecraftLibrary "net.lingala.zip4j:zip4j:[2.11.5]"
 }
 
 // NeoGradle compiles the game, but we don't want to add our common code to the game's code
