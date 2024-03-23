@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.forge;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.fml.common.Mod;
@@ -15,7 +16,7 @@ public class ForgeDynamicPack extends DynamicPackModBase {
         FORGE_DYNAMICPACK = this;
 
         var gameDir = FMLPaths.GAMEDIR.get().toFile();
-        init(gameDir);
+        init(gameDir, Loader.FORGE);
 
         Out.println("DynamicPack loaded. Hello forge world!");
     }

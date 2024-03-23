@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.fabric;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -14,7 +15,7 @@ public class FabricDynamicPreLaunch extends DynamicPackModBase implements PreLau
         Out.println("DynamicPack loaded. Hello fabric world!");
 
         var gameDir = FabricLoader.getInstance().getGameDir().toFile();
-        init(gameDir);
+        init(gameDir, Loader.FABRIC);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> onWorldJoinForUpdateChecks(Minecraft.getInstance().player));
     }

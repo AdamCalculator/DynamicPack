@@ -33,6 +33,7 @@
 package com.adamcalculator.dynamicpack.util.enc;
 
 
+import com.adamcalculator.dynamicpack.Support;
 import com.adamcalculator.dynamicpack.util.Out;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Hex;
@@ -53,6 +54,9 @@ public class GPGSignatureVerifier {
     }
 
     public static boolean verify(InputStream signedFileInputStream, InputStream signatureIs, String base64publicKey) throws IOException {
+        if (Support._isSkipGPGVerify()) {
+            return Support._getDefaultVerifySkipResult();
+        }
         try {
             PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(signatureIs, new BcKeyFingerprintCalculator());
 

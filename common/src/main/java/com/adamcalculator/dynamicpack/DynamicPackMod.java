@@ -4,6 +4,7 @@ import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.pack.Remote;
 import com.adamcalculator.dynamicpack.util.AFiles;
 import com.adamcalculator.dynamicpack.util.FailedOpenPackFileSystemException;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import org.json.JSONObject;
 
@@ -29,9 +30,11 @@ public abstract class DynamicPackMod {
 	private File gameDir;
 	private File resourcePacks;
 	private boolean minecraftInitialized = false;
+	private Loader loader = Loader.UNKNOWN;
 
 
-	public void init(File gameDir) {
+	public void init(File gameDir, Loader loader) {
+		this.loader = loader;
 		if (INSTANCE != null) {
 			throw new RuntimeException("Already initialized!");
 		}
@@ -144,12 +147,16 @@ public abstract class DynamicPackMod {
 		return false;
 	}
 
-	public File getGameDir() {
-		return gameDir;
+	public static File getGameDir() {
+		return INSTANCE.gameDir;
 	}
 
-	public Pack[] getPacks() {
-		return packs.values().toArray(new Pack[0]);
+	public static Pack[] getPacks() {
+		return INSTANCE.packs.values().toArray(new Pack[0]);
+	}
+
+	public static Loader getLoader() {
+		return INSTANCE.loader;
 	}
 
 	public void minecraftInitialized() {

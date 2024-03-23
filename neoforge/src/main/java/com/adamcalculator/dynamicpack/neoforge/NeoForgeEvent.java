@@ -7,7 +7,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 @Mod.EventBusSubscriber
-public class ForgeEvent {
+public class NeoForgeEvent {
     @SubscribeEvent
     public static void onEvent(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof LocalPlayer localPlayer) {

@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.neoforge;
 
 import com.adamcalculator.dynamicpack.client.DynamicPackModBase;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.fml.common.Mod;
@@ -15,7 +16,7 @@ public class NeoForgeDynamicPackMod extends DynamicPackModBase {
         NEOFORGE_DYNAMICPACK = this;
 
         var gameDir = FMLPaths.GAMEDIR.get().toFile();
-        init(gameDir);
+        init(gameDir, Loader.NEO_FORGE);
 
         Out.println("DynamicPack loaded. Hello neoforge world!");
     }

@@ -138,7 +138,7 @@ public class Urls {
                 throw new RuntimeException("Not allowed scheme.");
             }
 
-            final File gameDir = DynamicPackMod.INSTANCE.getGameDir();
+            final File gameDir = DynamicPackMod.getGameDir();
             File file = new File(gameDir, url.replace("file_debug_only://", ""));
             if (progress != null){
                 progress.accept(file.length());

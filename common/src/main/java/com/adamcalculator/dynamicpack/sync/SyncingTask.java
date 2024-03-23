@@ -37,7 +37,7 @@ public class SyncingTask implements Runnable {
         onSyncStart();
         DynamicPackMod.INSTANCE.rescanPacks();
         DynamicPackMod.INSTANCE.rescanPacksBlocked = true;
-        for (Pack pack : DynamicPackMod.INSTANCE.getPacks()) {
+        for (Pack pack : DynamicPackMod.getPacks()) {
             currentPack = pack;
             try {
                 pack.sync(createSyncProgressForPack(pack), manually);
