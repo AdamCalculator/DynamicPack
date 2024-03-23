@@ -45,7 +45,8 @@ public class DynamicPackScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        Compat.renderBackground(this, context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
+
         syncButton.active = !SyncingTask.isSyncing;
         contentsButton.active = !SyncingTask.isSyncing;
         int h = 20;
@@ -64,8 +65,6 @@ public class DynamicPackScreen extends Screen {
             Compat.drawWrappedString(context, SyncingTask.syncingLog2, 20, 78+30+20 + h, 500, 99, 0xCCCCCC);
             Compat.drawWrappedString(context, SyncingTask.syncingLog3, 20, 78+30+40 + h, 500, 99, 0xCCCCCC);
         }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override

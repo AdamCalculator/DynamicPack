@@ -33,13 +33,21 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
         this.pack = pack;
         this.resyncOnExit = resyncOnExit;
 
-
         for (BaseContent knownContent : ((DynamicRepoRemote) pack.getRemote()).getKnownContents()) {
             preChangeStates.put(knownContent, knownContent.getOverride());
             var v = new BaseContentEntry(knownContent);
             entries.add(v);
             this.addEntry(v);
         }
+    }
+
+    protected int getScrollbarPosition() {
+        return super.getScrollbarPosition() + 15;
+    }
+
+    @Override
+    public int getRowWidth() {
+        return super.getRowWidth() + 32;
     }
 
     public boolean isChanges() {

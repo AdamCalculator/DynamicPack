@@ -63,8 +63,9 @@ public class Compat {
         context.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
     }
 
+    // in 1.20.2(and later maybe) not needed
     public static void renderBackground(Screen screen, Object context, int mouseX, int mouseY, float delta) {
-        screen.renderBackground((GuiGraphics) context);
+        screen.renderBackground((GuiGraphics) context, mouseX, mouseY, delta);
     }
 
     public static void drawString(Object context, Font font, Component component, int i, int i1, int i2) {
