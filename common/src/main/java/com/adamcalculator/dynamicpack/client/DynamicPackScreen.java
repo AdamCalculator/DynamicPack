@@ -43,7 +43,7 @@ public class DynamicPackScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         syncButton.active = !SyncingTask.isSyncing;
         int h = 20;
         context.drawString(this.font, this.title, 20, 8, 16777215);
