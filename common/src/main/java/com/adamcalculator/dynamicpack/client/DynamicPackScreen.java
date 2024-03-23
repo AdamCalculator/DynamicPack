@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.DynamicPackMod;
+import com.adamcalculator.dynamicpack.pack.DynamicRepoRemote;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
 import com.adamcalculator.dynamicpack.util.TranslatableException;
@@ -23,6 +24,7 @@ public class DynamicPackScreen extends Screen {
     private final MutableComponent screenDescText;
     private Button syncButton;
     private final Consumer<Pack> destroyListener = this::setPack;
+    private Button contentsButton;
 
     public DynamicPackScreen(Screen parent, Pack pack) {
         super(Component.literal(pack.getName()).withStyle(ChatFormatting.BOLD));
@@ -43,13 +45,14 @@ public class DynamicPackScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
+        Compat.renderBackground(this, context, mouseX, mouseY, delta);
         syncButton.active = !SyncingTask.isSyncing;
+        contentsButton.active = !SyncingTask.isSyncing;
         int h = 20;
-        context.drawString(this.font, this.title, 20, 8, 16777215);
-        context.drawString(this.font, screenDescText, 20, 20 + h, 16777215);
-        context.drawString(this.font, Component.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36 + h, 16777215);
-        context.drawString(this.font, Component.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
+        Compat.drawString(context, this.font, this.title, 20, 8, 16777215);
+        Compat.drawString(context, this.font, screenDescText, 20, 20 + h, 16777215);
+        Compat.drawString(context, this.font, Component.translatable("dynamicpack.screen.pack.remote_type", pack.getRemoteType()), 20, 36 + h, 16777215);
+        Compat.drawString(context, this.font, Component.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
 
         if (pack.getLatestException() != null) {
             Compat.drawWrappedString(context, Component.translatable("dynamicpack.screen.pack.latestException", TranslatableException.getComponentFromException(pack.getLatestException())).getString(512), 20, 78 + h, 500, 99, 0xff2222);
@@ -74,6 +77,10 @@ public class DynamicPackScreen extends Screen {
         ));
 
         addRenderableWidget(Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 + 4, this.height - 48));
+        addRenderableWidget(contentsButton = Compat.createButton(Component.translatable("dynamicpack.screen.pack.dynamic.contents"), () -> {
+            Minecraft.getInstance().setScreen(new ContentsScreen(this, pack));
+        }, 150, 20, this.width / 2 + 4-160, this.height - 48));
+        contentsButton.visible = pack.getRemote() instanceof DynamicRepoRemote;
     }
 
     @Override
