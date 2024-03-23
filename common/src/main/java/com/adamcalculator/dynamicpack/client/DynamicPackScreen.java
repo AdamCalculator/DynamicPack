@@ -3,6 +3,7 @@ package com.adamcalculator.dynamicpack.client;
 import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.sync.SyncingTask;
+import com.adamcalculator.dynamicpack.util.TranslatableException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +52,7 @@ public class DynamicPackScreen extends Screen {
         context.drawString(this.font, Component.translatable("dynamicpack.screen.pack.latestUpdated", pack.getLatestUpdated() < 0 ? "-" : new Date(pack.getLatestUpdated() * 1000)), 20, 52 + h, 16777215);
 
         if (pack.getLatestException() != null) {
-            Compat.drawWrappedString(context, Component.translatable("dynamicpack.screen.pack.latestException", pack.getLatestException().getMessage()).getString(9999), 20, 78 + h, 500, 99, 0xff2222);
+            Compat.drawWrappedString(context, Component.translatable("dynamicpack.screen.pack.latestException", TranslatableException.getComponentFromException(pack.getLatestException())).getString(512), 20, 78 + h, 500, 99, 0xff2222);
             h+=10;
         }
 

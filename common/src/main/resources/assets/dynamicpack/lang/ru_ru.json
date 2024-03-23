@@ -23,5 +23,7 @@
   "dynamicpack.status_checker.not_safe.toast.description": "Доступно обновление безопасности",
   "dynamicpack.status_checker.format_not_actual": "Доступно обновление формата динамических паков! Возможно разработчики ресурспаков будут его использовать, и тогда без обновления мода они работать перестанут: %s",
   "dynamicpack.status_checker.download": "Загрузить!",
-  "dynamicpack.status_checker.download.hover": "Нажмите чтобы перейти %s"
+  "dynamicpack.status_checker.download.hover": "Нажмите чтобы перейти %s",
+  "dynamicpack.exceptions.pack.remote.modrinth.not_found_latest_version": "Не удалось найти последнюю версию на modrinth с подходящими параметрами"
+
 }

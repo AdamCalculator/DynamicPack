@@ -15,6 +15,7 @@ public class ModrinthRemote extends Remote {
     private Pack parent;
     private JSONObject cachedCurrentJson;
     private boolean usesCurrentGameVersion;
+    private boolean noSpecifyGameVersion;
 
     private String projectId;
     private String gameVersion;
@@ -27,8 +28,9 @@ public class ModrinthRemote extends Remote {
         this.parent = parent;
         this.cachedCurrentJson = current;
         this.projectId = json.getString("modrinth_project_id");
-        var ver = json.optString("game_version", "current");
+        var ver = json.optString("game_version", "no_specify");
         this.usesCurrentGameVersion = ver.equalsIgnoreCase("current");
+        this.noSpecifyGameVersion = ver.equalsIgnoreCase("no_specify");
         this.gameVersion = usesCurrentGameVersion ? getCurrentGameVersion() : ver;
     }
 
@@ -62,6 +64,10 @@ public class ModrinthRemote extends Remote {
         JSONArray j = new JSONArray(content);
         for (Object o : j) {
             JSONObject jsonObject = (JSONObject) o;
+            if (noSpecifyGameVersion) {
+                return jsonObject;
+            }
+
             JSONArray gameVersions = jsonObject.getJSONArray("game_versions");
             boolean supportGameVersion = false;
             for (Object version : gameVersions) {
@@ -74,7 +80,8 @@ public class ModrinthRemote extends Remote {
                 return jsonObject;
             }
         }
-        return null;
+        throw new TranslatableException("Could not find the latest version on modrinth with suitable parameters",
+                "dynamicpack.exceptions.pack.remote.modrinth.not_found_latest_version");
     }
 
     @Override

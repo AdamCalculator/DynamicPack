@@ -23,5 +23,6 @@
   "dynamicpack.status_checker.not_safe.toast.description": "Security update available",
   "dynamicpack.status_checker.format_not_actual": "Dynamic pack format update available! Perhaps resource pack developers will use it, and then without updating the mod they will stop working: %s",
   "dynamicpack.status_checker.download": "Download!",
-  "dynamicpack.status_checker.download.hover": "Click for go to %s"
+  "dynamicpack.status_checker.download.hover": "Click for go to %s",
+  "dynamicpack.exceptions.pack.remote.modrinth.not_found_latest_version": "Could not find the latest version on modrinth with suitable parameters"
 }
