@@ -125,10 +125,10 @@ public class Mod {
     }
 
     public static boolean isDebugLogs() {
-        return true;
+        return false;
     }
 
     public static boolean isDebugMessageOnWorldJoin() {
-        return true; // TODO: Disable
+        return false; // TODO: Disable
     }
 }
