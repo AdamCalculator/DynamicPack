@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Pack {
+public class Pack extends AbstractPack {
     public static final String UNKNOWN_PACK_MCMETA = """
                 {
                   "pack": {
@@ -53,6 +53,7 @@ public class Pack {
         }
     }
 
+    @Override
     public boolean isSyncing() {
         return isSyncing;
     }
