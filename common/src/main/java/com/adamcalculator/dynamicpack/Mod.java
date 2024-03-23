@@ -1,7 +1,6 @@
 package com.adamcalculator.dynamicpack;
 
 import com.adamcalculator.dynamicpack.util.Out;
-import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Mod {
-    public static final String VERSION_NAME_MOD = "1.0.15.2";
+    public static final String VERSION_NAME_MOD = "1.0.15.3";
     public static final String VERSION_NAME_BRANCH = "mc1.20";
     public static final String VERSION_NAME =  VERSION_NAME_MOD + "-" + VERSION_NAME_BRANCH;
     public static final long VERSION_BUILD = 15;
@@ -29,7 +28,7 @@ public class Mod {
         ALLOWED_HOSTS.add("modrinth.com");
         ALLOWED_HOSTS.add("github.com");
         ALLOWED_HOSTS.add("github.io");
-        ALLOWED_HOSTS.add("githubusercontent.com");
+        ALLOWED_HOSTS.add("githubusercontent.com"); // use github pages instead of this
         if (isLocalHostAllowed()) {
             ALLOWED_HOSTS.add("localhost");
         }
@@ -130,6 +129,6 @@ public class Mod {
     }
 
     public static boolean isDebugMessageOnWorldJoin() {
-        return true;
+        return true; // TODO: Disable
     }
 }
