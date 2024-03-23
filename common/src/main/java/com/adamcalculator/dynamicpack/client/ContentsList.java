@@ -28,7 +28,7 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
     private final List<ContentEntry> entries = new ArrayList<>();
 
     public ContentsList(ContentsScreen parent, Minecraft minecraft, Pack pack, Consumer<Boolean> resyncOnExit) {
-        super(minecraft, parent.width, parent.height - 57, 25, 40);
+        super(minecraft, parent.width, parent.height - 52, 20, 40);
         this.parent = parent;
         this.pack = pack;
         this.resyncOnExit = resyncOnExit;
