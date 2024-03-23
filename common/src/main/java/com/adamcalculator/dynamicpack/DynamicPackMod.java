@@ -34,11 +34,12 @@ public abstract class DynamicPackMod {
 
 
 	public void init(File gameDir, Loader loader) {
-		this.loader = loader;
 		if (INSTANCE != null) {
 			throw new RuntimeException("Already initialized!");
 		}
 		INSTANCE = this;
+		this.loader = loader;
+		Out.init(loader);
 		this.gameDir = gameDir;
 		this.resourcePacks = new File(gameDir, "resourcepacks");
 		this.resourcePacks.mkdirs();

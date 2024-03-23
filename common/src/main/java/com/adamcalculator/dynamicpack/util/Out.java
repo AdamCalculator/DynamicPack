@@ -6,9 +6,11 @@ import org.slf4j.LoggerFactory;
 
 public class Out {
     public static final Logger LOGGER = LoggerFactory.getLogger("dynamicpack");
+    private static final String DEFAULT_PREFIX = "[DynamicPack] ";
+
     public static boolean ENABLE = true;
     public static boolean USE_SOUT = false;
-    public static final String PREFIX = "[DynamicPack] ";
+    private static String PREFIX = "";
 
     public static void println(Object o) {
         if (!ENABLE) return;
@@ -70,5 +72,11 @@ public class Out {
             return;
         }
         LOGGER.error("[DynamicPack] No error. This is stacktrace printer", new Throwable("StackTrace printer"));
+    }
+
+    public static void init(Loader loader) {
+        if (loader == Loader.FABRIC && Mod.isRelease()) {
+            PREFIX = DEFAULT_PREFIX;
+        }
     }
 }
