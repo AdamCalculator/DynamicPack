@@ -125,7 +125,7 @@ public class Mod {
     }
 
     public static boolean isDebugLogs() {
-        return false;
+        return true;
     }
 
     public static boolean isDebugMessageOnWorldJoin() {

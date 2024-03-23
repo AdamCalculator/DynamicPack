@@ -172,4 +172,8 @@ public abstract class DynamicPackMod {
 	public abstract String getCurrentGameVersion();
 
 	public abstract boolean checkResourcePackMetaValid(String s) throws Exception;
+
+	public Path getResourcePackDir() {
+		return resourcePacks.toPath();
+	}
 }
