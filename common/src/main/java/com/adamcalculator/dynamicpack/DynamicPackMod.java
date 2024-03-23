@@ -39,6 +39,7 @@ public abstract class DynamicPackMod {
 		}
 		INSTANCE = this;
 		this.loader = loader;
+
 		Out.init(loader);
 		this.gameDir = gameDir;
 		this.resourcePacks = new File(gameDir, "resourcepacks");

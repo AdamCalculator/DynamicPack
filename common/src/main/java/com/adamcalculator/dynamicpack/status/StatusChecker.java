@@ -1,6 +1,8 @@
 package com.adamcalculator.dynamicpack.status;
 
+import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.Mod;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.Urls;
 import org.json.JSONObject;
@@ -18,13 +20,26 @@ public class StatusChecker {
         Out.println("Checking status...");
         String s = Urls.parseContent(URL, 1024 * 1024 * 128);
         JSONObject j = new JSONObject(s);
-        JSONObject lat = j.getJSONObject("latest_version");
+        String platformKey;
+        JSONObject lat = j.getJSONObject(platformKey = getLatestKeyForPlatform(DynamicPackMod.getLoader()));
         isUpdateAvailable = lat.getLong("build") > Mod.VERSION_BUILD;
         isSafe = lat.getLong("safe") <= Mod.VERSION_BUILD;
         isFormatActual = lat.getLong("format") <= Mod.VERSION_BUILD;
 
         isChecked = true;
-        Out.println(String.format("Status checked! isSafe=%s, isFormatActual=%s, isUpdateAvailable=%s", isSafe, isFormatActual, isUpdateAvailable));
+        Out.println(String.format("Status checked! platformKey=%s, isSafe=%s, isFormatActual=%s, isUpdateAvailable=%s", platformKey, isSafe, isFormatActual, isUpdateAvailable));
+    }
+
+    private static String getLatestKeyForPlatform(Loader loader) {
+        if (loader == null) {
+            return "latest_version";
+        }
+        return switch (loader) {
+            case UNKNOWN -> "latest_version";
+            case FABRIC -> "latest_version_fabric";
+            case FORGE -> "latest_version_forge";
+            case NEO_FORGE -> "latest_version_neoforge";
+        };
     }
 
     public static boolean isBlockUpdating(String remoteType) {
