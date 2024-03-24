@@ -1,2 +1,5 @@
 accessWidener	v1	named
 accessible method net/minecraft/client/gui/components/AbstractSelectionList getRowTop (I)I
+
+# 1.18.2(and lower maybe) specify
+accessible field net/minecraft/client/gui/screens/packs/TransferableSelectionList$PackEntry pack Lnet/minecraft/client/gui/screens/packs/PackSelectionModel$Entry;

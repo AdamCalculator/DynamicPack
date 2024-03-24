@@ -1,7 +1,7 @@
 package com.adamcalculator.dynamicpack.client.mixin;
 
 import com.adamcalculator.dynamicpack.client.PackMixinHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.packs.TransferableSelectionList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ public abstract class ResourcePackEntryMixin {
     @Shadow @Final private TransferableSelectionList parent;
 
     @Inject(at = @At("RETURN"), method = "render")
-    private void render(GuiGraphics ctx, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
+    private void render(PoseStack ctx, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         PackMixinHelper.renderResourcePackEntry(this, ctx, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta, ci);
     }
 

@@ -4,6 +4,11 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.0.81'
     id 'java-library'
 }
+
+// neoforge not exists on this version of mc
+if (true) {
+    return
+}
 base {
     archivesName = "${mod_name}-neoforge-${minecraft_version}"
 }
