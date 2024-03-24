@@ -43,6 +43,7 @@ public abstract class DynamicPackMod {
 		this.loader = loader;
 
 		Out.init(loader);
+		Out.println("Mod version: " + Mod.VERSION_NAME + " build: " + Mod.VERSION_BUILD);
 		this.gameDir = gameDir;
 		this.resourcePacks = new File(gameDir, "resourcepacks");
 		this.resourcePacks.mkdirs();
