@@ -1,6 +1,7 @@
 package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.pack.BaseContent;
+import com.adamcalculator.dynamicpack.pack.OverrideType;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
