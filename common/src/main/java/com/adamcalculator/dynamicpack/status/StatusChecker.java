@@ -34,12 +34,17 @@ public class StatusChecker {
         if (loader == null) {
             return "latest_version";
         }
-        return switch (loader) {
-            case UNKNOWN -> "latest_version";
-            case FABRIC -> "latest_version_fabric";
-            case FORGE -> "latest_version_forge";
-            case NEO_FORGE -> "latest_version_neoforge";
-        };
+
+        if (loader == Loader.FABRIC) {
+            return "latest_version_fabric";
+        }
+        if (loader == Loader.FORGE) {
+            return "latest_version_forge";
+        }
+        if (loader == Loader.NEO_FORGE) {
+            return "latest_version_neoforge";
+        }
+        return "latest_version";
     }
 
     public static boolean isBlockUpdating(String remoteType) {

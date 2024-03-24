@@ -10,11 +10,16 @@ public enum OverrideType {
     }
 
     public OverrideType next() {
-        return switch (this) {
-            case TRUE -> FALSE;
-            case FALSE -> NOT_SET;
-            case NOT_SET -> TRUE;
-        };
+        if (this == TRUE) {
+            return FALSE;
+        }
+        if (this == FALSE) {
+            return NOT_SET;
+        }
+        if (this == NOT_SET) {
+            return TRUE;
+        }
+        throw new UnsupportedOperationException("Hmm");
     }
 
     public boolean asBoolean() {

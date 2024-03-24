@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.function.Consumer;
@@ -42,7 +41,7 @@ public class DynamicPackScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull PoseStack context, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack context, int mouseX, int mouseY, float delta) {
         Compat.renderBackground(this, context, mouseX, mouseY, delta);
         syncButton.active = !SyncingTask.isSyncing;
         contentsButton.active = !SyncingTask.isSyncing;

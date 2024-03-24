@@ -10,7 +10,8 @@ import net.minecraftforge.fml.common.Mod;
 public class ForgeEvent {
     @SubscribeEvent
     public static void onEvent(EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof LocalPlayer localPlayer) {
+        if (event.getEntity() instanceof LocalPlayer) {
+            LocalPlayer localPlayer = (LocalPlayer) event.getEntity();
             ForgeDynamicPack.FORGE_DYNAMICPACK.forgeOnWorldJoin(localPlayer);
         }
     }

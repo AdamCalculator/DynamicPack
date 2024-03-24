@@ -112,17 +112,19 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
         }
 
         private Component currentState() {
-            String s = switch (content.getOverride()) {
-                case TRUE -> "dynamicpack.screen.pack_contents.state.true";
-                case FALSE -> "dynamicpack.screen.pack_contents.state.false";
-                case NOT_SET -> {
-                    if (content.getWithDefaultState()) {
-                        yield "dynamicpack.screen.pack_contents.state.default.true";
-                    } else {
-                        yield "dynamicpack.screen.pack_contents.state.default.false";
-                    }
+            OverrideType ov = content.getOverride();
+            String s = "hmm";
+            if (ov == OverrideType.TRUE) {
+                s = "dynamicpack.screen.pack_contents.state.true";
+            } else if (ov == OverrideType.FALSE) {
+                s = "dynamicpack.screen.pack_contents.state.false";
+            } else if (ov == OverrideType.NOT_SET) {
+                if (content.getWithDefaultState()) {
+                    s = "dynamicpack.screen.pack_contents.state.default.true";
+                } else {
+                    s = "dynamicpack.screen.pack_contents.state.default.false";
                 }
-            };
+            }
             return new TranslatableComponent(s);
         }
 

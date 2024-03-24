@@ -36,7 +36,8 @@ public class TranslatableException extends RuntimeException {
         if (e == null) {
             return null;
         }
-        if (e instanceof TranslatableException tr) {
+        if (e instanceof TranslatableException) {
+            TranslatableException tr = (TranslatableException) e;
             return new TranslatableComponent(tr.key, tr.args);
 
         } else if (e.getCause() != null) {

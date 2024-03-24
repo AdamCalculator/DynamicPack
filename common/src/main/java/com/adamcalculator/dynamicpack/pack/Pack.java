@@ -16,14 +16,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Pack extends AbstractPack {
-    public static final String UNKNOWN_PACK_MCMETA = """
-                {
-                  "pack": {
-                    "pack_format": 17,
-                    "description": "Unknown DynamicPack resource-pack..."
-                  }
-                }
-                """;
+    public static final String UNKNOWN_PACK_MCMETA = "{" +
+                "  \"pack\": {" +
+                "    \"pack_format\": 17,"+
+                "    \"description\": \"Unknown DynamicPack resource-pack...\"" +
+                "  }" +
+                "}";
 
     private final File location;
     private final JSONObject cachedJson;

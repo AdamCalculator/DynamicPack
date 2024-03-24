@@ -108,10 +108,12 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
             public void onStateChanged(Pack pack, SyncProgressState state) {
                 if (!manually) return;
 
-                if (state instanceof StateDownloading downloading) {
+                if (state instanceof StateDownloading) {
+                    StateDownloading downloading = (StateDownloading) state;
                     setToastContent(new TranslatableComponent("dynamicpack.toast.pack.state.downloading.title", pack.getName()), new TranslatableComponent("dynamicpack.toast.pack.state.downloading.description", downloading.getPercentage(), downloading.getName()));
 
-                } else if (state instanceof StateFileDeleted deleted) {
+                } else if (state instanceof StateFileDeleted) {
+                    StateFileDeleted deleted = (StateFileDeleted) state;
                     setToastContent(new TranslatableComponent("dynamicpack.toast.pack.state.deleting.title", pack.getName()), new TranslatableComponent("dynamicpack.toast.pack.state.deleting.description", deleted.getPath().getFileName().toString()));
 
                 } else {
@@ -131,7 +133,9 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
     public boolean checkResourcePackMetaValid(String s) {
         // Coped from 1.20.4 port (this is a 1.19.4 port)
         JsonObject pack = GsonHelper.parse(s).getAsJsonObject("pack");
-        if (pack.get("pack_format").getAsNumber() instanceof LazilyParsedNumber lazilyParsedNumber) {
+        Number num = pack.get("pack_format").getAsNumber();
+        if (num instanceof LazilyParsedNumber) {
+            LazilyParsedNumber lazilyParsedNumber = (LazilyParsedNumber) num;
             lazilyParsedNumber.intValue();
         }
         JsonElement description = pack.get("description");
