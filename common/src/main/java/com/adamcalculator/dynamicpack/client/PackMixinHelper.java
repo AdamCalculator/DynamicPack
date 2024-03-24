@@ -2,6 +2,7 @@ package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.DynamicPackMod;
 import com.adamcalculator.dynamicpack.pack.Pack;
+import com.adamcalculator.dynamicpack.util.Out;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.packs.TransferableSelectionList;
@@ -10,11 +11,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class PackMixinHelper {
-    private static final ResourceLocation BUTTON_TEXTURE = ResourceLocation.tryBuild("dynamicpack", "select_button.png");
-    private static final ResourceLocation BUTTON_WARNING_TEXTURE = ResourceLocation.tryBuild("dynamicpack", "select_button_warning.png");
-    private static final ResourceLocation BUTTON_SYNCING_TEXTURE = ResourceLocation.tryBuild("dynamicpack", "select_button_syncing.png");
+    private static final ResourceLocation BUTTON_TEXTURE = ResourceLocation.tryParse("dynamicpack:select_button.png");
+    private static final ResourceLocation BUTTON_WARNING_TEXTURE = ResourceLocation.tryParse("dynamicpack:select_button_warning.png");
+    private static final ResourceLocation BUTTON_SYNCING_TEXTURE = ResourceLocation.tryParse("dynamicpack:select_button_syncing.png");
 
-    private static void drawTexture(PoseStack context, Pack pack, int x, int y, int i, int j, boolean hovered) {
+    public static void drawTexture(PoseStack context, Pack pack, int x, int y, int i, int j, boolean hovered) {
         Exception latestException = pack.getLatestException();
         if (pack.isSyncing()) {
             Compat.drawTexture(context, BUTTON_TEXTURE, x + 174, y+16, 0.0F, ((i >= 174 && j >= 16 && hovered) ? 16f : 0f), 16, 16, 16, 32);
@@ -36,7 +37,12 @@ public class PackMixinHelper {
 
     public static void renderResourcePackEntry(Object resourcePackEntryMixin, PoseStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
         TransferableSelectionList.PackEntry entry = (TransferableSelectionList.PackEntry) resourcePackEntryMixin;
-        Pack pack = DynamicPackMod.INSTANCE.getDynamicPackByMinecraftName(entry.getPackId());
+
+        // IDE may error this, but gradle success build
+        String nam = "file/"+entry.pack.getTitle().getString(256);
+        Out.debug(nam);
+        Pack pack = DynamicPackMod.INSTANCE.getDynamicPackByMinecraftName(nam);
+
         if (pack != null) {
             int i = mouseX - x;
             int j = mouseY - y;
@@ -46,7 +52,11 @@ public class PackMixinHelper {
 
     public static void mouseClicked(Object resourcePackEntryMixin, TransferableSelectionList widget, double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         TransferableSelectionList.PackEntry entry = (TransferableSelectionList.PackEntry) resourcePackEntryMixin;
-        Pack pack = DynamicPackMod.INSTANCE.getDynamicPackByMinecraftName(entry.getPackId());
+
+        // IDE may error this, but gradle success build
+        String nam = "file/"+entry.pack.getTitle().getString(256);
+        Out.debug(nam);
+        Pack pack = DynamicPackMod.INSTANCE.getDynamicPackByMinecraftName(nam);
         if (pack != null) {
             double d = mouseX - (double)widget.getRowLeft();
             double e = mouseY - (double)widget.getRowTop(widget.children().indexOf(entry));

@@ -1,6 +1,8 @@
 package com.adamcalculator.dynamicpack.util;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class TranslatableException extends RuntimeException {
     private final String key;
@@ -35,7 +37,7 @@ public class TranslatableException extends RuntimeException {
             return null;
         }
         if (e instanceof TranslatableException tr) {
-            return Component.translatable(tr.key, tr.args);
+            return new TranslatableComponent(tr.key, tr.args);
 
         } else if (e.getCause() != null) {
             return _findComponentOnException(e.getCause());
@@ -46,7 +48,7 @@ public class TranslatableException extends RuntimeException {
     public static Component getComponentFromException(Throwable e) {
         Component component = _findComponentOnException(e);
         if (component == null) {
-            component = Component.literal(e.getMessage());
+            component = new TextComponent(e.getMessage());
         }
         return component;
     }
