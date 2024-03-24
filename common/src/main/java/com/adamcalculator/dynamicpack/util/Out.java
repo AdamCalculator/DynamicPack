@@ -1,11 +1,12 @@
 package com.adamcalculator.dynamicpack.util;
 
 import com.adamcalculator.dynamicpack.Mod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class Out {
-    public static final Logger LOGGER = LoggerFactory.getLogger("dynamicpack");
+    public static final Logger LOGGER = LogManager.getLogger("dynamicpack");
     private static final String DEFAULT_PREFIX = "[DynamicPack] ";
 
     public static boolean ENABLE = true;
