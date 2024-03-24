@@ -74,7 +74,7 @@ public class PackMixinHelper {
     }
 
     public static void minecraftInitReturned() {
-        DynamicPackMod.INSTANCE.minecraftInitialized();
+        DynamicPackMod.minecraftInitialized = true;
     }
 
     public static void updatePacksMinecraftRequest() {

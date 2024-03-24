@@ -9,7 +9,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -45,7 +44,7 @@ public class ContentsScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull PoseStack context, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack context, int mouseX, int mouseY, float delta) {
         Compat.renderBackground(this, context, mouseX, mouseY, delta);
         contentsList.render(context, mouseX, mouseY, delta);
         /*1.19.4*/drawCenteredString(context, this.font, this.title, this.width / 2, 8, 16777215);

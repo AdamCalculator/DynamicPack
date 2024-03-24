@@ -29,7 +29,7 @@ public abstract class DynamicPackMod {
 	private HashMap<String, Pack> packs = new HashMap<>();
 	private File gameDir;
 	private File resourcePacks;
-	private boolean minecraftInitialized = false;
+	public static boolean minecraftInitialized = false;
 	private Loader loader = Loader.UNKNOWN;
 
 
@@ -161,11 +161,8 @@ public abstract class DynamicPackMod {
 		return INSTANCE.loader;
 	}
 
-	public void minecraftInitialized() {
-		this.minecraftInitialized = true;
-	}
 
-	public boolean isMinecraftInitialized() {
+	public static boolean isMinecraftInitialized() {
 		return minecraftInitialized;
 	}
 
