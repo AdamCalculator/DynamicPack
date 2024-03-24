@@ -2,11 +2,13 @@ package com.adamcalculator.dynamicpack.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -59,5 +61,17 @@ public class Compat {
     public static void drawTexture(GuiGraphics context, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         RenderSystem.setShaderTexture(0, texture);
         context.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
+    }
+
+    public static void renderBackground(Screen screen, Object context, int mouseX, int mouseY, float delta) {
+        screen.renderBackground((GuiGraphics) context);
+    }
+
+    public static void drawString(Object context, Font font, Component component, int i, int i1, int i2) {
+        ((GuiGraphics) context).drawString(font, component, i, i1, i2);
+    }
+
+    public static void drawCenteredString(Object context, Font font, Component title, int i, int i1, int i2) {
+        ((GuiGraphics) context).drawCenteredString(font, title, i, i1, i2);
     }
 }

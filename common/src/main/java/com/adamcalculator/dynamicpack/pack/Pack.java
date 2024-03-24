@@ -222,4 +222,8 @@ public class Pack extends AbstractPack {
     public boolean isDestroyed() {
         return destroyed;
     }
+
+    public Remote getRemote() {
+        return remote;
+    }
 }
