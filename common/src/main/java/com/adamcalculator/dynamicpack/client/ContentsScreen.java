@@ -10,9 +10,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -30,7 +31,7 @@ public class ContentsScreen extends Screen {
     protected final LinkedHashMap<BaseContent, OverrideType> preChangeStates = new LinkedHashMap<>();
 
     protected ContentsScreen(Screen parent, Pack pack) {
-        super(new TranslatableComponent("dynamicpack.screen.pack_contents.title"));
+        super(Component.translatable("dynamicpack.screen.pack_contents.title"));
         this.parent = parent;
         this.pack = pack;
         this.minecraft = Minecraft.getInstance();
@@ -101,20 +102,17 @@ public class ContentsScreen extends Screen {
         super.init();
         this.addWidget(this.contentsList = new ContentsList(this, this.minecraft));
         this.addRenderableWidget(doneButton = Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 - 155 + 160, this.height - 29));
-        this.addRenderableWidget(resetButton = Compat.createButton(new TranslatableComponent("controls.reset"), this::reset, 150, 20, this.width / 2 - 155, this.height - 29));
+        this.addRenderableWidget(resetButton = Compat.createButton(Component.translatable("controls.reset"), this::reset, 150, 20, this.width / 2 - 155, this.height - 29));
         updateDoneButton();
     }
 
     private void updateDoneButton() {
         if (syncOnExit) {
-            doneButton.setMessage(new TranslatableComponent("dynamicpack.screen.pack_contents.apply").withStyle(ChatFormatting.BOLD, ChatFormatting.GOLD));
-            // TODO: 1.18.2 backport todo
-            //doneButton.setTooltip(Tooltip.create(new TranslatableComponent("dynamicpack.screen.pack_contents.apply.tooltip")));
+            doneButton.setMessage(Component.translatable("dynamicpack.screen.pack_contents.apply").withStyle(ChatFormatting.BOLD, ChatFormatting.GOLD));
+            doneButton.setTooltip(Tooltip.create(Component.translatable("dynamicpack.screen.pack_contents.apply.tooltip")));
         } else {
             doneButton.setMessage(CommonComponents.GUI_DONE);
-            // TODO: 1.18.2 backport todo
-
-            //doneButton.setTooltip(null);
+            doneButton.setTooltip(null);
         }
         resetButton.visible = syncOnExit;
     }

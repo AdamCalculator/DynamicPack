@@ -7,11 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 
@@ -51,13 +50,12 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
             this.stateButton = createStateButton();
             stateButton.active = !content.isRequired();
             if (!stateButton.active) {
-                // TODO: 1.18.2 backport: not work tooltips
-                //this.stateButton.setTooltip(Tooltip.create(Component.translatable("dynamicpack.screen.pack_contents.state.tooltip_disabled")));
+                this.stateButton.setTooltip(Tooltip.create(Component.translatable("dynamicpack.screen.pack_contents.state.tooltip_disabled")));
             }
         }
 
         private Button createStateButton() {
-            return new Button(0, 0, 140, 20, new TranslatableComponent("dynamicpack.screen.pack_contents.state", currentState()), (button) -> {
+            return Button.builder(Component.translatable("dynamicpack.screen.pack_contents.state", currentState()), (button) -> {
                 try {
                     content.nextOverride();
                 } catch (Exception e) {
@@ -65,13 +63,13 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
                 }
                 parent.onAfterChange();
                 refresh();
-            });
+            }).bounds(0, 0, 140, 20).build();
         }
 
 
         @Override
         public void refresh() {
-            stateButton.setMessage(new TranslatableComponent("dynamicpack.screen.pack_contents.state", currentState()));
+            stateButton.setMessage(Component.translatable("dynamicpack.screen.pack_contents.state", currentState()));
         }
 
         private Component currentState() {
@@ -86,7 +84,7 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
                     }
                 }
             };
-            return new TranslatableComponent(s);
+            return Component.translatable(s);
         }
 
         public void render(PoseStack context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
@@ -95,10 +93,10 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
             if (name != null) {
                 txt = name;
             }
-            Component text = new TextComponent(txt);
-            Compat.drawString(context, ContentsList.this.minecraft.font, text, (x - 50), y+10, 16777215);
-            this.stateButton.x = (x+entryWidth-140);
-            this.stateButton.y = (y);
+            Component text = Component.literal(txt);
+            Compat.drawString(context, ContentsList.this.minecraft.font, text, (x - 70), y+10, 16777215);
+            this.stateButton.setX(x+entryWidth-140);
+            this.stateButton.setY(y);
             this.stateButton.render(context, mouseX, mouseY, tickDelta);
         }
 

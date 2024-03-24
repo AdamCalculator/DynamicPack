@@ -19,10 +19,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.GsonHelper;
-
-import java.util.UUID;
 
 public abstract class DynamicPackModBase extends DynamicPackMod {
     private SystemToast toast = null;
@@ -44,11 +45,11 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
 
     public void onWorldJoinForUpdateChecks(LocalPlayer player) {
         if (Mod.isDebugMessageOnWorldJoin()) {
-            player.sendMessage(new TextComponent("Debug message on world join").withStyle(ChatFormatting.GREEN), UUID.randomUUID());
+            player.sendSystemMessage(Component.literal("Debug message on world join").withStyle(ChatFormatting.GREEN));
         }
-        Component download = new TranslatableComponent("dynamicpack.status_checker.download")
+        Component download = Component.translatable("dynamicpack.status_checker.download")
                 .withStyle(Style.EMPTY
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("dynamicpack.status_checker.download.hover", new TextComponent(com.adamcalculator.dynamicpack.Mod.MODRINTH_URL).withStyle(ChatFormatting.UNDERLINE, ChatFormatting.AQUA))))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("dynamicpack.status_checker.download.hover", Component.literal(com.adamcalculator.dynamicpack.Mod.MODRINTH_URL).withStyle(ChatFormatting.UNDERLINE, ChatFormatting.AQUA))))
                         .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, com.adamcalculator.dynamicpack.Mod.MODRINTH_URL))
                 )
                 .withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE);
@@ -58,12 +59,12 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
             Out.warn("player == null on world join");
 
         } else if (!StatusChecker.isSafe()) {
-            player.sendMessage(new TranslatableComponent("dynamicpack.status_checker.not_safe", download), UUID.randomUUID());
-            setToastContent(new TranslatableComponent("dynamicpack.status_checker.not_safe.toast.title"),
-                    new TranslatableComponent("dynamicpack.status_checker.not_safe.toast.description"));
+            player.sendSystemMessage(Component.translatable("dynamicpack.status_checker.not_safe", download));
+            setToastContent(Component.translatable("dynamicpack.status_checker.not_safe.toast.title"),
+                    Component.translatable("dynamicpack.status_checker.not_safe.toast.description"));
 
         } else if (!StatusChecker.isFormatActual()) {
-            player.sendMessage(new TranslatableComponent("dynamicpack.status_checker.format_not_actual", download), UUID.randomUUID());
+            player.sendSystemMessage(Component.translatable("dynamicpack.status_checker.format_not_actual", download));
 
         } else if (StatusChecker.isModUpdateAvailable()) {
             Out.println("DynamicPack mod update available: " + com.adamcalculator.dynamicpack.Mod.MODRINTH_URL);
@@ -91,13 +92,13 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
         return new SyncingTask(manually) {
             @Override
             public void onSyncStart() {
-                if (manually) setToastContent(new TextComponent("DynamicPack"), new TranslatableComponent("dynamicpack.toast.syncStarted"));
+                if (manually) setToastContent(Component.literal("DynamicPack"), Component.translatable("dynamicpack.toast.syncStarted"));
             }
 
             @Override
             public void onSyncDone(boolean reloadRequired) {
                 if (manually || reloadRequired) {
-                    setToastContent(new TextComponent("DynamicPack"), new TranslatableComponent("dynamicpack.toast.done"));
+                    setToastContent(Component.literal("DynamicPack"), Component.translatable("dynamicpack.toast.done"));
                 }
                 if (reloadRequired) {
                     tryToReloadResources();
@@ -109,13 +110,13 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
                 if (!manually) return;
 
                 if (state instanceof StateDownloading downloading) {
-                    setToastContent(new TranslatableComponent("dynamicpack.toast.pack.state.downloading.title", pack.getName()), new TranslatableComponent("dynamicpack.toast.pack.state.downloading.description", downloading.getPercentage(), downloading.getName()));
+                    setToastContent(Component.translatable("dynamicpack.toast.pack.state.downloading.title", pack.getName()), Component.translatable("dynamicpack.toast.pack.state.downloading.description", downloading.getPercentage(), downloading.getName()));
 
                 } else if (state instanceof StateFileDeleted deleted) {
-                    setToastContent(new TranslatableComponent("dynamicpack.toast.pack.state.deleting.title", pack.getName()), new TranslatableComponent("dynamicpack.toast.pack.state.deleting.description", deleted.getPath().getFileName().toString()));
+                    setToastContent(Component.translatable("dynamicpack.toast.pack.state.deleting.title", pack.getName()), Component.translatable("dynamicpack.toast.pack.state.deleting.description", deleted.getPath().getFileName().toString()));
 
                 } else {
-                    setToastContent(new TranslatableComponent("dynamicpack.toast.pack.state.unknown.title"), new TranslatableComponent("dynamicpack.toast.pack.state.unknown.description"));
+                    setToastContent(Component.translatable("dynamicpack.toast.pack.state.unknown.title"), Component.translatable("dynamicpack.toast.pack.state.unknown.description"));
                 }
             }
         };
@@ -148,8 +149,8 @@ public abstract class DynamicPackModBase extends DynamicPackMod {
                 client.execute(client::reloadResourcePacks);
 
             } else {
-                setToastContent(new TranslatableComponent("dynamicpack.toast.needReload"),
-                        new TranslatableComponent("dynamicpack.toast.needReload.description"));
+                setToastContent(Component.translatable("dynamicpack.toast.needReload"),
+                        Component.translatable("dynamicpack.toast.needReload.description"));
             }
         }
     }
