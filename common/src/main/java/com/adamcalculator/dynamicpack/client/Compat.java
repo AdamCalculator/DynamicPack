@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,6 +14,7 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -22,10 +23,9 @@ import java.util.List;
 public class Compat {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    public static <T extends GuiEventListener & Renderable & NarratableEntry> T createButton(Component text, Runnable press, int w, int h, int x, int y) {
-        return (T) Button.builder(text, button -> press.run()).size(w, h).pos(x, y).build();
+    public static <T extends GuiEventListener & Widget & NarratableEntry> T createButton(Component text, Runnable press, int w, int h, int x, int y) {
+        return (T) new Button(x, y, w, h, text, (jhfdre) -> press.run());
     }
-
 
     /**
      * Rewritten from ModMenu (MIT)
@@ -34,7 +34,7 @@ public class Compat {
         while (string != null && string.endsWith("\n")) {
             string = string.substring(0, string.length() - 1);
         }
-        List<FormattedText> strings = CLIENT.font.getSplitter().splitLines(Component.literal(string), wrapWidth, Style.EMPTY);
+        List<FormattedText> strings = CLIENT.font.getSplitter().splitLines(new TextComponent(string), wrapWidth, Style.EMPTY);
         for (int i = 0; i < strings.size(); i++) {
             if (i >= lines) {
                 break;
