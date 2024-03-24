@@ -7,6 +7,10 @@ plugins {
 base {
     archivesName = "${mod_name}-fabric-${minecraft_version}"
 }
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
 dependencies {
     // https://mvnrepository.com/artifact/org.bouncycastle/bcpg-jdk18on
     include 'org.bouncycastle:bcpg-jdk18on:1.77'
@@ -34,6 +38,11 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly project(":common")
+
+    // https://mvnrepository.com/artifact/net.fabricmc/access-widener
+    implementation 'net.fabricmc:access-widener:1.0.2'
+    include 'net.fabricmc:access-widener:1.0.2'
+
 }
 
 loom {

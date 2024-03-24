@@ -28,5 +28,5 @@ plugins {
 rootProject.name = 'DynamicPack'
 include("common")
 include("fabric")
-include("forge")
-include("neoforge")
+//include("forge")
+//include("neoforge")

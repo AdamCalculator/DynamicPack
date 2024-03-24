@@ -53,7 +53,7 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
     
         it.options.encoding = 'UTF-8'
-        it.options.getRelease().set(16)
+        it.options.getRelease().set(11)
     }
 
     processResources {

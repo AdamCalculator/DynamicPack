@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -144,11 +143,6 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
         public List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.stateButton);
         }
-
-        public List<? extends NarratableEntry> narratables() {
-            return ImmutableList.of(this.stateButton);
-        }
-
     }
 
     public abstract static class ContentEntry extends Entry<ContentEntry> {

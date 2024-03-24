@@ -67,14 +67,14 @@ public class DynamicPackScreen extends Screen {
 
     @Override
     protected void init() {
-        addRenderableWidget(syncButton = Compat.createButton(
+        addButton(syncButton = Compat.createButton(
                 new TranslatableComponent("dynamicpack.screen.pack.manually_sync"),
                         () -> DynamicPackMod.INSTANCE.startManuallySync(),
                 100, 20, width - 120, 10
         ));
 
-        addRenderableWidget(Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 + 4, this.height - 48));
-        addRenderableWidget(contentsButton = Compat.createButton(new TranslatableComponent("dynamicpack.screen.pack.dynamic.contents"), () -> {
+        addButton(Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 + 4, this.height - 48));
+        addButton(contentsButton = Compat.createButton(new TranslatableComponent("dynamicpack.screen.pack.dynamic.contents"), () -> {
             Minecraft.getInstance().setScreen(new ContentsScreen(this, pack));
         }, 150, 20, this.width / 2 + 4-160, this.height - 48));
         contentsButton.visible = pack.getRemote() instanceof DynamicRepoRemote;

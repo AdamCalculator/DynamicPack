@@ -61,8 +61,8 @@ public class ContentsScreen extends Screen {
         });
         this.addWidget(this.contentsList);
 
-        this.addRenderableWidget(doneButton = Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 - 155 + 160, this.height - 29));
-        this.addRenderableWidget(resetButton = Compat.createButton(new TranslatableComponent("controls.reset"), this::reset, 150, 20, this.width / 2 - 155, this.height - 29));
+        this.addButton(doneButton = Compat.createButton(CommonComponents.GUI_DONE, this::onClose, 150, 20, this.width / 2 - 155 + 160, this.height - 29));
+        this.addButton(resetButton = Compat.createButton(new TranslatableComponent("controls.reset"), this::reset, 150, 20, this.width / 2 - 155, this.height - 29));
         resetButton.visible = false;
     }
 

@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -23,7 +22,7 @@ import java.util.List;
 public class Compat {
     private static final Minecraft CLIENT = Minecraft.getInstance();
 
-    public static <T extends GuiEventListener & Widget & NarratableEntry> T createButton(Component text, Runnable press, int w, int h, int x, int y) {
+    public static <T extends GuiEventListener & Widget> T createButton(Component text, Runnable press, int w, int h, int x, int y) {
         return (T) new Button(x, y, w, h, text, (jhfdre) -> press.run());
     }
 
@@ -60,7 +59,7 @@ public class Compat {
     }
 
     public static void drawTexture(PoseStack context, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-        RenderSystem.setShaderTexture(0, texture);
+        CLIENT.getTextureManager().bind(texture);
         GuiComponent.blit(context, x, y, u, v, width, height, textureWidth, textureHeight);
     }
 
@@ -69,10 +68,6 @@ public class Compat {
     }
 
     public static void drawString(PoseStack context, Font font, Component text, int i, int i1, int i2) {
-        GuiComponent.drawString(context, font, text, i, i1, i2);
-    }
-
-    public static void drawString(PoseStack context, Font font, FormattedCharSequence text, int i, int i1, int i2) {
         GuiComponent.drawString(context, font, text, i, i1, i2);
     }
 }
