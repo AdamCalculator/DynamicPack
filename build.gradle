@@ -77,7 +77,7 @@ subprojects {
                 "credits": credits
         ]
 
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json', "Mod.java"]) {
             expand expandProps
         }
         inputs.properties(expandProps)
