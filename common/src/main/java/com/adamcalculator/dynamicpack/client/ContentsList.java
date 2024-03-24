@@ -1,9 +1,6 @@
 package com.adamcalculator.dynamicpack.client;
 
 import com.adamcalculator.dynamicpack.pack.BaseContent;
-import com.adamcalculator.dynamicpack.pack.DynamicRepoRemote;
-import com.adamcalculator.dynamicpack.pack.OverrideType;
-import com.adamcalculator.dynamicpack.pack.Pack;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
@@ -15,28 +12,17 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ContentsList extends ContainerObjectSelectionList<ContentsList.ContentEntry> {
     private final ContentsScreen parent;
-    private final Pack pack;
-    private final Consumer<Boolean> resyncOnExit;
-    private final HashMap<BaseContent, OverrideType> preChangeStates = new HashMap<>();
-    private final List<ContentEntry> entries = new ArrayList<>();
 
-    public ContentsList(ContentsScreen parent, Minecraft minecraft, Pack pack, Consumer<Boolean> resyncOnExit) {
+    public ContentsList(ContentsScreen parent, Minecraft minecraft) {
         super(minecraft, parent.width, parent.height, 20, parent.height - 32, 40);
         this.parent = parent;
-        this.pack = pack;
-        this.resyncOnExit = resyncOnExit;
 
-        for (BaseContent knownContent : ((DynamicRepoRemote) pack.getRemote()).getKnownContents()) {
-            preChangeStates.put(knownContent, knownContent.getOverride());
-            var v = new BaseContentEntry(knownContent);
-            entries.add(v);
+        for (BaseContent knownContent : parent.preChangeStates.keySet()) {
+            var v = new ContentsList.BaseContentEntry(knownContent);
             this.addEntry(v);
         }
     }
@@ -50,39 +36,8 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
         return super.getRowWidth() + 32;
     }
 
-    public boolean isChanges() {
-        boolean t = false;
-
-        for (BaseContent knownContent : preChangeStates.keySet()) {
-            if (preChangeStates.get(knownContent) != knownContent.getOverride()) {
-                t = true;
-                break;
-            }
-        }
-        return t;
-    }
-
-    public void onAfterChange() {
-        boolean isChanges = isChanges();
-        resyncOnExit.accept(isChanges);
-    }
-
-    public void reset() {
-        for (BaseContent knownContent : preChangeStates.keySet()) {
-            OverrideType overrideType = preChangeStates.get(knownContent);
-            try {
-                knownContent.setOverrideType(overrideType);
-            } catch (Exception e) {
-                Out.error("Error while reset changes", e);
-            }
-        }
-
-
-        for (ContentEntry entry : entries) {
-            entry.refresh();
-        }
-
-        onAfterChange();
+    public void refreshAll() {
+        children().forEach(ContentEntry::refresh);
     }
 
     public class BaseContentEntry extends ContentEntry {
@@ -106,7 +61,7 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
                 } catch (Exception e) {
                     Out.error("Error while switch content override", e);
                 }
-                onAfterChange();
+                parent.onAfterChange();
                 refresh();
             }).bounds(0, 0, 140, 20).build();
         }
@@ -139,7 +94,7 @@ public class ContentsList extends ContainerObjectSelectionList<ContentsList.Cont
                 txt = name;
             }
             Component text = Component.literal(txt);
-            context.drawString(ContentsList.this.minecraft.font, text, (x - 70), y+10, 16777215, false);
+            context.drawString(ContentsList.this.minecraft.font, text, (x - 50), y+10, 16777215, false);
             this.stateButton.setX(x+entryWidth-140);
             this.stateButton.setY(y);
             this.stateButton.render(context, mouseX, mouseY, tickDelta);
