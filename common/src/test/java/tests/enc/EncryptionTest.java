@@ -1,11 +1,14 @@
 package tests.enc;
 
+import com.adamcalculator.dynamicpack.DynamicPackMod;
+import com.adamcalculator.dynamicpack.util.Loader;
 import com.adamcalculator.dynamicpack.util.Out;
 import com.adamcalculator.dynamicpack.util.enc.GPGSignatureVerifier;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -13,10 +16,32 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class EncodingTest {
+public class EncryptionTest {
 
     @Test
     public void d() throws IOException {
+        new DynamicPackMod() {
+            @Override
+            public void startSyncThread() {
+
+            }
+
+            @Override
+            public void startManuallySync() {
+
+            }
+
+            @Override
+            public String getCurrentGameVersion() {
+                return null;
+            }
+
+            @Override
+            public boolean checkResourcePackMetaValid(String s) throws Exception {
+                return false;
+            }
+        }.init(new File("tests_files"), Loader.FABRIC);
+        // TODO: Not work on forge & neoforge!!!
         Out.USE_SOUT = true;
 
         Random random = new Random();
