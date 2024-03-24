@@ -14,6 +14,14 @@ public class InputValidator {
         return matcher.matches();
     }
 
+    public static boolean isContentNameValid(String input) {
+        if (input == null) {
+            return false;
+        }
+
+        return input.trim().length() < 64 && !input.trim().isEmpty() && !input.contains("\n") && !input.contains("\r") && !input.contains("\b");
+    }
+
     public static boolean isPackNameValid(String input) {
         if (input == null) {
             return false;

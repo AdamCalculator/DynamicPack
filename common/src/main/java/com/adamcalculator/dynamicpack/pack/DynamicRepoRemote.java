@@ -99,6 +99,16 @@ public class DynamicRepoRemote extends Remote {
                 jsonObject.put("required", true);
             }
             jsonObject.put("default_active", defaultActive);
+
+            String name = repoContent.optString("name", null);
+            if (name != null) {
+                if (InputValidator.isContentNameValid(name)) {
+                    jsonObject.put("name", name);
+                } else {
+                    Out.println("Name of content '" + id + "' not valid.");
+                }
+            }
+
             newKnown.put(id, jsonObject);
         }
     }
