@@ -9,9 +9,11 @@ import com.adamcalculator.dynamicpack.util.Out;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -139,7 +141,15 @@ public abstract class DynamicPackMod {
 	}
 
 	public boolean isResourcePackActive(Pack pack) throws IOException {
-		for (String readLine : Files.readAllLines(new File(getGameDir(), "options.txt").toPath(), StandardCharsets.UTF_8)) {
+		List<String> lines;
+		try {
+			lines = Files.readAllLines(new File(getGameDir(), "options.txt").toPath(), StandardCharsets.UTF_8);
+		} catch (FileNotFoundException | NoSuchFileException e) {
+			Out.println("options.txt not exists. isResourcePackActive => false.");
+			return false;
+		}
+
+        for (String readLine : lines) {
 			if (readLine.startsWith("resourcePacks:")) {
 				String name = "file/" + pack.getLocation().getName();
 				if (readLine.contains(name)) {
