@@ -74,7 +74,8 @@ subprojects {
                 "description": project.description,
                 "neoforge_version": neoforge_version,
                 "neoforge_loader_version_range": neoforge_loader_version_range,
-                "credits": credits
+                "credits": credits,
+                "fabric_minecraft_version": fabric_minecraft_version
         ]
 
         filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
