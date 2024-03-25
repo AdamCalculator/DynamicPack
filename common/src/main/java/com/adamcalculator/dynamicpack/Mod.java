@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Mod {
-    public static final long VERSION_BUILD = 18;
-    public static final String VERSION_NAME_MOD = "1.0.18";
+    public static final long VERSION_BUILD = 19;
+    public static final String VERSION_NAME_MOD = "1.0.19";
     public static final String VERSION_NAME_BRANCH = "mc1.20.4";
     public static final String VERSION_NAME =  VERSION_NAME_MOD + "+" + VERSION_NAME_BRANCH;
     public static final String MOD_ID = "dynamicpack";
