@@ -44,9 +44,15 @@ public class DynamicRepoSyncProcessV1 {
         for (String s : oldestFilesList) {
             if (s.contains(DynamicPackMod.CLIENT_FILE)) continue;
             Path path = packRootPath.resolve(s);
+            String logPath;
+            if (remote.parent.isZip()) {
+                logPath = path.toString();
+            } else {
+                logPath = remote.parent.getLocation().toPath().relativize(path).toString();
+            }
             progress.stateChanged(new StateFileDeleted(path));
 
-            progress.textLog("File deleted from resource-pack: " + s);
+            progress.textLog("File deleted from resource-pack: " + logPath);
             AFiles.nioSmartDelete(path);
             markReloadRequired();
         }
@@ -113,57 +119,71 @@ public class DynamicRepoSyncProcessV1 {
         String rem = c.optString("remote_parent", "");
         JSONObject files = c.getJSONObject("files");
 
+        InputValidator.validOrThrownPath(par);
+        InputValidator.validOrThrownPath(rem);
+
         int processedFiles = 0;
         for (final String _relativePath : files.keySet()) {
-            var path = getAndCheckPath(par, _relativePath); // parent / path.     assets/minecraft
-            var filePath = packRootPath.resolve(path);
-            Path filePathForLogs;
-            if (remote.parent.isZip()) {
-                filePathForLogs = filePath;
-            } else {
-                filePathForLogs = filePath.relativize(DynamicPackMod.INSTANCE.getResourcePackDir());
-            }
-            var fileRemoteUrl = getUrlFromPath(rem, path);
+            try {
+                var path = getAndCheckPath(par, _relativePath); // parent / path.     assets/minecraft
+                InputValidator.validOrThrownPath(path);
 
-            JSONObject fileExtra = files.getJSONObject(_relativePath);
-            String hash = fileExtra.getString("hash");
-
-            // remove from unused list
-            oldestFilesList.remove(filePath.toString());
-
-            boolean isOverwrite = false;
-            if (Files.exists(filePath)) {
-                String localHash = Hashes.nioCalcHashForPath(filePath);
-                if (!localHash.equals(hash)) {
-                    isOverwrite = true;
-                    this.progress.textLog(filePathForLogs + ": overwrite! hash not equal: local:" + localHash+ " remote:"+hash);
+                var filePath = packRootPath.resolve(path);
+                Path filePathForLogs;
+                if (remote.parent.isZip()) {
+                    filePathForLogs = filePath;
+                } else {
+                    filePathForLogs = remote.parent.getLocation().toPath().relativize(filePath);
                 }
-            } else {
-                this.progress.textLog("Overwrite! Not exists: " + filePathForLogs);
-                isOverwrite = true;
-            }
+                var fileRemoteUrl = getUrlFromPathAndCheck(rem, path);
 
-            if (isOverwrite) {
-                if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) {
+                JSONObject fileExtra = files.getJSONObject(_relativePath);
+                String hash = fileExtra.getString("hash");
+                if (!InputValidator.isHashValid(hash)) {
+                    progress.textLog("Skipping file because hash not valid");
                     continue;
                 }
 
-                markReloadRequired();
-                this.progress.textLog("Overwriting: " + filePathForLogs);
-                Urls.downloadDynamicFile(fileRemoteUrl, filePath, hash, new FileDownloadConsumer() {
-                    @Override
-                    public void onUpdate(FileDownloadConsumer it) {
-                        progress.downloading(filePath.getFileName().toString(), it.getPercentage());
-                    }
-                });
-            }
+                // remove from unused list
+                oldestFilesList.remove(filePath.toString());
 
-            processedFiles++;
+                boolean isOverwrite = false;
+                if (Files.exists(filePath)) {
+                    String localHash = Hashes.nioCalcHashForPath(filePath);
+                    if (!localHash.equals(hash)) {
+                        isOverwrite = true;
+                        this.progress.textLog(filePathForLogs + ": overwrite! hash not equal: local:" + localHash + " remote:" + hash);
+                    }
+                } else {
+                    this.progress.textLog("Overwrite! Not exists: " + filePathForLogs);
+                    isOverwrite = true;
+                }
+
+                if (isOverwrite) {
+                    if (filePath.getFileName().toString().contains(DynamicPackMod.CLIENT_FILE)) {
+                        continue;
+                    }
+
+                    markReloadRequired();
+                    this.progress.textLog("Overwriting: " + filePathForLogs);
+                    Urls.downloadDynamicFile(fileRemoteUrl, filePath, hash, new FileDownloadConsumer() {
+                        @Override
+                        public void onUpdate(FileDownloadConsumer it) {
+                            progress.downloading(filePath.getFileName().toString(), it.getPercentage());
+                        }
+                    });
+                }
+
+                processedFiles++;
+            } catch (Exception e) {
+                progress.textLog("Error " + e);
+                Out.error("Error while process file in pack...", e);
+            }
         }
         this.progress.textLog("Files processed in this content: " + processedFiles);
     }
 
-    private String getUrlFromPath(String remoteParent, String path) {
+    private String getUrlFromPathAndCheck(String remoteParent, String path) {
         checkPathSafety(remoteParent);
 
         if (remoteParent.isEmpty()) {
