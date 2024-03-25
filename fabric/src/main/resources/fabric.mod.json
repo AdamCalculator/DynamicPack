@@ -8,8 +8,9 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "homepage": "https://modrinth.com/mod/dynamicpack",
+        "sources": "https://github.com/AdamCalculator/DynamicPack",
+        "issues": "https://github.com/AdamCalculator/DynamicPack/issues"
     },
     "license": "${license}",
     "icon": "assets/dynamicpack/icon.png",
@@ -27,7 +28,7 @@
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
-        "minecraft": ">=${minecraft_version}",
+        "minecraft": "${fabric_minecraft_version}",
         "java": ">=17"
     }
 }
