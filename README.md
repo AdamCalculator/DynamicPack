@@ -10,6 +10,8 @@ A mod that will monitor the current version of your resource pack and download a
 
 ## Packs using it mod
 * [CursedEveriday](https://github.com/AdamCalculator/CursedEveryday) by Adam - pack from the creator, on it you can learn how it works
+* [better-moss](https://modrinth.com/resourcepack/better-moss)
+* [bettertables](https://modrinth.com/resourcepack/bettertables)
 
 ## Plans
 The mod is planned to support **any bootloader** and any version, but I don't have enough time right now. **I'm always happy to see new contributors!**
