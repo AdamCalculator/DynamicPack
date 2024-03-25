@@ -124,9 +124,11 @@ public class DynamicRepoSyncProcessV1 {
 
         int processedFiles = 0;
         for (final String _relativePath : files.keySet()) {
+            boolean pathValidated = false;
             try {
                 var path = getAndCheckPath(par, _relativePath); // parent / path.     assets/minecraft
                 InputValidator.validOrThrownPath(path);
+                pathValidated = true;
 
                 var filePath = packRootPath.resolve(path);
                 Path filePathForLogs;
@@ -177,7 +179,11 @@ public class DynamicRepoSyncProcessV1 {
                 processedFiles++;
             } catch (Exception e) {
                 progress.textLog("Error " + e);
-                Out.error("Error while process file in pack...", e);
+                if (pathValidated) {
+                    Out.error("Error while process file " + _relativePath + " in pack...", e);
+                } else {
+                    Out.error("Error while process file " + "(failed to validate)" + " in pack...", e);
+                }
             }
         }
         this.progress.textLog("Files processed in this content: " + processedFiles);
