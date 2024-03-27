@@ -42,3 +42,8 @@ If you want your package to update itself from **Modrinth**, you need to add the
 ```
 
 For other features (dynamic repos) visit [github wiki!](https://github.com/AdamCalculator/DynamicPack/wiki)
+
+
+## Thanks
+* [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template)
+* [Bouncy Castle](https://github.com/bcgit/bc-java)
