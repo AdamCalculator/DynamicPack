@@ -40,6 +40,10 @@ If you want your package to update itself from **Modrinth**, you need to add the
     "formatVersion": 1
 }
 ```
+**⚠️⚠️⚠️ JSON Specification not support //comments! Delete it before use.**
+
+You can validate your JSON [here](https://jsonformatter.curiousconcept.com/#)
+
 
 For other features (dynamic repos) visit [github wiki!](https://github.com/AdamCalculator/DynamicPack/wiki)
 
